@@ -1,0 +1,5162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>=
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#f4f5f7">
+  <title>My Student Hub</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Arial, sans-serif;
+    }
+
+    :root {
+      --background: #f4f5f7;
+      --card: #ffffff;
+      --text: #17181a;
+      --secondary: #777777;
+      --border: #e5e5e7;
+      --blue: #1769c2;
+      --blue-light: #edf3fb;
+      --nav: rgba(255, 255, 255, .92);
+      --danger: #ff3b30;
+      --shadow: 0 4px 16px rgba(0, 0, 0, .05);
+    }
+
+    body.dark {
+      --background: #101114;
+      --card: #1b1c20;
+      --text: #f5f5f7;
+      --secondary: #999ba1;
+      --border: #303136;
+      --blue-light: #202d3e;
+      --nav: rgba(27, 28, 32, .94);
+      --shadow: 0 5px 18px rgba(0, 0, 0, .25);
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background .25s, color .25s;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100vh;
+      margin: auto;
+      background: var(--background);
+      padding: 20px 20px 110px;
+    }
+
+    .page {
+      display: none;
+      animation: pageIn .25s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      padding: 18px 5px 22px;
+    }
+
+    .small-title {
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      margin-bottom: 5px;
+    }
+
+    .title {
+      font-size: 34px;
+      font-weight: 750;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--secondary);
+      margin-top: 5px;
+      font-size: 15px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .top-bar h1 {
+      font-size: 30px;
+      letter-spacing: -.8px;
+    }
+
+    .top-bar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-bar-left h1 {
+      font-size: 24px;
+    }
+
+    .icon-button {
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--card);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .icon-button.active {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .student-card {
+      background: linear-gradient(135deg, #174a8b, #2767b8);
+      color: white;
+      border-radius: 25px;
+      padding: 22px;
+      margin-bottom: 25px;
+      box-shadow: 0 12px 28px rgba(23, 74, 139, .20);
+    }
+
+    .student-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gcc-logo {
+      width: auto;
+      height: 48px;
+      border-radius: 15px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, .18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+    }
+
+    .student-status {
+      background: rgba(255, 255, 255, .18);
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .student-name {
+      margin-top: 24px;
+      font-size: 23px;
+      font-weight: 700;
+    }
+
+    .student-school {
+      margin-top: 4px;
+      opacity: .8;
+      font-size: 14px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 25px 3px 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .button {
+      border: none;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 19px 16px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .15s;
+      position: relative;
+    }
+
+    .button:active {
+      transform: scale(.96);
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--blue-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      margin-bottom: 13px;
+    }
+
+    .button-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .button-description {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-button {
+      width: 100%;
+      border: none;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    .list-icon {
+      width: 43px;
+      height: 43px;
+      background: var(--blue-light);
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      margin-right: 13px;
+      flex-shrink: 0;
+    }
+
+    .list-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .list-title {
+      font-weight: 650;
+      font-size: 15px;
+    }
+
+    .list-subtitle {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .arrow {
+      color: var(--secondary);
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .class-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .class-card {
+      background: var(--card);
+      border-radius: 21px;
+      padding: 18px;
+      min-height: 125px;
+      position: relative;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform .15s;
+    }
+
+    .class-card:active {
+      transform: scale(.98);
+    }
+
+    .class-name {
+      font-size: 19px;
+      font-weight: 750;
+      padding-right: 100px;
+    }
+
+    .class-code {
+      color: var(--secondary);
+      font-size: 14px;
+      margin-top: 4px;
+      font-weight: 550;
+    }
+
+    .class-details {
+      position: absolute;
+      left: 18px;
+      bottom: 17px;
+      color: var(--secondary);
+      font-size: 12px;
+      max-width: calc(100% - 130px);
+      text-align: left;
+    }
+
+    .class-grade {
+      position: absolute;
+      right: 17px;
+      top: 17px;
+      min-width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: var(--blue-light);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .class-room {
+      position: absolute;
+      right: 17px;
+      bottom: 17px;
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 600;
+      max-width: 90px;
+      text-align: right;
+    }
+
+    .add-class-button {
+      width: 100%;
+      border: none;
+      background: var(--blue);
+      color: white;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(23, 105, 194, .22);
+    }
+
+    .add-tile {
+      border: 2px dashed var(--border);
+      background: transparent;
+      box-shadow: none;
+      color: var(--secondary);
+    }
+
+    .link-remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .progress-bar-track {
+      background: var(--border);
+      height: 6px;
+      border-radius: 6px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width .2s;
+    }
+
+    .kanban-board {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .kanban-column {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: var(--shadow);
+    }
+
+    .kanban-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 750;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .kanban-count {
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+
+    .kanban-tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .kanban-empty {
+      color: var(--secondary);
+      font-size: 12px;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    .task-card {
+      background: var(--background);
+      border-radius: 14px;
+      padding: 11px 13px;
+      cursor: pointer;
+    }
+
+    .task-card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .task-priority-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .task-title {
+      font-size: 13px;
+      font-weight: 650;
+      flex: 1;
+    }
+
+    .task-due {
+      font-size: 11px;
+      color: var(--secondary);
+      margin-top: 5px;
+      padding-left: 16px;
+    }
+
+    .task-due.overdue {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .calendar-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 2px 2px 12px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-nav-arrow {
+      border: none;
+      background: var(--blue-light);
+      color: var(--text);
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      font-size: 17px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .calendar-card-title {
+      font-size: 17px;
+      font-weight: 750;
+      text-align: center;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .profile-card {
+      background: var(--card);
+      color: var(--text);
+      border: none;
+      border-radius: 23px;
+      padding: 23px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      width: 100%;
+      display: block;
+    }
+
+    .profile-avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      margin: auto;
+      background: linear-gradient(135deg, #174a8b, #4c8ed9);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      font-weight: 800;
+      overflow: hidden;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-upload-wrap {
+      position: relative;
+      width: 78px;
+      margin: 0 auto;
+    }
+
+    .avatar-edit-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      border: 3px solid var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .avatar-crop-viewport {
+      width: 240px;
+      height: 240px;
+      max-width: 62vw;
+      max-height: 62vw;
+      aspect-ratio: 1 / 1;
+      margin: 4px auto 0;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      background: var(--background);
+      box-shadow: inset 0 0 0 1px var(--border);
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .avatar-crop-viewport.dragging {
+      cursor: grabbing;
+    }
+
+    .avatar-crop-viewport img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      max-width: none;
+      transform-origin: center center;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    .text-link {
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 0 0;
+    }
+
+    .profile-name {
+      font-size: 21px;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    .profile-school {
+      color: var(--secondary);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .info-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 5px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      width: 105px;
+      color: var(--secondary);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .info-value {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .primary-button {
+      width: 100%;
+      border: none;
+      background: var(--blue);
+      color: white;
+      border-radius: 17px;
+      padding: 15px;
+      margin-top: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .secondary-button {
+      width: 100%;
+      border: none;
+      background: var(--blue-light);
+      color: var(--blue);
+      border-radius: 17px;
+      padding: 15px;
+      margin-top: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .danger-button {
+      width: 100%;
+      border: none;
+      background: rgba(255, 59, 48, .10);
+      color: var(--danger);
+      border-radius: 17px;
+      padding: 15px;
+      margin-top: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .settings-section {
+      margin-bottom: 25px;
+    }
+
+    .settings-label {
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0 4px 8px;
+    }
+
+    .setting-row {
+      width: 100%;
+      border: none;
+      background: var(--card);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      text-align: left;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .setting-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--blue-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-right: 13px;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-title {
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .setting-description {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .switch {
+      width: 48px;
+      height: 29px;
+      background: #d1d1d6;
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .switch.active {
+      background: #34c759;
+    }
+
+    .switch-circle {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform .2s;
+    }
+
+    .switch.active .switch-circle {
+      transform: translateX(19px);
+    }
+
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .calendar-month-title {
+      font-size: 20px;
+      font-weight: 750;
+    }
+
+    .calendar-arrows {
+      display: flex;
+      gap: 6px;
+    }
+
+    .calendar-arrow {
+      border: none;
+      background: var(--card);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .calendar-view-switcher {
+      display: flex;
+      background: var(--card);
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .view-button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--secondary);
+      padding: 9px 4px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .view-button.active {
+      background: var(--blue);
+      color: white;
+    }
+
+    .calendar-card {
+      background: var(--card);
+      border-radius: 21px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 6px;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      color: var(--secondary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-day {
+      min-height: 70px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 8px 3px 6px;
+      cursor: pointer;
+      position: relative;
+      transition: background .15s;
+    }
+
+    .calendar-day:active {
+      transform: scale(.97);
+    }
+
+    .calendar-day.other-month {
+      opacity: .28;
+    }
+
+    .calendar-day.today {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .calendar-day-number {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .calendar-day.today .calendar-day-number {
+      background: var(--blue);
+      color: white;
+    }
+
+    .calendar-day.custom-colored {
+      background: color-mix(in srgb, var(--day-color) 18%, transparent);
+    }
+
+    .calendar-day-events {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 5px;
+    }
+
+    .day-event-chip {
+      width: 100%;
+      font-size: 9px;
+      font-weight: 650;
+      line-height: 1.3;
+      padding: 2px 4px;
+      border-radius: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      background: color-mix(in srgb, var(--chip-color) 22%, transparent);
+      color: var(--text);
+      border-left: 3px solid var(--chip-color);
+      box-sizing: border-box;
+    }
+
+    .day-event-more {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-align: left;
+      width: 100%;
+      padding: 1px 4px;
+    }
+
+    .day-color-bar {
+      position: absolute;
+      bottom: 3px;
+      left: 8px;
+      right: 8px;
+      height: 3px;
+      border-radius: 5px;
+      background: var(--day-color);
+    }
+
+    .week-view {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .week-day-card {
+      background: var(--card);
+      border-radius: 17px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .week-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .week-day-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .week-day-date {
+      color: var(--secondary);
+      font-size: 12px;
+    }
+
+    .week-event {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .week-event-color {
+      width: 5px;
+      height: 35px;
+      border-radius: 5px;
+    }
+
+    .week-event-info {
+      flex: 1;
+    }
+
+    .week-event-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .week-event-time {
+      color: var(--secondary);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .agenda-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agenda-date {
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 700;
+      margin: 8px 3px 3px;
+    }
+
+    .agenda-event {
+      background: var(--card);
+      border-radius: 17px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .agenda-event-color {
+      width: 5px;
+      align-self: stretch;
+      min-height: 40px;
+      border-radius: 5px;
+      margin-right: 12px;
+    }
+
+    .agenda-event-info {
+      flex: 1;
+    }
+
+    .agenda-event-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .agenda-event-subtitle {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .calendar-empty {
+      text-align: center;
+      padding: 30px 15px;
+      color: var(--secondary);
+    }
+
+    .calendar-empty-icon {
+      font-size: 38px;
+      margin-bottom: 8px;
+    }
+
+    body:has(.modal-background.show) {
+      overflow: hidden;
+    }
+
+    .modal-background {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0, 0, 0, .45);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 10px;
+      overscroll-behavior: contain;
+    }
+
+    .modal-background.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      max-height: 90dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 25px 25px 18px 18px;
+      padding: 22px;
+      animation: modalUp .25s ease;
+    }
+
+    @keyframes modalUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 22px;
+    }
+
+    .close-button {
+      border: none;
+      background: var(--blue-light);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .class-day-buttons {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .class-day-button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .class-day-button.selected {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0 0 6px 3px;
+    }
+
+    .form-input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .form-input[type="time"],
+    .form-input[type="date"] {
+      padding: 13px 8px;
+    }
+
+    .form-input:focus {
+      border-color: var(--blue);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .form-grid>.form-group {
+      min-width: 0;
+    }
+
+    textarea.form-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .color-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .color-option {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+    }
+
+    .color-option.selected {
+      border-color: var(--text);
+      transform: scale(1.08);
+    }
+
+    /* Image attach */
+    .image-preview-wrap {
+      position: relative;
+      margin-top: 10px;
+    }
+
+    .image-preview-wrap img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: block;
+    }
+
+    .image-preview-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .55);
+      color: white;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .thumb-icon {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Checklists */
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 13px 15px;
+      box-shadow: var(--shadow);
+      margin-bottom: 8px;
+    }
+
+    .checklist-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 13px;
+    }
+
+    .checklist-checkbox.checked {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .checklist-item-text {
+      flex: 1;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .checklist-item-text.checked {
+      text-decoration: line-through;
+      color: var(--secondary);
+    }
+
+    .checklist-item-delete {
+      background: none;
+      border: none;
+      color: var(--secondary);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Rich notes editor */
+    .rich-toolbar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0 10px;
+    }
+
+    .rich-toolbar-btn {
+      flex-shrink: 0;
+      background: var(--card);
+      border: none;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      width: 38px;
+      height: 38px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .rich-note-textarea {
+      width: 100%;
+      min-height: 50vh;
+      border: none;
+      border-radius: 16px;
+      background: var(--card);
+      color: var(--text);
+      padding: 16px;
+      font-size: 15px;
+      line-height: 1.55;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .rich-note-preview {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 50vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .rich-note-preview h1,
+    .rich-note-preview h2,
+    .rich-note-preview h3 {
+      margin: 14px 0 8px;
+    }
+
+    .rich-note-preview p {
+      margin: 8px 0;
+    }
+
+    .rich-note-preview ul,
+    .rich-note-preview ol {
+      padding-left: 22px;
+      margin: 8px 0;
+    }
+
+    .rich-note-preview img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 8px 0;
+    }
+
+    .rich-note-preview code {
+      background: var(--background);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+
+    .rich-note-preview pre code {
+      display: block;
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .mode-toggle-btn {
+      border: none;
+      background: none;
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .mode-toggle-btn.active {
+      background: var(--blue);
+      color: white;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--secondary);
+      font-size: 11px;
+      padding: 30px 0 5px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 100;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(calc(100% - 24px), 470px);
+      height: 67px;
+      background: var(--nav);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 23px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, .13);
+    }
+
+    .nav-button {
+      border: none;
+      background: none;
+      height: 100%;
+      flex: 1;
+      color: var(--secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .nav-icon {
+      font-size: 21px;
+      line-height: 22px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav-button.active {
+      color: var(--blue);
+    }
+
+    /* Flashcards */
+    .flip-card {
+      background: transparent;
+      min-height: 220px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      text-align: center;
+      transition: transform .5s;
+      transform-style: preserve-3d;
+    }
+
+    .flip-card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      background: var(--blue-light);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      font-size: 18px;
+      font-weight: 650;
+      text-align: center;
+      overflow-y: auto;
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+
+    /* Quiz */
+    .quiz-question {
+      font-size: 17px;
+      font-weight: 700;
+      text-align: center;
+      padding: 10px 5px 22px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 15px;
+      padding: 14px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .quiz-option.correct {
+      border-color: #34c759;
+      background: rgba(52, 199, 89, .12);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--danger);
+      background: rgba(255, 59, 48, .12);
+    }
+
+    .quiz-score {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .quiz-score-number {
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--blue);
+    }
+
+    .quiz-help {
+      color: var(--secondary);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 5px;
+    }
+
+    .quiz-check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 15px;
+      padding: 13px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .quiz-check-row.selected {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    .quiz-check-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .password-card {
+      background: var(--card);
+      color: var(--text);
+      border: none;
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      font: inherit;
+    }
+
+    .password-card:focus {
+      outline: none;
+    }
+
+    .password-card-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .password-type {
+      color: var(--secondary);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .password-secret {
+      margin-top: 10px;
+      padding: 9px 11px;
+      background: var(--background);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .security-note {
+      background: var(--blue-light);
+      color: var(--secondary);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      .title {
+        font-size: 30px;
+      }
+
+      .grid {
+        gap: 9px;
+      }
+
+      .button {
+        padding: 16px 13px;
+      }
+
+      .calendar-day {
+        min-height: 48px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- HOME -->
+    <div id="home" class="page active">
+      <div class="header">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+          <div>
+            <div class="small-title" id="schoolSmallTitle">YOUR SCHOOL</div>
+            <div class="title">Student Hub</div>
+            <div class="subtitle" id="homeSubtitle">Everything you need for GCC.</div>
+          </div>
+          <button id="homeEditButton" class="icon-button" onclick="toggleHomeEditMode()">✎</button>
+        </div>
+      </div>
+      <div class="student-card">
+        <div class="student-card-top">
+          <div class="gcc-logo" id="schoolLogoAbbr">—</div>
+          <div class="student-status" id="homeGradeBadge">—</div>
+        </div>
+        <div id="homeName" class="student-name">Student 👋</div>
+        <div class="student-school" id="schoolNameHome">Add your school in Settings</div>
+      </div>
+      <div class="section-title">Student</div>
+      <div class="grid" id="studentLinksGrid"></div>
+      <div class="section-title">Quick Access</div>
+      <div class="list" id="quickLinksList"></div>
+    </div>
+
+    <!-- CLASSES -->
+    <div id="classes" class="page">
+      <div class="top-bar">
+        <h1>Classes</h1>
+      </div>
+      <div id="classList" class="class-list"></div>
+      <button class="add-class-button" onclick="openClassModal()">+ Add Class</button>
+      <div class="footer">Tap a class to edit it.</div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div id="calendar" class="page">
+      <div class="top-bar">
+        <h1>Calendar</h1>
+        <div class="top-bar-actions"><button class="icon-button" onclick="openCalendarModal()">+</button></div>
+      </div>
+      <div class="calendar-view-switcher">
+        <button id="monthViewButton" class="view-button active" onclick="changeCalendarView('month')">Month</button>
+        <button id="weekViewButton" class="view-button" onclick="changeCalendarView('week')">Week</button>
+        <button id="agendaViewButton" class="view-button" onclick="changeCalendarView('agenda')">Upcoming</button>
+      </div>
+      <div id="calendarControls" class="calendar-controls">
+        <div id="calendarMonthTitle" class="calendar-month-title">Upcoming</div>
+      </div>
+      <div id="calendarContent"></div>
+      <button class="add-class-button" onclick="openCalendarModal()">+ Add Event</button>
+      <div class="footer">Add tests, assignments, events, reminders, notes and more.</div>
+    </div>
+
+    <!-- PROJECTS / TO-DOS -->
+    <div id="todos" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="handleTodosBackClick()">‹</button>
+          <h1 id="todosPageTitle">Projects</h1>
+        </div>
+        <div class="top-bar-actions">
+          <button id="todosEditButton" class="icon-button" onclick="openProjectModal(currentProjectID)"
+            style="display:none;">✎</button>
+          <button id="todosAddButton" class="icon-button" onclick="handleTodosAddClick()">+</button>
+        </div>
+      </div>
+
+      <div id="projectListView">
+        <div id="projectList" class="class-list"></div>
+        <button class="add-class-button" onclick="openProjectModal()">+ Add Project</button>
+        <div class="footer">Tap a project to open its board.</div>
+      </div>
+
+      <div id="projectDetailView" style="display:none;">
+        <div id="kanbanBoard" class="kanban-board"></div>
+        <button class="add-class-button" onclick="openTaskModal()">+ Add Task</button>
+        <div class="footer">Tap a task to edit its status, priority, or due date.</div>
+      </div>
+    </div>
+
+    <!-- STUDY SETS -->
+    <div id="studysets" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="handleStudySetsBackClick()">‹</button>
+          <h1 id="studySetsPageTitle">Study Sets</h1>
+        </div>
+        <div class="top-bar-actions">
+          <button id="studySetsEditButton" class="icon-button" onclick="openSetModal(currentSetID)"
+            style="display:none;">✎</button>
+          <button id="studySetsAddButton" class="icon-button" onclick="handleStudySetsAddClick()">+</button>
+        </div>
+      </div>
+
+      <div id="setListView">
+        <div id="setList" class="class-list"></div>
+        <button class="add-class-button" onclick="openSetModal()">+ Add Study Set</button>
+        <div class="footer">Tap a set to view its cards.</div>
+      </div>
+
+      <div id="setDetailView" style="display:none;">
+        <div class="grid" style="margin-bottom:16px;">
+          <button class="button" onclick="startStudyMode()">
+            <div class="icon">🔁</div>
+            <div class="button-title">Study</div>
+            <div class="button-description">Flip through flashcards</div>
+          </button>
+          <button class="button" onclick="startQuizMode()">
+            <div class="icon">📝</div>
+            <div class="button-title">Quiz</div>
+            <div class="button-description">Test yourself</div>
+          </button>
+        </div>
+        <div id="cardList" class="class-list"></div>
+        <button class="add-class-button" onclick="openCardModal()">+ Add Card</button>
+        <div class="footer">Tap a card to edit its front and back.</div>
+      </div>
+    </div>
+
+    <!-- GPA CALCULATOR -->
+    <div id="gpa" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <h1>GPA Calculator</h1>
+        </div>
+      </div>
+      <div class="student-card">
+        <div style="font-size:13px;opacity:.8;font-weight:700;letter-spacing:.3px;">CURRENT GPA</div>
+        <div id="gpaResult" style="font-size:42px;font-weight:800;margin-top:6px;">0.00</div>
+        <div id="gpaCreditTotal" style="font-size:13px;opacity:.8;margin-top:4px;">0 credit hours</div>
+      </div>
+      <div class="info-card" style="margin-bottom:20px;">
+        <div class="info-row">
+          <div class="info-label" style="width:auto;flex:1;">Include Current GPA</div>
+          <div id="gpaUseCurrentSwitch" class="switch" onclick="toggleGpaUseCurrent()">
+            <div class="switch-circle"></div>
+          </div>
+        </div>
+        <div id="gpaPriorCreditsRow" class="info-row" style="display:none;">
+          <div class="info-label" style="width:auto;flex:1;">Prior Credit Hours</div>
+          <div class="info-value" style="flex:0 0 auto;"><input id="gpaPriorCredits" class="form-input" type="number"
+              min="0" step="0.5" placeholder="0" style="width:90px;padding:8px;text-align:right;"
+              onchange="updateGpaPriorCredits()"></div>
+        </div>
+      </div>
+      <div id="gpaUseCurrentHint" class="quiz-help" style="display:none;margin-top:-12px;margin-bottom:20px;">Your
+        current GPA (set in Settings) will be blended in using the credit hours entered above.</div>
+      <div class="section-title">Courses</div>
+      <div id="gpaCourseList" class="list"></div>
+      <button class="add-class-button" onclick="openGpaModal()">+ Add Course</button>
+      <div class="footer">Tap a course to edit or remove it.</div>
+    </div>
+
+    <!-- STUDY TIMER -->
+    <div id="timer" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <h1>Study Timer</h1>
+        </div>
+      </div>
+      <div class="student-card" style="text-align:center;">
+        <div id="timerMode" style="font-size:13px;opacity:.8;font-weight:700;letter-spacing:.5px;">FOCUS SESSION</div>
+        <div id="timerDisplay" style="font-size:56px;font-weight:800;margin:14px 0;">25:00</div>
+        <div id="timerCycleLabel" style="font-size:13px;opacity:.8;">Session 1</div>
+      </div>
+      <div class="grid" style="margin-top:16px;">
+        <button class="button" id="timerStartButton" onclick="toggleTimer()">
+          <div class="icon">▶️</div>
+          <div class="button-title" id="timerStartLabel">Start</div>
+          <div class="button-description">Begin focus session</div>
+        </button>
+        <button class="button" onclick="resetTimer()">
+          <div class="icon">🔄</div>
+          <div class="button-title">Reset</div>
+          <div class="button-description">Back to start</div>
+        </button>
+      </div>
+      <div class="section-title">Durations (minutes)</div>
+      <div class="info-card">
+        <div class="info-row">
+          <div class="info-label">Focus</div>
+          <div class="info-value"><input id="focusMinutes" class="form-input" type="number" min="1" max="120" value="25"
+              onchange="updateTimerDurations()" style="padding:8px;"></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Break</div>
+          <div class="info-value"><input id="breakMinutes" class="form-input" type="number" min="1" max="60" value="5"
+              onchange="updateTimerDurations()" style="padding:8px;"></div>
+        </div>
+      </div>
+      <div class="footer">A simple Pomodoro-style timer to help you focus.</div>
+    </div>
+
+    <!-- QUICK NOTES -->
+    <div id="notes" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <h1>Quick Notes</h1>
+        </div>
+        <div class="top-bar-actions"><button class="icon-button" onclick="openNoteModal()">+</button></div>
+      </div>
+      <div id="notesList" class="list"></div>
+      <button class="add-class-button" onclick="openNoteModal()">+ Add Note</button>
+      <div class="footer">Tap a note to edit it.</div>
+    </div>
+
+    <!-- RICH NOTES -->
+    <div id="richnotes" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <h1>Notes</h1>
+        </div>
+        <div class="top-bar-actions"><button class="icon-button" onclick="openRichNoteEditor()">+</button></div>
+      </div>
+      <div id="richNotesList" class="list"></div>
+      <button class="add-class-button" onclick="openRichNoteEditor()">+ Add Note</button>
+      <div class="footer">Tap a note to open it. Supports markdown, images, and LaTeX ($x^2$).</div>
+    </div>
+
+    <!-- RICH NOTE EDITOR -->
+    <div id="richNoteEditor" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="closeRichNoteEditor()">‹</button>
+        </div>
+        <div class="top-bar-actions">
+          <div class="mode-toggle">
+            <button class="mode-toggle-btn active" id="richNoteEditModeBtn"
+              onclick="setRichNoteMode('edit')">Edit</button>
+            <button class="mode-toggle-btn" id="richNotePreviewModeBtn"
+              onclick="setRichNoteMode('preview')">Preview</button>
+          </div>
+          <button id="deleteRichNoteButton" class="icon-button" onclick="deleteCurrentRichNote()"
+            style="display:none;">🗑️</button>
+        </div>
+      </div>
+      <input id="richNoteTitle" class="form-input" style="font-size:19px;font-weight:700;margin-bottom:10px;"
+        type="text" placeholder="Title" oninput="onRichNoteChange()">
+      <div id="richNoteEditView">
+        <div class="rich-toolbar">
+          <button class="rich-toolbar-btn" onclick="richNoteWrap('**','**','bold text')" title="Bold"><b>B</b></button>
+          <button class="rich-toolbar-btn" onclick="richNoteWrap('_','_','italic text')"
+            title="Italic"><i>i</i></button>
+          <button class="rich-toolbar-btn" onclick="richNotePrefixLine('# ')" title="Heading">H1</button>
+          <button class="rich-toolbar-btn" onclick="richNotePrefixLine('## ')" title="Subheading">H2</button>
+          <button class="rich-toolbar-btn" onclick="richNotePrefixLine('- ')" title="Bullet list">•</button>
+          <button class="rich-toolbar-btn" onclick="richNotePrefixLine('1. ')" title="Numbered list">1.</button>
+          <button class="rich-toolbar-btn" onclick="richNotePrefixLine('- [ ] ')" title="Checklist">☑</button>
+          <button class="rich-toolbar-btn" onclick="richNoteWrap('$','$','x^2')" title="Inline math">𝑥</button>
+          <button class="rich-toolbar-btn" onclick="richNoteWrap('\n$$\n','\n$$\n','E = mc^2')"
+            title="Block math">∑</button>
+          <button class="rich-toolbar-btn" onclick="$('richNoteImageInput').click()" title="Add image">🖼️</button>
+        </div>
+        <textarea id="richNoteContent" class="rich-note-textarea" placeholder="Start writing..."
+          oninput="onRichNoteChange()"></textarea>
+        <input type="file" id="richNoteImageInput" accept="image/*" style="display:none;"
+          onchange="handleRichNoteImageUpload(event)">
+      </div>
+      <div id="richNotePreviewView" class="rich-note-preview" style="display:none;"></div>
+      <div class="footer" style="margin-top:10px;">Saved automatically.</div>
+    </div>
+
+    <!-- CHECKLISTS -->
+    <div id="checklists" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="handleChecklistsBackClick()">‹</button>
+          <h1 id="checklistsPageTitle">Checklists</h1>
+        </div>
+        <div class="top-bar-actions">
+          <button id="checklistsEditButton" class="icon-button" onclick="openChecklistModal(currentChecklistID)"
+            style="display:none;">✎</button>
+          <button id="checklistsAddButton" class="icon-button" onclick="handleChecklistsAddClick()">+</button>
+        </div>
+      </div>
+
+      <div id="checklistListView">
+        <div id="checklistList" class="class-list"></div>
+        <button class="add-class-button" onclick="openChecklistModal()">+ Add Checklist</button>
+        <div class="footer">Tap a checklist to view its items.</div>
+      </div>
+
+      <div id="checklistDetailView" style="display:none;">
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <input id="newChecklistItemText" class="form-input" type="text" placeholder="Add an item..."
+            onkeydown="if(event.key==='Enter') addChecklistItem();">
+          <button class="icon-button" style="flex-shrink:0;" onclick="addChecklistItem()">+</button>
+        </div>
+        <div id="checklistItemsList"></div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div id="tools" class="page">
+      <div class="top-bar">
+        <h1>Tools</h1>
+      </div>
+
+      <div class="section-title">Tools</div>
+      <div class="list">
+        <button class="list-button" onclick="openTodos()">
+          <div class="list-icon">✅</div>
+          <div class="list-info">
+            <div class="list-title">Projects &amp; To-Dos</div>
+            <div class="list-subtitle">Boards to manage tasks and projects</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openStudySets()">
+          <div class="list-icon">🧠</div>
+          <div class="list-info">
+            <div class="list-title">Study Sets</div>
+            <div class="list-subtitle">Flashcards and quizzes to help you learn</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openGPA()">
+          <div class="list-icon">🎯</div>
+          <div class="list-info">
+            <div class="list-title">GPA Calculator</div>
+            <div class="list-subtitle">Estimate your GPA from your courses</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openChecklists()">
+          <div class="list-icon">☑️</div>
+          <div class="list-info">
+            <div class="list-title">Checklists</div>
+            <div class="list-subtitle">Packing lists, to-buy lists, and more</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openTimer()">
+          <div class="list-icon">⏱️</div>
+          <div class="list-info">
+            <div class="list-title">Study Timer</div>
+            <div class="list-subtitle">Pomodoro-style focus and break timer</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openNotes()">
+          <div class="list-icon">🗒️</div>
+          <div class="list-info">
+            <div class="list-title">Quick Notes</div>
+            <div class="list-subtitle">Short notes for classes and ideas</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openRichNotes()">
+          <div class="list-icon">📝</div>
+          <div class="list-info">
+            <div class="list-title">Notes</div>
+            <div class="list-subtitle">Rich notes with markdown, images, and math</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="list-button" onclick="openPasswordVault()">
+          <div class="list-icon">🔐</div>
+          <div class="list-info">
+            <div class="list-title">Passwords</div>
+            <div class="list-subtitle">Save passwords, usernames, emails, websites and more</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- PASSWORD VAULT -->
+    <div id="passwords" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <h1>Passwords</h1>
+        </div>
+        <div class="top-bar-actions"><button class="icon-button" onclick="openPasswordModal()">+</button></div>
+      </div>
+      <div class="security-note">
+        Your entries are stored only in this browser's local storage. This is a convenience tool, not an encrypted
+        password manager. Avoid storing anything highly sensitive here.
+      </div>
+      <div id="passwordList" class="list"></div>
+      <button class="add-class-button" onclick="openPasswordModal()">+ Add Password / Info</button>
+      <div class="footer">Tap an entry to edit it.</div>
+    </div>
+
+    <!-- PASSWORD DETAIL MODAL -->
+    <div id="passwordDetailModal" class="modal-background">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="passwordDetailTitle">Password</h2><button class="close-button"
+            onclick="closePasswordDetail()">×</button>
+        </div>
+        <div class="info-card">
+          <div class="info-row">
+            <div class="info-label">Username</div>
+            <div id="detailUsername" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Email</div>
+            <div id="detailEmail" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Password</div>
+            <div id="detailPassword" class="info-value" style="font-family:monospace;word-break:break-all;">—
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Website</div>
+            <div id="detailWebsite" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Phone</div>
+            <div id="detailPhone" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Notes</div>
+            <div id="detailNotes" class="info-value">—</div>
+          </div>
+        </div>
+        <button class="primary-button" onclick="editPasswordFromDetail()">Edit</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="page">
+      <div class="top-bar">
+        <h1>Settings</h1>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">PROFILE</div>
+        <button class="profile-card" style="cursor:pointer;position:relative;" onclick="openProfilePage()">
+          <div class="arrow" style="position:absolute;top:22px;right:18px;">›</div>
+          <div class="profile-avatar" id="settingsProfileAvatar">A</div>
+          <div class="profile-name" id="settingsProfileName">Student</div>
+          <div class="profile-school" id="settingsProfileSchool">Add your school</div>
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">SCHOOL</div>
+        <button class="setting-row" onclick="openSchoolInfoModal()">
+          <div class="setting-icon">🏫</div>
+          <div class="setting-info">
+            <div class="setting-title">School Info</div>
+            <div class="setting-description">Customize your school's name, abbreviation, and grade</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+        <button class="setting-row" onclick="openGPAProfileModal()">
+          <div class="setting-icon">🎓</div>
+          <div class="setting-info">
+            <div class="setting-title">Current GPA</div>
+            <div class="setting-description">Your current overall GPA</div>
+          </div>
+          <div id="settingsCurrentGPA" class="info-value" style="flex:0 0 auto;font-size:17px;">—</div>
+          <div class="arrow" style="margin-left:10px;">›</div>
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">APPEARANCE</div>
+        <div class="setting-row">
+          <div class="setting-icon">🌙</div>
+          <div class="setting-info">
+            <div class="setting-title">Dark Mode</div>
+            <div class="setting-description">Use a darker appearance</div>
+          </div>
+          <div id="darkSwitch" class="switch" onclick="toggleDarkMode()">
+            <div class="switch-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">DATA</div>
+        <button class="setting-row" onclick="resetAllData()">
+          <div class="setting-icon">🗑️</div>
+          <div class="setting-info">
+            <div class="setting-title">Reset App Data</div>
+            <div class="setting-description">Delete your saved profile, classes, links, and tools data</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+      </div>
+      <div class="footer">My Student Hub<br>Version 5.1</div>
+    </div>
+
+    <!-- PROFILE INFO -->
+    <div id="profileInfo" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
+          <h1>Profile</h1>
+        </div>
+      </div>
+      <div class="profile-card" style="margin-bottom:12px;">
+        <div class="avatar-upload-wrap">
+          <div class="profile-avatar" id="profileInfoAvatar">A</div>
+          <button class="avatar-edit-badge" onclick="$('avatarFileInput').click()" aria-label="Change photo">📷</button>
+        </div>
+        <div class="profile-name" id="profileInfoName">Student</div>
+        <div class="profile-school" id="profileInfoSchool">Add your school</div>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:2px;">
+          <button class="text-link" id="adjustPhotoBtn" onclick="adjustAvatarPhoto()" style="display:none;">Adjust
+            Photo</button>
+          <button class="text-link" id="removePhotoBtn" onclick="removeAvatarPhoto()" style="display:none;">Remove
+            Photo</button>
+        </div>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;"
+          onchange="handleAvatarUpload(event)">
+      </div>
+      <div class="info-card">
+        <div class="info-row">
+          <div class="info-label">Name</div>
+          <div id="settingsProfileInfoName" class="info-value">Student</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Birthday</div>
+          <div id="settingsProfileBirthday" class="info-value">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">MEID</div>
+          <div id="settingsProfileMEID" class="info-value">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Email</div>
+          <div id="settingsProfileEmail" class="info-value">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Phone</div>
+          <div id="settingsProfilePhone" class="info-value">—</div>
+        </div>
+      </div>
+      <button class="primary-button" onclick="openProfileModal()">Edit Profile</button>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-button active" onclick="showPage('home', this)">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </button>
+    <button class="nav-button" onclick="showPage('classes', this)">
+      <div class="nav-icon">📚</div>
+      <div class="nav-label">Classes</div>
+    </button>
+    <button class="nav-button" onclick="showPage('calendar', this)">
+      <div class="nav-icon">📅</div>
+      <div class="nav-label">Calendar</div>
+    </button>
+    <button class="nav-button" onclick="showPage('tools', this)">
+      <div class="nav-icon">🧰</div>
+      <div class="nav-label">Tools</div>
+    </button>
+    <button class="nav-button" onclick="showPage('settings', this)">
+      <div class="nav-icon">⚙️</div>
+      <div class="nav-label">Settings</div>
+    </button>
+  </nav>
+
+  <!-- AVATAR CROP MODAL -->
+  <div id="avatarCropModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Adjust Photo</h2><button class="close-button" onclick="closeAvatarCrop()">×</button>
+      </div>
+      <div class="avatar-crop-viewport" id="avatarCropViewport">
+        <img id="avatarCropImg" alt="" draggable="false">
+      </div>
+      <div class="quiz-help" style="text-align:center;margin-top:12px;">Drag to reposition, use the slider to zoom.
+      </div>
+      <div class="form-group" style="margin-top:10px;">
+        <label class="form-label">ZOOM</label>
+        <input id="avatarCropZoom" type="range" min="100" max="300" value="100" step="1"
+          style="width:100%;accent-color:var(--blue);" oninput="onAvatarCropZoomInput()">
+      </div>
+      <button class="primary-button" onclick="saveAvatarCrop()">Save Photo</button>
+      <button class="secondary-button" onclick="closeAvatarCrop()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Edit Profile</h2><button class="close-button" onclick="closeModal('profileModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">NAME</label><input id="editName" class="form-input" type="text"
+          placeholder="Your name"></div>
+      <div class="form-group"><label class="form-label">BIRTHDAY</label><input id="editBirthday" class="form-input"
+          type="date"></div>
+      <div class="form-group"><label class="form-label">MEID</label><input id="editMEID" class="form-input" type="text"
+          placeholder="MEID"></div>
+      <div class="form-group"><label class="form-label">EMAIL</label><input id="editEmail" class="form-input"
+          type="email" placeholder="Your email"></div>
+      <div class="form-group"><label class="form-label">PHONE</label><input id="editPhone" class="form-input" type="tel"
+          placeholder="Phone number" maxlength="14" oninput="formatPhoneInputLive(event)"></div>
+      <button class="primary-button" onclick="saveProfile()">Save Profile</button>
+    </div>
+  </div>
+
+  <!-- CURRENT GPA MODAL -->
+  <div id="gpaProfileModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Current GPA</h2><button class="close-button" onclick="closeModal('gpaProfileModal')">×</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CURRENT GPA</label>
+        <input id="editCurrentGPA" class="form-input" type="number" min="0" max="4" step="0.01" placeholder="3.50">
+      </div>
+      <div class="quiz-help">Enter your current overall GPA from 0.00 to 4.00.</div>
+      <button class="primary-button" onclick="saveCurrentGPA()">Save GPA</button>
+      <button class="secondary-button" onclick="clearCurrentGPA()">Clear GPA</button>
+    </div>
+  </div>
+
+  <!-- SCHOOL INFO MODAL -->
+  <div id="schoolInfoModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>School Info</h2><button class="close-button" onclick="closeModal('schoolInfoModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">SCHOOL NAME</label><input id="editSchoolName" class="form-input"
+          type="text" placeholder="School name"></div>
+      <div class="form-group"><label class="form-label">ABBREVIATED NAME</label><input id="editSchoolAbbr"
+          class="form-input" type="text" placeholder="Abbreviation" maxlength="6"></div>
+      <div class="form-group">
+        <label class="form-label">GRADE / YEAR</label>
+        <select id="editSchoolGrade" class="form-input" onchange="toggleSchoolMajorField()">
+          <option value="">Select grade</option>
+          <optgroup label="Elementary / Middle School">
+            <option value="Kindergarten">Kindergarten</option>
+            <option value="1st Grade">1st Grade</option>
+            <option value="2nd Grade">2nd Grade</option>
+            <option value="3rd Grade">3rd Grade</option>
+            <option value="4th Grade">4th Grade</option>
+            <option value="5th Grade">5th Grade</option>
+            <option value="6th Grade">6th Grade</option>
+            <option value="7th Grade">7th Grade</option>
+            <option value="8th Grade">8th Grade</option>
+          </optgroup>
+          <optgroup label="High School">
+            <option value="9th Grade (Freshman)">9th Grade (Freshman)</option>
+            <option value="10th Grade (Sophomore)">10th Grade (Sophomore)</option>
+            <option value="11th Grade (Junior)">11th Grade (Junior)</option>
+            <option value="12th Grade (Senior)">12th Grade (Senior)</option>
+          </optgroup>
+          <optgroup label="College">
+            <option value="Freshman">Freshman</option>
+            <option value="Sophomore">Sophomore</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior">Senior</option>
+            <option value="Graduate">Graduate</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group" id="schoolMajorFieldGroup" style="display:none;">
+        <label class="form-label">MAJOR / PROGRAM</label>
+        <input id="editSchoolMajor" class="form-input" type="text" placeholder="Major">
+      </div>
+      <button class="primary-button" onclick="saveSchoolInfo()">Save</button>
+    </div>
+  </div>
+
+  <!-- CLASS MODAL -->
+  <div id="classModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="classModalTitle">Add Class</h2><button class="close-button"
+          onclick="closeModal('classModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">CLASS NAME</label><input id="editClassName" class="form-input"
+          type="text" placeholder="Class name"></div>
+      <div class="form-group"><label class="form-label">COURSE CODE</label><input id="editClassCode" class="form-input"
+          type="text" placeholder="Course code"></div>
+      <div class="form-group">
+        <label class="form-label">DAYS</label>
+        <div id="classDayButtons" class="class-day-buttons">
+          <button type="button" class="class-day-button" data-day="Monday" onclick="toggleClassDay(this)">Mon</button>
+          <button type="button" class="class-day-button" data-day="Tuesday" onclick="toggleClassDay(this)">Tue</button>
+          <button type="button" class="class-day-button" data-day="Wednesday"
+            onclick="toggleClassDay(this)">Wed</button>
+          <button type="button" class="class-day-button" data-day="Thursday" onclick="toggleClassDay(this)">Thu</button>
+          <button type="button" class="class-day-button" data-day="Friday" onclick="toggleClassDay(this)">Fri</button>
+          <button type="button" class="class-day-button" data-day="Saturday" onclick="toggleClassDay(this)">Sat</button>
+          <button type="button" class="class-day-button" data-day="Sunday" onclick="toggleClassDay(this)">Sun</button>
+        </div>
+        <input id="editClassDays" type="hidden">
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">START TIME</label><input id="editClassStart"
+            class="form-input" type="time"></div>
+        <div class="form-group"><label class="form-label">END TIME</label><input id="editClassEnd" class="form-input"
+            type="time"></div>
+      </div>
+      <div class="form-group"><label class="form-label">ROOM</label><input id="editClassRoom" class="form-input"
+          type="text" placeholder="Room"></div>
+      <div class="form-group">
+        <label class="form-label">GRADE</label>
+        <select id="editClassGrade" class="form-input">
+          <option value="N/A">N/A</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="F">F</option>
+          <option value="P">P</option>
+          <option value="W">W</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">NOTES</label><input id="editClassNotes" class="form-input"
+          type="text" placeholder="Optional"></div>
+      <button class="primary-button" onclick="saveClass()">Save Class</button>
+      <button id="deleteClassButton" class="danger-button" onclick="deleteCurrentClass()" style="display:none;">Delete
+        Class</button>
+    </div>
+  </div>
+
+  <!-- CALENDAR EVENT MODAL -->
+  <div id="calendarModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="calendarModalTitle">Add Event</h2><button class="close-button"
+          onclick="closeModal('calendarModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">TITLE</label><input id="editEventTitle" class="form-input"
+          type="text" placeholder="Event title"></div>
+      <div class="form-group"><label class="form-label">DATE</label><input id="editEventDate" class="form-input"
+          type="date"></div>
+      <div class="form-group"><label class="form-label">TIME</label><input id="editEventTime" class="form-input"
+          type="time"></div>
+      <div class="form-group">
+        <label class="form-label">TYPE</label>
+        <select id="editEventType" class="form-input">
+          <option value="Test">Test</option>
+          <option value="Assignment">Assignment</option>
+          <option value="Project">Project</option>
+          <option value="Event">Event</option>
+          <option value="Reminder">Reminder</option>
+          <option value="Note">Note</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CLASS</label>
+        <select id="editEventClass" class="form-input">
+          <option value="">No Class</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">LOCATION</label><input id="editEventLocation" class="form-input"
+          type="text" placeholder="Optional"></div>
+      <div class="form-group"><label class="form-label">NOTES</label><textarea id="editEventNotes" class="form-input"
+          placeholder="Notes"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">EVENT COLOR</label>
+        <div id="eventColorOptions" class="color-options">
+          <button class="color-option selected" data-color="#1769c2" style="background:#1769c2"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#ff3b30" style="background:#ff3b30"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#ff9500" style="background:#ff9500"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#34c759" style="background:#34c759"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#af52de" style="background:#af52de"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#5856d6" style="background:#5856d6"
+            onclick="selectEventColor(this)"></button>
+          <button class="color-option" data-color="#ff2d55" style="background:#ff2d55"
+            onclick="selectEventColor(this)"></button>
+        </div>
+      </div>
+      <button class="primary-button" onclick="saveCalendarEvent()">Save Event</button>
+      <button id="deleteEventButton" class="danger-button" onclick="deleteCalendarEvent()" style="display:none;">Delete
+        Event</button>
+    </div>
+  </div>
+
+  <!-- DAY COLOR MODAL -->
+  <div id="dayColorModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Customize Day</h2><button class="close-button" onclick="closeModal('dayColorModal')">×</button>
+      </div>
+      <p style="color:var(--secondary);font-size:13px;margin-bottom:18px;">Give this day a color so important dates
+        stand out on your calendar.</p>
+      <div class="color-options">
+        <button class="color-option" style="background:#1769c2" data-color="#1769c2"
+          onclick="saveDayColor('#1769c2')"></button>
+        <button class="color-option" style="background:#ff3b30" data-color="#ff3b30"
+          onclick="saveDayColor('#ff3b30')"></button>
+        <button class="color-option" style="background:#ff9500" data-color="#ff9500"
+          onclick="saveDayColor('#ff9500')"></button>
+        <button class="color-option" style="background:#34c759" data-color="#34c759"
+          onclick="saveDayColor('#34c759')"></button>
+        <button class="color-option" style="background:#af52de" data-color="#af52de"
+          onclick="saveDayColor('#af52de')"></button>
+        <button class="color-option" style="background:#5856d6" data-color="#5856d6"
+          onclick="saveDayColor('#5856d6')"></button>
+      </div>
+      <button class="secondary-button" onclick="saveDayColor('')">Remove Day Color</button>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL -->
+  <div id="projectModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="projectModalTitle">Add Project</h2><button class="close-button"
+          onclick="closeModal('projectModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">PROJECT NAME</label><input id="editProjectName"
+          class="form-input" type="text" placeholder="Project name"></div>
+      <div class="form-group">
+        <label class="form-label">COLOR</label>
+        <div id="projectColorOptions" class="color-options">
+          <button class="color-option selected" data-color="#1769c2" style="background:#1769c2"
+            onclick="selectProjectColor(this)"></button>
+          <button class="color-option" data-color="#ff3b30" style="background:#ff3b30"
+            onclick="selectProjectColor(this)"></button>
+          <button class="color-option" data-color="#ff9500" style="background:#ff9500"
+            onclick="selectProjectColor(this)"></button>
+          <button class="color-option" data-color="#34c759" style="background:#34c759"
+            onclick="selectProjectColor(this)"></button>
+          <button class="color-option" data-color="#af52de" style="background:#af52de"
+            onclick="selectProjectColor(this)"></button>
+          <button class="color-option" data-color="#5856d6" style="background:#5856d6"
+            onclick="selectProjectColor(this)"></button>
+        </div>
+      </div>
+      <button class="primary-button" onclick="saveProject()">Save Project</button>
+      <button id="deleteProjectButton" class="danger-button" onclick="deleteCurrentProject()"
+        style="display:none;">Delete Project</button>
+    </div>
+  </div>
+
+  <!-- TASK MODAL -->
+  <div id="taskModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="taskModalTitle">Add Task</h2><button class="close-button" onclick="closeModal('taskModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">TASK</label><input id="editTaskTitle" class="form-input"
+          type="text" placeholder="Task title"></div>
+      <div class="form-group">
+        <label class="form-label">STATUS</label>
+        <div id="taskStatusButtons" class="class-day-buttons" style="grid-template-columns:repeat(3,1fr);">
+          <button type="button" class="class-day-button" data-status="todo" onclick="selectTaskStatus(this)">To
+            Do</button>
+          <button type="button" class="class-day-button" data-status="inprogress" onclick="selectTaskStatus(this)">In
+            Progress</button>
+          <button type="button" class="class-day-button" data-status="done"
+            onclick="selectTaskStatus(this)">Done</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PRIORITY</label>
+        <div id="taskPriorityButtons" class="class-day-buttons" style="grid-template-columns:repeat(3,1fr);">
+          <button type="button" class="class-day-button" data-priority="low"
+            onclick="selectTaskPriority(this)">Low</button>
+          <button type="button" class="class-day-button" data-priority="medium"
+            onclick="selectTaskPriority(this)">Medium</button>
+          <button type="button" class="class-day-button" data-priority="high"
+            onclick="selectTaskPriority(this)">High</button>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">DUE DATE</label><input id="editTaskDue" class="form-input"
+          type="date"></div>
+      <div class="form-group"><label class="form-label">NOTES</label><textarea id="editTaskNotes" class="form-input"
+          placeholder="Optional"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">IMAGE (OPTIONAL)</label>
+        <button type="button" class="secondary-button" onclick="$('taskImageInput').click()">+ Add Image</button>
+        <div id="taskImagePreviewWrap" class="image-preview-wrap" style="display:none;">
+          <img id="taskImagePreview" alt="Task image">
+          <button type="button" class="image-preview-remove" onclick="removeTaskImage()">×</button>
+        </div>
+        <input type="file" id="taskImageInput" accept="image/*" style="display:none;"
+          onchange="handleTaskImageUpload(event)">
+      </div>
+      <button class="primary-button" onclick="saveTask()">Save Task</button>
+      <button id="deleteTaskButton" class="danger-button" onclick="deleteCurrentTask()" style="display:none;">Delete
+        Task</button>
+    </div>
+  </div>
+
+  <!-- DAY EVENTS MODAL -->
+  <div id="dayEventsModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="dayEventsTitle">Events</h2><button class="close-button"
+          onclick="closeModal('dayEventsModal')">×</button>
+      </div>
+      <div id="dayEventsList" class="agenda-list"></div>
+      <button class="primary-button" onclick="addEventForSelectedDay()">+ Add Event</button>
+      <button class="secondary-button" onclick="customizeSelectedDayColor()">Customize Day Color</button>
+    </div>
+  </div>
+
+  <!-- LINK MODAL (Home page Student / Quick Access links) -->
+  <div id="linkModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="linkModalTitle">Add Link</h2><button class="close-button" onclick="closeModal('linkModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">ICON (EMOJI)</label><input id="editLinkIcon" class="form-input"
+          type="text" placeholder="🔗" maxlength="4"></div>
+      <div class="form-group"><label class="form-label">TITLE</label><input id="editLinkTitle" class="form-input"
+          type="text" placeholder="Title"></div>
+      <div class="form-group"><label class="form-label">DESCRIPTION</label><input id="editLinkDescription"
+          class="form-input" type="text" placeholder="Short description"></div>
+      <div class="form-group"><label class="form-label">URL</label><input id="editLinkURL" class="form-input" type="url"
+          placeholder="https://"></div>
+      <button class="primary-button" onclick="saveLink()">Save Link</button>
+      <button id="deleteLinkButton" class="danger-button" onclick="deleteCurrentLink()" style="display:none;">Delete
+        Link</button>
+    </div>
+  </div>
+
+  <!-- STUDY SET MODAL -->
+  <div id="setModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="setModalTitle">Add Study Set</h2><button class="close-button"
+          onclick="closeModal('setModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">SET NAME</label><input id="editSetName" class="form-input"
+          type="text" placeholder="Set name"></div>
+      <div class="form-group">
+        <label class="form-label">COLOR</label>
+        <div id="setColorOptions" class="color-options">
+          <button class="color-option selected" data-color="#1769c2" style="background:#1769c2"
+            onclick="selectSetColor(this)"></button>
+          <button class="color-option" data-color="#ff3b30" style="background:#ff3b30"
+            onclick="selectSetColor(this)"></button>
+          <button class="color-option" data-color="#ff9500" style="background:#ff9500"
+            onclick="selectSetColor(this)"></button>
+          <button class="color-option" data-color="#34c759" style="background:#34c759"
+            onclick="selectSetColor(this)"></button>
+          <button class="color-option" data-color="#af52de" style="background:#af52de"
+            onclick="selectSetColor(this)"></button>
+          <button class="color-option" data-color="#5856d6" style="background:#5856d6"
+            onclick="selectSetColor(this)"></button>
+        </div>
+      </div>
+      <button class="primary-button" onclick="saveSet()">Save Study Set</button>
+      <button id="deleteSetButton" class="danger-button" onclick="deleteCurrentSet()" style="display:none;">Delete
+        Study Set</button>
+    </div>
+  </div>
+
+  <!-- CHECKLIST MODAL -->
+  <div id="checklistModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="checklistModalTitle">Add Checklist</h2><button class="close-button"
+          onclick="closeModal('checklistModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">CHECKLIST NAME</label><input id="editChecklistName"
+          class="form-input" type="text" placeholder="Checklist name"></div>
+      <div class="form-group">
+        <label class="form-label">COLOR</label>
+        <div id="checklistColorOptions" class="color-options">
+          <button class="color-option selected" data-color="#1769c2" style="background:#1769c2"
+            onclick="selectChecklistColor(this)"></button>
+          <button class="color-option" data-color="#ff3b30" style="background:#ff3b30"
+            onclick="selectChecklistColor(this)"></button>
+          <button class="color-option" data-color="#ff9500" style="background:#ff9500"
+            onclick="selectChecklistColor(this)"></button>
+          <button class="color-option" data-color="#34c759" style="background:#34c759"
+            onclick="selectChecklistColor(this)"></button>
+          <button class="color-option" data-color="#af52de" style="background:#af52de"
+            onclick="selectChecklistColor(this)"></button>
+          <button class="color-option" data-color="#5856d6" style="background:#5856d6"
+            onclick="selectChecklistColor(this)"></button>
+        </div>
+      </div>
+      <button class="primary-button" onclick="saveChecklist()">Save Checklist</button>
+      <button id="deleteChecklistButton" class="danger-button" onclick="deleteCurrentChecklist()"
+        style="display:none;">Delete Checklist</button>
+    </div>
+  </div>
+
+  <!-- FLASHCARD MODAL -->
+  <div id="cardModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="cardModalTitle">Add Card</h2><button class="close-button" onclick="closeModal('cardModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">FRONT (TERM / QUESTION)</label><textarea id="editCardFront"
+          class="form-input" placeholder="Front"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">IMAGE (OPTIONAL)</label>
+        <button type="button" class="secondary-button" onclick="$('cardImageInput').click()">+ Add Image</button>
+        <div id="cardImagePreviewWrap" class="image-preview-wrap" style="display:none;">
+          <img id="cardImagePreview" alt="Card image">
+          <button type="button" class="image-preview-remove" onclick="removeCardImage()">×</button>
+        </div>
+        <input type="file" id="cardImageInput" accept="image/*" style="display:none;"
+          onchange="handleCardImageUpload(event)">
+      </div>
+      <div class="form-group"><label class="form-label">BACK (DEFINITION / ANSWER)</label><textarea id="editCardBack"
+          class="form-input" placeholder="Back"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">CORRECT QUIZ ANSWERS (OPTIONAL)</label>
+        <textarea id="editCardCorrectAnswers" class="form-input" placeholder="One answer per line"></textarea>
+        <div class="quiz-help">You can leave this blank for a normal question, or add multiple correct answers.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">EXTRA QUIZ OPTIONS (OPTIONAL)</label>
+        <textarea id="editCardExtraOptions" class="form-input" placeholder="One option per line"></textarea>
+        <div class="quiz-help">These are added as choices when this card appears in a quiz.</div>
+      </div>
+      <button class="primary-button" onclick="saveCard()">Save Card</button>
+      <button id="deleteCardButton" class="danger-button" onclick="deleteCurrentCard()" style="display:none;">Delete
+        Card</button>
+    </div>
+  </div>
+
+  <!-- STUDY MODE MODAL -->
+  <div id="studyModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Study</h2><button class="close-button" onclick="closeModal('studyModal')">×</button>
+      </div>
+      <div id="studyProgress"
+        style="color:var(--secondary);font-size:12px;font-weight:700;text-align:center;margin-bottom:10px;"></div>
+      <div class="flip-card" id="flipCard" onclick="flipStudyCard()">
+        <div class="flip-card-inner" id="flipCardInner">
+          <div class="flip-card-front" id="flipCardFront"></div>
+          <div class="flip-card-back" id="flipCardBack"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button class="secondary-button" style="margin-top:0;" onclick="prevStudyCard()">‹ Prev</button>
+        <button class="secondary-button" style="margin-top:0;" onclick="nextStudyCard()">Next ›</button>
+      </div>
+      <button class="primary-button" onclick="shuffleStudyCards()">🔀 Shuffle</button>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE MODAL -->
+  <div id="quizModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Quiz</h2><button class="close-button" onclick="closeModal('quizModal')">×</button>
+      </div>
+      <div id="quizProgress"
+        style="color:var(--secondary);font-size:12px;font-weight:700;text-align:center;margin-bottom:10px;"></div>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+
+  <!-- GPA COURSE MODAL -->
+  <div id="gpaModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="gpaModalTitle">Add Course</h2><button class="close-button" onclick="closeModal('gpaModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">COURSE NAME</label><input id="editGpaName" class="form-input"
+          type="text" placeholder="Course name"></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">CREDIT HOURS</label><input id="editGpaCredits"
+            class="form-input" type="number" min="0" step="0.5" placeholder="3"></div>
+        <div class="form-group">
+          <label class="form-label">GRADE</label>
+          <select id="editGpaGrade" class="form-input">
+            <option value="4">A</option>
+            <option value="3.7">A-</option>
+            <option value="3.3">B+</option>
+            <option value="3">B</option>
+            <option value="2.7">B-</option>
+            <option value="2.3">C+</option>
+            <option value="2">C</option>
+            <option value="1.7">C-</option>
+            <option value="1.3">D+</option>
+            <option value="1">D</option>
+            <option value="0">F</option>
+          </select>
+        </div>
+      </div>
+      <button class="primary-button" onclick="saveGpaCourse()">Save Course</button>
+      <button id="deleteGpaButton" class="danger-button" onclick="deleteCurrentGpaCourse()" style="display:none;">Delete
+        Course</button>
+    </div>
+  </div>
+
+  <!-- NOTE MODAL -->
+  <div id="noteModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="noteModalTitle">Add Note</h2><button class="close-button" onclick="closeModal('noteModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">TITLE</label><input id="editNoteTitle" class="form-input"
+          type="text" placeholder="Title"></div>
+      <div class="form-group"><label class="form-label">CONTENT</label><textarea id="editNoteContent" class="form-input"
+          style="min-height:140px;" placeholder="Note"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">IMAGE (OPTIONAL)</label>
+        <button type="button" class="secondary-button" onclick="$('noteImageInput').click()">+ Add Image</button>
+        <div id="noteImagePreviewWrap" class="image-preview-wrap" style="display:none;">
+          <img id="noteImagePreview" alt="Note image">
+          <button type="button" class="image-preview-remove" onclick="removeNoteImage()">×</button>
+        </div>
+        <input type="file" id="noteImageInput" accept="image/*" style="display:none;"
+          onchange="handleNoteImageUpload(event)">
+      </div>
+      <button class="primary-button" onclick="saveNote()">Save Note</button>
+      <button id="deleteNoteButton" class="danger-button" onclick="deleteCurrentNote()" style="display:none;">Delete
+        Note</button>
+    </div>
+  </div>
+
+  <!-- PASSWORD VAULT MODAL -->
+  <div id="passwordModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="passwordModalTitle">Add Password / Info</h2><button class="close-button"
+          onclick="closeModal('passwordModal')">×</button>
+      </div>
+      <div class="form-group"><label class="form-label">NAME / SERVICE</label><input id="editPasswordName"
+          class="form-input" type="text" placeholder="Name"></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">USERNAME</label><input id="editPasswordUsername"
+            class="form-input" type="text" placeholder="Optional"></div>
+        <div class="form-group"><label class="form-label">EMAIL</label><input id="editPasswordEmail" class="form-input"
+            type="email" placeholder="Optional"></div>
+      </div>
+      <div class="form-group"><label class="form-label">PASSWORD</label>
+        <div style="position:relative;">
+          <input id="editPasswordPassword" class="form-input" style="padding-right:48px;" type="password"
+            placeholder="Optional">
+          <button type="button" class="icon-button" id="passwordVisibilityToggle"
+            onclick="togglePasswordInputVisibility()" aria-label="Show password"
+            style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;box-shadow:none;">
+            <svg id="passwordVisibilityIcon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">WEBSITE</label><input id="editPasswordWebsite"
+          class="form-input" type="url" placeholder="Optional"></div>
+      <div class="form-group"><label class="form-label">PHONE</label><input id="editPasswordPhone" class="form-input"
+          type="tel" placeholder="Optional" maxlength="14" oninput="formatPhoneInputLive(event)"></div>
+      <div class="form-group"><label class="form-label">OTHER / NOTES</label><textarea id="editPasswordNotes"
+          class="form-input" placeholder="Notes"></textarea></div>
+      <button class="primary-button" onclick="savePasswordEntry()">Save Entry</button>
+      <button id="deletePasswordButton" class="danger-button" onclick="deleteCurrentPasswordEntry()"
+        style="display:none;">Delete Entry</button>
+    </div>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js");
+    }
+
+    /* ===== SHORTCUTS ===== */
+    const $ = id => document.getElementById(id);
+    const $$ = sel => document.querySelectorAll(sel);
+    const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+    const load = key => JSON.parse(localStorage.getItem(key));
+    const openModal = id => $(id).classList.add("show");
+    const closeModal = id => $(id).classList.remove("show");
+    const updateSelection = (containerId, itemSel, attr, value) =>
+      $$(`#${containerId} ${itemSel}`).forEach(el => el.classList.toggle("selected", el.dataset[attr] === value));
+
+    /* ===== DATA ===== */
+    let profile = load("gccProfile") || { name: "", grade: "", birthday: "", meid: "", major: "", email: "", phone: "", currentGPA: "", avatar: "", avatarSource: "", avatarCrop: null };
+    (function sanitizeProfile() {
+      let changed = false;
+      ["name", "grade", "birthday", "meid", "major", "email", "phone"].forEach(k => {
+        if (profile[k] === "undefined" || profile[k] === "null") { profile[k] = ""; changed = true; }
+      });
+      if (changed) save("gccProfile", profile);
+    })();
+    let schoolInfo = load("gccSchoolInfo") || { name: "", abbr: "" };
+    profile.currentGPA = profile.currentGPA ?? "";
+    let classes = load("gccClasses") || [];
+    let calendarEvents = load("gccCalendarEvents") || [];
+    let dayColors = load("gccDayColors") || {};
+
+    let editingClassID = null, editingEventID = null, selectedEventColor = "#1769c2", selectedDayForColor = null;
+    let calendarDate = new Date(), calendarView = "month";
+
+    let projects = load("gccProjects") || [];
+    let currentProjectID = null, editingProjectID = null, editingTaskID = null, pendingTaskImage = null;
+    let selectedProjectColor = "#1769c2", selectedTaskStatus = "todo", selectedTaskPriority = "medium";
+
+    let homeLinks = load("gccHomeLinks") || {
+      student: [
+        { id: 1, icon: "🎓", title: "Student Center", description: "Classes, grades and account", url: "https://redirect.maricopa.edu/student-center" },
+        { id: 2, icon: "📚", title: "Canvas", description: "Courses and assignments", url: "https://learn.maricopa.edu/" },
+        { id: 3, icon: "🏫", title: "GCC", description: "College website", url: "https://www.gccaz.edu/" },
+        { id: 4, icon: "✉️", title: "Student Email", description: "School email", url: "http://google.maricopa.edu/" }
+      ],
+      quick: [
+        { id: 5, icon: "🌐", title: "Maricopa Community Colleges", description: "Main Maricopa website", url: "https://www.maricopa.edu/" },
+        { id: 6, icon: "📖", title: "GCC Student Resources", description: "Student services and resources", url: "https://www.gccaz.edu/students" },
+        { id: 7, icon: "📅", title: "Academic Calendar", description: "Important dates", url: "https://www.gccaz.edu/academic-calendar" }
+      ]
+    };
+    let homeEditMode = false, editingLinkType = null, editingLinkID = null;
+
+    let studySets = load("gccStudySets") || [];
+    let currentSetID = null, editingSetID = null, editingCardID = null, selectedSetColor = "#1769c2", pendingCardImage = null;
+    let studyModeCards = [], studyModeIndex = 0;
+    let quizQuestions = [], quizIndex = 0, quizScore = 0, quizAnswered = false, quizSelectedAnswers = [];
+
+    let passwordEntries = load("gccPasswordEntries") || [];
+    let editingPasswordID = null;
+
+    let gpaCourses = load("gccGpaCourses") || [];
+    let editingGpaID = null;
+    let gpaSettings = load("gccGpaSettings") || { useCurrent: false, priorCredits: "" };
+
+    let notes = load("gccNotes") || [];
+    let editingNoteID = null;
+    let pendingNoteImage = null;
+
+    let richNotes = load("gccRichNotes") || [];
+    let editingRichNoteID = null;
+
+    let checklists = load("gccChecklists") || [];
+    let currentChecklistID = null, editingChecklistID = null, selectedChecklistColor = "#1769c2";
+
+    let timerInterval = null, timerSeconds = 25 * 60, timerIsBreak = false, timerRunning = false, timerCycle = 1;
+
+    /* ===== NAVIGATION ===== */
+    function showPage(pageID, button) {
+      $$(".page").forEach(p => p.classList.remove("active"));
+      $(pageID).classList.add("active");
+      $$(".nav-button").forEach(n => n.classList.remove("active"));
+      button.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (pageID === "classes") renderClasses();
+      if (pageID === "calendar") renderCalendar();
+      if (pageID === "home") renderHomeLinks();
+    }
+
+    function openToolPage(pageID) {
+      $$(".page").forEach(p => p.classList.remove("active"));
+      $(pageID).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showSettingsFromTools() {
+      $$(".page").forEach(p => p.classList.remove("active"));
+      $("settings").classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showProfileFromTools() { showSettingsFromTools(); }
+
+    function showToolsFromTool() {
+      $$(".page").forEach(p => p.classList.remove("active"));
+      $("tools").classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openPage(url) { window.open(url, '_blank'); }
+
+    /* ===== HOME LINKS ===== */
+    function toggleHomeEditMode() {
+      homeEditMode = !homeEditMode;
+      const btn = $("homeEditButton");
+      btn.classList.toggle("active", homeEditMode);
+      btn.textContent = homeEditMode ? "✓" : "✎";
+      renderHomeLinks();
+    }
+
+    function renderHomeLinks() {
+      const grid = $("studentLinksGrid");
+      grid.innerHTML = "";
+      homeLinks.student.forEach(link => {
+        const btn = document.createElement("button");
+        btn.className = "button";
+        btn.onclick = () => homeEditMode ? openLinkModal("student", link.id) : openPage(link.url);
+        btn.innerHTML = `
+          ${homeEditMode ? `<div class="link-remove" onclick="event.stopPropagation();deleteLinkQuick('student', ${link.id})">✕</div>` : ""}
+          <div class="icon">${link.icon}</div>
+          <div class="button-title">${escapeHTML(link.title)}</div>
+          <div class="button-description">${escapeHTML(link.description)}</div>
+        `;
+        grid.appendChild(btn);
+      });
+      if (homeEditMode) {
+        const addBtn = document.createElement("button");
+        addBtn.className = "button add-tile";
+        addBtn.onclick = () => openLinkModal("student");
+        addBtn.innerHTML = `<div class="icon">➕</div><div class="button-title">Add Link</div><div class="button-description">New shortcut card</div>`;
+        grid.appendChild(addBtn);
+      }
+
+      const list = $("quickLinksList");
+      list.innerHTML = "";
+      homeLinks.quick.forEach(link => {
+        const btn = document.createElement("button");
+        btn.className = "list-button";
+        btn.onclick = () => homeEditMode ? openLinkModal("quick", link.id) : openPage(link.url);
+        btn.innerHTML = `
+          <div class="list-icon">${link.icon}</div>
+          <div class="list-info">
+            <div class="list-title">${escapeHTML(link.title)}</div>
+            <div class="list-subtitle">${escapeHTML(link.description)}</div>
+          </div>
+          <div class="arrow">${homeEditMode ? "✎" : "›"}</div>
+        `;
+        list.appendChild(btn);
+      });
+      if (homeEditMode) {
+        const addBtn = document.createElement("button");
+        addBtn.className = "list-button add-tile";
+        addBtn.onclick = () => openLinkModal("quick");
+        addBtn.innerHTML = `<div class="list-icon">➕</div><div class="list-info"><div class="list-title">Add Link</div><div class="list-subtitle">New quick access item</div></div>`;
+        list.appendChild(addBtn);
+      }
+    }
+
+    function deleteLinkQuick(type, id) {
+      if (!confirm("Remove this link?")) return;
+      homeLinks[type] = homeLinks[type].filter(l => l.id !== id);
+      save("gccHomeLinks", homeLinks);
+      renderHomeLinks();
+    }
+
+    function openLinkModal(type, id = null) {
+      editingLinkType = type;
+      editingLinkID = id;
+      if (id === null) {
+        $("linkModalTitle").textContent = type === "student" ? "Add Student Link" : "Add Quick Access Link";
+        $("editLinkIcon").value = "🔗";
+        $("editLinkTitle").value = "";
+        $("editLinkDescription").value = "";
+        $("editLinkURL").value = "";
+        $("deleteLinkButton").style.display = "none";
+      } else {
+        const link = homeLinks[type].find(l => l.id === id);
+        if (!link) return;
+        $("linkModalTitle").textContent = "Edit Link";
+        $("editLinkIcon").value = link.icon;
+        $("editLinkTitle").value = link.title;
+        $("editLinkDescription").value = link.description;
+        $("editLinkURL").value = link.url;
+        $("deleteLinkButton").style.display = "block";
+      }
+      openModal("linkModal");
+    }
+
+
+    function saveLink() {
+      const title = $("editLinkTitle").value.trim();
+      const url = $("editLinkURL").value.trim();
+      if (!title) { alert("Please enter a title."); return; }
+      if (!url) { alert("Please enter a URL."); return; }
+      const linkData = {
+        icon: $("editLinkIcon").value.trim() || "🔗",
+        title,
+        description: $("editLinkDescription").value.trim(),
+        url
+      };
+      if (editingLinkID === null) {
+        linkData.id = Date.now();
+        homeLinks[editingLinkType].push(linkData);
+      } else {
+        const i = homeLinks[editingLinkType].findIndex(l => l.id === editingLinkID);
+        if (i !== -1) homeLinks[editingLinkType][i] = { ...homeLinks[editingLinkType][i], ...linkData };
+      }
+      save("gccHomeLinks", homeLinks);
+      closeModal('linkModal');
+      renderHomeLinks();
+    }
+
+    function deleteCurrentLink() {
+      if (editingLinkID === null) return;
+      if (!confirm("Delete this link?")) return;
+      homeLinks[editingLinkType] = homeLinks[editingLinkType].filter(l => l.id !== editingLinkID);
+      save("gccHomeLinks", homeLinks);
+      closeModal('linkModal');
+      renderHomeLinks();
+    }
+
+    /* ===== PROFILE ===== */
+    function renderProfile() {
+      const clean = v => (v && v !== "undefined" && v !== "null") ? v : "";
+      const name = clean(profile.name) || "Student";
+      $("homeName").textContent = name + " 👋";
+      const initials = name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase() || "S";
+      ["settingsProfileAvatar", "profileInfoAvatar"].forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        el.innerHTML = profile.avatar ? `<img src="${profile.avatar}" alt="Profile photo">` : initials;
+      });
+      $("removePhotoBtn").style.display = profile.avatar ? "inline-block" : "none";
+      const adjustBtn = $("adjustPhotoBtn");
+      if (adjustBtn) adjustBtn.style.display = profile.avatarSource ? "inline-block" : "none";
+      const setText = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+      setText("settingsProfileName", name);
+      setText("profileInfoName", name);
+      setText("settingsProfileInfoName", name);
+      setText("settingsProfileBirthday", clean(profile.birthday) || "—");
+      setText("settingsProfileMEID", clean(profile.meid) || "—");
+      setText("settingsProfileEmail", clean(profile.email) || "—");
+      setText("settingsProfilePhone", formatPhone(clean(profile.phone)) || "—");
+      setText("settingsCurrentGPA", profile.currentGPA !== "" && profile.currentGPA != null ? Number(profile.currentGPA).toFixed(2) : "—");
+      setText("homeGradeBadge", clean(profile.grade) || "—");
+    }
+
+    /* Resizes an uploaded image file to a max dimension and returns a JPEG data URL */
+    function resizeImageFile(file, maxSize) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+              const scale = maxSize / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.85));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const dataUrl = await resizeImageFile(file, 1000);
+      event.target.value = "";
+      openAvatarCrop(dataUrl);
+    }
+
+    function adjustAvatarPhoto() {
+      if (!profile.avatarSource) return;
+      openAvatarCrop(profile.avatarSource, profile.avatarCrop || null);
+    }
+
+    function removeAvatarPhoto() {
+      if (!confirm("Remove your profile photo?")) return;
+      profile.avatar = "";
+      profile.avatarSource = "";
+      profile.avatarCrop = null;
+      save("gccProfile", profile);
+      renderProfile();
+    }
+
+    /* ===== AVATAR CROP ===== */
+    let avatarCropImgEl = null;
+    let avatarCropNaturalW = 0, avatarCropNaturalH = 0;
+    let avatarCropBaseW = 0, avatarCropBaseH = 0;
+    let avatarCropContainerSize = 0;
+    let avatarCropZoom = 1;
+    let avatarCropDX = 0, avatarCropDY = 0;
+    let avatarCropSourceDataUrl = null;
+    let avatarCropDragging = false;
+    let avatarCropDragStart = { x: 0, y: 0 };
+    let avatarCropStartOffset = { x: 0, y: 0 };
+
+    function openAvatarCrop(sourceDataUrl, existingCropState = null) {
+      avatarCropSourceDataUrl = sourceDataUrl;
+      openModal("avatarCropModal");
+      const img = $("avatarCropImg");
+      avatarCropImgEl = img;
+      img.onload = () => {
+        avatarCropNaturalW = img.naturalWidth;
+        avatarCropNaturalH = img.naturalHeight;
+        const viewport = $("avatarCropViewport");
+        avatarCropContainerSize = viewport.clientWidth;
+        const baseScale = avatarCropContainerSize / Math.min(avatarCropNaturalW, avatarCropNaturalH);
+        avatarCropBaseW = avatarCropNaturalW * baseScale;
+        avatarCropBaseH = avatarCropNaturalH * baseScale;
+        img.style.width = avatarCropBaseW + "px";
+        img.style.height = avatarCropBaseH + "px";
+        if (existingCropState) {
+          avatarCropZoom = existingCropState.zoom || 1;
+          avatarCropDX = existingCropState.dx || 0;
+          avatarCropDY = existingCropState.dy || 0;
+        } else {
+          avatarCropZoom = 1;
+          avatarCropDX = 0;
+          avatarCropDY = 0;
+        }
+        $("avatarCropZoom").value = Math.round(avatarCropZoom * 100);
+        clampAvatarCropOffset();
+        applyAvatarCropTransform();
+      };
+      img.src = sourceDataUrl;
+    }
+
+    function closeAvatarCrop() {
+      closeModal("avatarCropModal");
+      avatarCropSourceDataUrl = null;
+    }
+
+    function clampAvatarCropOffset() {
+      const z = avatarCropZoom;
+      const maxDx = Math.max(0, avatarCropBaseW / 2 - avatarCropContainerSize / (2 * z));
+      const maxDy = Math.max(0, avatarCropBaseH / 2 - avatarCropContainerSize / (2 * z));
+      avatarCropDX = Math.min(maxDx, Math.max(-maxDx, avatarCropDX));
+      avatarCropDY = Math.min(maxDy, Math.max(-maxDy, avatarCropDY));
+    }
+
+    function applyAvatarCropTransform() {
+      if (!avatarCropImgEl) return;
+      avatarCropImgEl.style.transform = `translate(-50%, -50%) scale(${avatarCropZoom}) translate(${avatarCropDX}px, ${avatarCropDY}px)`;
+    }
+
+    function onAvatarCropZoomInput() {
+      avatarCropZoom = $("avatarCropZoom").value / 100;
+      clampAvatarCropOffset();
+      applyAvatarCropTransform();
+    }
+
+    function setupAvatarCropDragHandlers() {
+      const viewport = $("avatarCropViewport");
+      if (!viewport || viewport.dataset.bound) return;
+      viewport.dataset.bound = "1";
+      viewport.addEventListener("pointerdown", e => {
+        if (!avatarCropImgEl) return;
+        avatarCropDragging = true;
+        viewport.classList.add("dragging");
+        viewport.setPointerCapture(e.pointerId);
+        avatarCropDragStart = { x: e.clientX, y: e.clientY };
+        avatarCropStartOffset = { x: avatarCropDX, y: avatarCropDY };
+      });
+      viewport.addEventListener("pointermove", e => {
+        if (!avatarCropDragging) return;
+        const dx = (e.clientX - avatarCropDragStart.x) / avatarCropZoom;
+        const dy = (e.clientY - avatarCropDragStart.y) / avatarCropZoom;
+        avatarCropDX = avatarCropStartOffset.x + dx;
+        avatarCropDY = avatarCropStartOffset.y + dy;
+        clampAvatarCropOffset();
+        applyAvatarCropTransform();
+      });
+      const endDrag = () => {
+        if (!avatarCropDragging) return;
+        avatarCropDragging = false;
+        viewport.classList.remove("dragging");
+      };
+      viewport.addEventListener("pointerup", endDrag);
+      viewport.addEventListener("pointercancel", endDrag);
+      viewport.addEventListener("pointerleave", endDrag);
+      viewport.addEventListener("wheel", e => {
+        if (!avatarCropImgEl) return;
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -5 : 5;
+        const newZoomPct = Math.min(300, Math.max(100, Number($("avatarCropZoom").value) + delta));
+        $("avatarCropZoom").value = newZoomPct;
+        onAvatarCropZoomInput();
+      }, { passive: false });
+    }
+
+    function saveAvatarCrop() {
+      const viewport = $("avatarCropViewport");
+      const img = avatarCropImgEl;
+      if (!img || !img.complete) return;
+      const vRect = viewport.getBoundingClientRect();
+      const iRect = img.getBoundingClientRect();
+      const scaleFactor = iRect.width / avatarCropNaturalW;
+      const srcX = (vRect.left - iRect.left) / scaleFactor;
+      const srcY = (vRect.top - iRect.top) / scaleFactor;
+      const srcSize = vRect.width / scaleFactor;
+      const OUT = 320;
+      const canvas = document.createElement("canvas");
+      canvas.width = OUT;
+      canvas.height = OUT;
+      canvas.getContext("2d").drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, OUT, OUT);
+      profile.avatar = canvas.toDataURL("image/jpeg", 0.9);
+      profile.avatarSource = avatarCropSourceDataUrl;
+      profile.avatarCrop = { zoom: avatarCropZoom, dx: avatarCropDX, dy: avatarCropDY };
+      save("gccProfile", profile);
+      renderProfile();
+      closeAvatarCrop();
+    }
+
+    function openProfilePage() { openToolPage("profileInfo"); }
+
+    function renderSchoolInfo() {
+      const name = schoolInfo.name || "";
+      const abbr = schoolInfo.abbr || "";
+      const setText = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+      setText("schoolSmallTitle", name ? name.toUpperCase() : "YOUR SCHOOL");
+      setText("schoolLogoAbbr", abbr || "—");
+      setText("schoolNameHome", name || "Add your school in Settings");
+      setText("settingsProfileSchool", name || "Add your school");
+      setText("profileInfoSchool", name || "Add your school");
+      setText("homeSubtitle", abbr ? `Everything you need for ${abbr}.` : "Everything you need, all in one place.");
+    }
+
+    const COLLEGE_GRADES = ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"];
+
+    function toggleSchoolMajorField() {
+      const grade = $("editSchoolGrade").value;
+      const group = $("schoolMajorFieldGroup");
+      group.style.display = COLLEGE_GRADES.includes(grade) ? "block" : "none";
+    }
+
+    function openSchoolInfoModal() {
+      $("editSchoolName").value = schoolInfo.name || "";
+      $("editSchoolAbbr").value = schoolInfo.abbr || "";
+      $("editSchoolGrade").value = profile.grade || "";
+      $("editSchoolMajor").value = profile.major || "";
+      toggleSchoolMajorField();
+      openModal("schoolInfoModal");
+    }
+
+
+    function saveSchoolInfo() {
+      const name = $("editSchoolName").value.trim();
+      const abbr = $("editSchoolAbbr").value.trim();
+      profile.grade = $("editSchoolGrade").value;
+      profile.major = COLLEGE_GRADES.includes(profile.grade) ? $("editSchoolMajor").value.trim() : "";
+      save("gccProfile", profile);
+      schoolInfo.name = name;
+      schoolInfo.abbr = abbr;
+      save("gccSchoolInfo", schoolInfo);
+      renderSchoolInfo();
+      renderProfile();
+      closeModal('schoolInfoModal');
+    }
+
+    function openProfileModal() {
+      $("editName").value = profile.name || "";
+      $("editBirthday").value = profile.birthday || "";
+      $("editMEID").value = profile.meid || "";
+      $("editEmail").value = profile.email || "";
+      $("editPhone").value = profile.phone || "";
+      openModal("profileModal");
+    }
+
+    function openGPAProfileModal() {
+      $("editCurrentGPA").value = profile.currentGPA !== "" && profile.currentGPA != null ? Number(profile.currentGPA).toFixed(2) : "";
+      openModal("gpaProfileModal");
+    }
+
+
+    function saveCurrentGPA() {
+      const raw = $("editCurrentGPA").value.trim();
+      if (raw === "") {
+        profile.currentGPA = "";
+      } else {
+        const num = parseFloat(raw);
+        if (isNaN(num) || num < 0 || num > 4) {
+          alert("Please enter a GPA from 0.00 to 4.00.");
+          return;
+        }
+        profile.currentGPA = num.toFixed(2);
+      }
+      save("gccProfile", profile);
+      renderProfile();
+      closeModal('gpaProfileModal');
+    }
+
+    function clearCurrentGPA() {
+      profile.currentGPA = "";
+      save("gccProfile", profile);
+      renderProfile();
+      closeModal('gpaProfileModal');
+    }
+
+    function saveProfile() {
+      profile.name = $("editName").value.trim() || "Student";
+      profile.birthday = $("editBirthday").value;
+      profile.meid = $("editMEID").value.trim();
+      profile.email = $("editEmail").value.trim();
+      profile.phone = $("editPhone").value.trim();
+      save("gccProfile", profile);
+      renderProfile();
+      closeModal('profileModal');
+    }
+
+    /* ===== CLASSES ===== */
+    function renderClasses() {
+      const container = $("classList");
+      container.innerHTML = "";
+      if (classes.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">📚</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add your first class below.</div></div>`;
+        return;
+      }
+      classes.forEach(c => {
+        const card = document.createElement("div");
+        card.className = "class-card";
+        card.onclick = () => openClassModal(c.id);
+        let details = c.days;
+        if (c.start || c.end) details += " · " + formatTime(c.start) + " – " + formatTime(c.end);
+        card.innerHTML = `
+          <div class="class-name">${escapeHTML(c.name)}</div>
+          <div class="class-code">${escapeHTML(c.code)}</div>
+          <div class="class-details">${escapeHTML(details)}</div>
+          <div class="class-grade">${escapeHTML(c.grade || "—")}</div>
+          ${c.room ? `<div class="class-room">${escapeHTML(c.room)}</div>` : ""}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openClassModal(id = null) {
+      editingClassID = id;
+      const fields = ["editClassName", "editClassCode", "editClassDays", "editClassStart", "editClassEnd", "editClassRoom", "editClassGrade", "editClassNotes"];
+      $$(".class-day-button").forEach(b => b.classList.remove("selected"));
+      if (id === null) {
+        $("classModalTitle").textContent = "Add Class";
+        fields.forEach(f => $(f).value = "");
+        $("editClassGrade").value = "N/A";
+        $("deleteClassButton").style.display = "none";
+      } else {
+        const c = classes.find(item => item.id === id);
+        if (!c) return;
+        $("classModalTitle").textContent = "Edit Class";
+        $("editClassName").value = c.name;
+        $("editClassCode").value = c.code;
+        $("editClassDays").value = c.days;
+        $("editClassStart").value = c.start;
+        $("editClassEnd").value = c.end;
+        $("editClassRoom").value = c.room;
+        $("editClassGrade").value = c.grade;
+        $("editClassNotes").value = c.notes;
+        (c.days || "").split(/,\s*|\s*&\s*/).forEach(day => {
+          const btn = document.querySelector(`.class-day-button[data-day="${day.trim()}"]`);
+          if (btn) btn.classList.add("selected");
+        });
+        $("deleteClassButton").style.display = "block";
+      }
+      openModal("classModal");
+    }
+
+    function toggleClassDay(button) {
+      button.classList.toggle("selected");
+      updateSelectedClassDays();
+    }
+
+    function updateSelectedClassDays() {
+      const days = Array.from($$(".class-day-button.selected")).map(b => b.dataset.day);
+      let formatted = "";
+      if (days.length === 1) formatted = days[0];
+      else if (days.length === 2) formatted = `${days[0]} & ${days[1]}`;
+      else if (days.length > 2) formatted = days.join(", ");
+      $("editClassDays").value = formatted;
+    }
+
+
+    function saveClass() {
+      const classData = {
+        name: $("editClassName").value.trim(),
+        code: $("editClassCode").value.trim(),
+        days: $("editClassDays").value.trim(),
+        start: $("editClassStart").value,
+        end: $("editClassEnd").value,
+        room: $("editClassRoom").value.trim(),
+        grade: $("editClassGrade").value.trim(),
+        notes: $("editClassNotes").value.trim()
+      };
+      if (!classData.name) { alert("Please enter a class name."); return; }
+      if (editingClassID === null) {
+        classData.id = Date.now();
+        classes.push(classData);
+      } else {
+        const i = classes.findIndex(item => item.id === editingClassID);
+        if (i !== -1) classes[i] = { ...classes[i], ...classData };
+      }
+      save("gccClasses", classes);
+      renderClasses();
+      closeModal('classModal');
+    }
+
+    function deleteCurrentClass() {
+      if (editingClassID === null) return;
+      if (!confirm("Delete this class?")) return;
+      classes = classes.filter(item => item.id !== editingClassID);
+      save("gccClasses", classes);
+      renderClasses();
+      closeModal('classModal');
+    }
+
+    /* ===== CALENDAR ===== */
+    function changeCalendarView(view) {
+      calendarView = view;
+      $$(".view-button").forEach(b => b.classList.remove("active"));
+      $(view + "ViewButton").classList.add("active");
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const container = $("calendarContent");
+      container.innerHTML = "";
+      $("calendarControls").style.display = calendarView === "agenda" ? "flex" : "none";
+      if (calendarView === "month") renderMonthView(container);
+      if (calendarView === "week") renderWeekView(container);
+      if (calendarView === "agenda") renderAgendaView(container);
+    }
+
+    function renderMonthView(container) {
+      const year = calendarDate.getFullYear(), month = calendarDate.getMonth();
+      const monthName = calendarDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      $("calendarMonthTitle").textContent = monthName;
+      const firstDay = new Date(year, month, 1), lastDay = new Date(year, month + 1, 0);
+      const startingDay = firstDay.getDay(), totalDays = lastDay.getDate();
+      const previousLastDay = new Date(year, month, 0).getDate();
+
+      let html = `<div class="calendar-card">
+    <div class="calendar-card-header">
+      <button class="card-nav-arrow" onclick="changeCalendarPeriod(-1)">‹</button>
+      <div class="calendar-card-title" onclick="goToToday()">${monthName}</div>
+      <button class="card-nav-arrow" onclick="changeCalendarPeriod(1)">›</button>
+    </div>
+    <div class="calendar-weekdays">${"S,M,T,W,T,F,S".split(",").map(d => `<div class="calendar-weekday">${d}</div>`).join("")}</div><div class="calendar-grid">`;
+      for (let i = startingDay - 1; i >= 0; i--) html += createCalendarDay(year, month - 1, previousLastDay - i, true);
+      for (let day = 1; day <= totalDays; day++) html += createCalendarDay(year, month, day, false);
+      const cells = startingDay + totalDays;
+      const remaining = cells % 7 === 0 ? 0 : 7 - (cells % 7);
+      for (let day = 1; day <= remaining; day++) html += createCalendarDay(year, month + 1, day, true);
+      html += `</div></div>`;
+
+      container.innerHTML = html;
+      attachCalendarDayListeners();
+    }
+
+    function createCalendarDay(year, month, day, otherMonth) {
+      const date = new Date(year, month, day);
+      const dateKey = formatDateKey(date);
+      const isToday = date.toDateString() === new Date().toDateString();
+      const events = calendarEvents.filter(e => e.date === dateKey).sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+      const customColor = dayColors[dateKey];
+      const maxChips = 2;
+      const chips = events.slice(0, maxChips).map(e => `<div class="day-event-chip" style="--chip-color:${e.color}">${escapeHTML(e.title)}</div>`).join("");
+      const more = events.length > maxChips ? `<div class="day-event-more">+${events.length - maxChips} more</div>` : "";
+
+      return `
+    <div class="calendar-day ${otherMonth ? "other-month" : ""} ${isToday ? "today" : ""} ${customColor ? "custom-colored" : ""}"
+         data-date="${dateKey}" style="${customColor ? "--day-color:" + customColor : ""}">
+      <div class="calendar-day-number">${day}</div>
+      <div class="calendar-day-events">${chips}${more}</div>
+      ${customColor ? `<div class="day-color-bar"></div>` : ""}
+    </div>`;
+    }
+
+    function attachCalendarDayListeners() {
+      $$(".calendar-day").forEach(day => {
+        day.addEventListener("click", function () {
+          openDayEventsModal(this.dataset.date);
+        });
+      });
+    }
+
+    function renderWeekView(container) {
+      const current = new Date(calendarDate);
+      const start = new Date(current);
+      start.setDate(current.getDate() - current.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+
+      const rangeLabel = start.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " – " + end.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+      let html = `<div class="calendar-card-header">
+      <button class="card-nav-arrow" onclick="changeCalendarPeriod(-1)">‹</button>
+      <div class="calendar-card-title" onclick="goToToday()">${rangeLabel}</div>
+      <button class="card-nav-arrow" onclick="changeCalendarPeriod(1)">›</button>
+    </div>
+    <div class="week-view">`;
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        const key = formatDateKey(date);
+        const events = calendarEvents.filter(e => e.date === key);
+
+        html += `<div class="week-day-card" onclick="openCalendarModal(null,'${key}')">
+      <div class="week-day-header">
+        <div class="week-day-name">${date.toLocaleDateString("en-US", { weekday: "long" })}</div>
+        <div class="week-day-date">${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</div>
+      </div>`;
+
+        if (events.length === 0) html += `<div style="color:var(--secondary);font-size:12px;margin-top:10px;">No events</div>`;
+
+        events.forEach(e => {
+          html += `<div class="week-event" onclick="event.stopPropagation();openCalendarModal(${e.id})">
+        <div class="week-event-color" style="background:${e.color}"></div>
+        <div class="week-event-info">
+          <div class="week-event-title">${escapeHTML(e.title)}</div>
+          <div class="week-event-time">${e.time ? formatTime(e.time) : e.type}</div>
+        </div>
+      </div>`;
+        });
+
+        html += `</div>`;
+      }
+      html += "</div>";
+      container.innerHTML = html;
+    }
+
+    function renderAgendaView(container) {
+      $("calendarMonthTitle").textContent = "Upcoming";
+      const sorted = [...calendarEvents].sort((a, b) => a.date.localeCompare(b.date));
+
+      if (sorted.length === 0) {
+        container.innerHTML = `<div class="calendar-card"><div class="calendar-empty"><div class="calendar-empty-icon">📅</div>No upcoming events yet.</div></div>`;
+        return;
+      }
+
+      let html = '<div class="agenda-list">';
+      let lastDate = "";
+      sorted.forEach(e => {
+        if (e.date !== lastDate) {
+          const date = new Date(e.date + "T12:00:00");
+          html += `<div class="agenda-date">${date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>`;
+          lastDate = e.date;
+        }
+        html += `<div class="agenda-event" onclick="openCalendarModal(${e.id})">
+      <div class="agenda-event-color" style="background:${e.color}"></div>
+      <div class="agenda-event-info">
+        <div class="agenda-event-title">${escapeHTML(e.title)}</div>
+        <div class="agenda-event-subtitle">${e.time ? formatTime(e.time) + " · " : ""}${escapeHTML(e.type)}${e.location ? " · " + escapeHTML(e.location) : ""}</div>
+      </div>
+      <div class="arrow">›</div>
+    </div>`;
+      });
+      html += "</div>";
+      container.innerHTML = html;
+    }
+
+    function changeCalendarPeriod(amount) {
+      if (calendarView === "month") calendarDate.setMonth(calendarDate.getMonth() + amount);
+      else calendarDate.setDate(calendarDate.getDate() + (amount * 7));
+      renderCalendar();
+    }
+
+    function goToToday() { calendarDate = new Date(); renderCalendar(); }
+
+    /* ===== CALENDAR EVENT MODAL ===== */
+    function openCalendarModal(id = null, date = null) {
+      editingEventID = id;
+      if (id === null) {
+        $("calendarModalTitle").textContent = "Add Event";
+        $("editEventTitle").value = "";
+        $("editEventDate").value = date || formatDateKey(calendarDate);
+        $("editEventTime").value = "";
+        $("editEventType").value = "Other";
+        $("editEventLocation").value = "";
+        $("editEventNotes").value = "";
+        populateEventClassDropdown();
+        selectedEventColor = "#1769c2";
+        updateSelection("eventColorOptions", ".color-option", "color", selectedEventColor);
+        $("deleteEventButton").style.display = "none";
+      } else {
+        const e = calendarEvents.find(item => item.id === id);
+        if (!e) return;
+        $("calendarModalTitle").textContent = "Edit Event";
+        $("editEventTitle").value = e.title;
+        $("editEventDate").value = e.date;
+        $("editEventTime").value = e.time;
+        $("editEventType").value = e.type;
+        $("editEventLocation").value = e.location;
+        $("editEventNotes").value = e.notes;
+        populateEventClassDropdown(e.classIndex || "");
+        selectedEventColor = e.color;
+        updateSelection("eventColorOptions", ".color-option", "color", selectedEventColor);
+        $("deleteEventButton").style.display = "block";
+      }
+      openModal("calendarModal");
+    }
+
+
+    function populateEventClassDropdown(selectedClass = "") {
+      const select = $("editEventClass");
+      if (!select) return;
+      select.innerHTML = `<option value="">No Class</option>`;
+      classes.forEach(c => {
+        const option = document.createElement("option");
+        option.value = c.id;
+        option.textContent = `${c.name} · ${c.code || ""}`;
+        if (String(c.id) === String(selectedClass)) option.selected = true;
+        select.appendChild(option);
+      });
+    }
+
+    function selectEventColor(element) {
+      selectedEventColor = element.dataset.color;
+      updateSelection("eventColorOptions", ".color-option", "color", selectedEventColor);
+    }
+
+    function saveCalendarEvent() {
+      const eventData = {
+        title: $("editEventTitle").value.trim(),
+        date: $("editEventDate").value,
+        time: $("editEventTime").value,
+        type: $("editEventType").value,
+        classIndex: $("editEventClass").value,
+        location: $("editEventLocation").value.trim(),
+        notes: $("editEventNotes").value.trim(),
+        color: selectedEventColor
+      };
+      if (!eventData.title) { alert("Please enter an event title."); return; }
+      if (!eventData.date) { alert("Please choose a date."); return; }
+      if (editingEventID === null) {
+        eventData.id = Date.now();
+        calendarEvents.push(eventData);
+      } else {
+        const i = calendarEvents.findIndex(e => e.id === editingEventID);
+        if (i !== -1) calendarEvents[i] = { ...calendarEvents[i], ...eventData };
+      }
+      save("gccCalendarEvents", calendarEvents);
+      renderCalendar();
+      closeModal('calendarModal');
+    }
+
+    function deleteCalendarEvent() {
+      if (editingEventID === null) return;
+      if (!confirm("Delete this event?")) return;
+      calendarEvents = calendarEvents.filter(e => e.id !== editingEventID);
+      save("gccCalendarEvents", calendarEvents);
+      renderCalendar();
+      closeModal('calendarModal');
+    }
+
+    /* ===== DAY EVENTS MODAL ===== */
+    function openDayEventsModal(dateKey) {
+      selectedDayForColor = dateKey;
+
+      const date = new Date(dateKey + "T12:00:00");
+      $("dayEventsTitle").textContent = date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+
+      const events = calendarEvents.filter(e => e.date === dateKey).sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+      const list = $("dayEventsList");
+
+      if (events.length === 0) {
+        list.innerHTML = `<div class="calendar-empty"><div class="calendar-empty-icon">📅</div>No events on this day.</div>`;
+      } else {
+        list.innerHTML = events.map(e => `
+      <div class="agenda-event" onclick="closeModal('dayEventsModal');openCalendarModal(${e.id})">
+        <div class="agenda-event-color" style="background:${e.color}"></div>
+        <div class="agenda-event-info">
+          <div class="agenda-event-title">${escapeHTML(e.title)}</div>
+          <div class="agenda-event-subtitle">${e.time ? formatTime(e.time) + " · " : ""}${escapeHTML(e.type)}${e.location ? " · " + escapeHTML(e.location) : ""}</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+    `).join("");
+      }
+
+      openModal("dayEventsModal");
+    }
+
+
+    function addEventForSelectedDay() {
+      const date = selectedDayForColor;
+      closeModal('dayEventsModal');
+      openCalendarModal(null, date);
+    }
+
+    function customizeSelectedDayColor() {
+      const date = selectedDayForColor;
+      closeModal('dayEventsModal');
+      openDayColorModal(date);
+    }
+
+    /* ===== DAY COLORS ===== */
+    function openDayColorModal(date) {
+      selectedDayForColor = date;
+      openModal("dayColorModal");
+    }
+
+
+    function saveDayColor(color) {
+      if (color) dayColors[selectedDayForColor] = color;
+      else delete dayColors[selectedDayForColor];
+      save("gccDayColors", dayColors);
+      closeModal('dayColorModal');
+      renderCalendar();
+    }
+
+    /* ===== HELPERS ===== */
+    function formatTime(time) {
+      if (!time) return "";
+      const [h, m] = time.split(":");
+      let hours = parseInt(h);
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      return `${hours}:${m} ${ampm}`;
+    }
+
+    function formatPhone(phone) {
+      if (!phone) return "";
+      const digits = phone.replace(/\D/g, "");
+      if (digits.length === 10) return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      if (digits.length === 11 && digits[0] === "1") return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+      return phone;
+    }
+
+    function formatPhoneInputLive(event) {
+      const input = event.target;
+      const raw = input.value;
+      const cursorPos = input.selectionStart;
+      const digitsBeforeCursor = raw.slice(0, cursorPos).replace(/\D/g, "").length;
+      const digits = raw.replace(/\D/g, "").slice(0, 10);
+      let formatted = "";
+      if (digits.length > 0) formatted += "(" + digits.slice(0, 3);
+      if (digits.length >= 3) formatted += ") ";
+      if (digits.length > 3) formatted += digits.slice(3, 6);
+      if (digits.length >= 6) formatted += "-";
+      if (digits.length > 6) formatted += digits.slice(6, 10);
+      input.value = formatted;
+      let count = 0, pos = formatted.length;
+      if (digitsBeforeCursor === 0) {
+        pos = 0;
+      } else {
+        for (let i = 0; i < formatted.length; i++) {
+          if (/\d/.test(formatted[i])) count++;
+          if (count === digitsBeforeCursor) { pos = i + 1; break; }
+        }
+      }
+      input.setSelectionRange(pos, pos);
+    }
+
+    function formatDateKey(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function formatShortDate(dateStr) {
+      const d = new Date(dateStr + "T12:00:00");
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
+    function escapeHTML(text) {
+      if (!text) return "";
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* ===== DARK MODE ===== */
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      $("darkSwitch").classList.toggle("active", isDark);
+      localStorage.setItem("gccDarkMode", isDark ? "true" : "false");
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", isDark ? "#101114" : "#f4f5f7");
+    }
+
+    function loadDarkMode() {
+      if (localStorage.getItem("gccDarkMode") === "true") {
+        document.body.classList.add("dark");
+        $("darkSwitch").classList.add("active");
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", "#101114");
+      }
+    }
+
+    /* ===== PROJECTS & TO-DOS ===== */
+    function openTodos() {
+      openToolPage("todos");
+      currentProjectID = null;
+      $("projectDetailView").style.display = "none";
+      $("projectListView").style.display = "block";
+      $("todosEditButton").style.display = "none";
+      $("todosPageTitle").textContent = "Projects";
+      renderProjectList();
+    }
+
+    function closeTodos() {
+      showToolsFromTool();
+    }
+
+    function handleTodosBackClick() {
+      if (currentProjectID !== null) {
+        currentProjectID = null;
+        $("projectDetailView").style.display = "none";
+        $("projectListView").style.display = "block";
+        $("todosEditButton").style.display = "none";
+        $("todosPageTitle").textContent = "Projects";
+        renderProjectList();
+      } else {
+        closeTodos();
+      }
+    }
+
+    function handleTodosAddClick() {
+      if (currentProjectID !== null) openTaskModal();
+      else openProjectModal();
+    }
+
+    function renderProjectList() {
+      const container = $("projectList");
+      container.innerHTML = "";
+      if (projects.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">✅</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Projects Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a project to start tracking tasks.</div></div>`;
+        return;
+      }
+      projects.forEach(p => {
+        const total = p.tasks.length;
+        const done = p.tasks.filter(t => t.status === "done").length;
+        const pct = total ? Math.round((done / total) * 100) : 0;
+        const card = document.createElement("div");
+        card.className = "class-card";
+        card.style.minHeight = "auto";
+        card.onclick = () => openProjectDetail(p.id);
+        card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:12px;height:12px;border-radius:50%;background:${p.color};flex-shrink:0;"></div>
+        <div class="class-name" style="padding-right:0;font-size:17px;">${escapeHTML(p.name)}</div>
+      </div>
+      <div class="class-code" style="margin-top:8px;">${total} task${total === 1 ? "" : "s"} · ${done} done</div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%;background:${p.color}"></div></div>
+    `;
+        container.appendChild(card);
+      });
+    }
+
+    function openProjectDetail(id) {
+      currentProjectID = id;
+      const p = projects.find(pr => pr.id === id);
+      if (!p) return;
+      $("projectListView").style.display = "none";
+      $("projectDetailView").style.display = "block";
+      $("todosEditButton").style.display = "flex";
+      $("todosPageTitle").textContent = p.name;
+      renderKanbanBoard();
+    }
+
+    function renderKanbanBoard() {
+      const p = projects.find(pr => pr.id === currentProjectID);
+      const board = $("kanbanBoard");
+      if (!p) { board.innerHTML = ""; return; }
+      const columns = [
+        { key: "todo", label: "To Do" },
+        { key: "inprogress", label: "In Progress" },
+        { key: "done", label: "Done" }
+      ];
+      board.innerHTML = columns.map(col => {
+        const tasks = p.tasks.filter(t => t.status === col.key).sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"));
+        const taskHTML = tasks.length === 0
+          ? `<div class="kanban-empty">No tasks</div>`
+          : tasks.map(t => {
+            const overdue = t.due && t.due < formatDateKey(new Date()) && col.key !== "done";
+            return `
+          <div class="task-card" onclick="openTaskModal(${t.id})">
+            <div class="task-card-top">
+              <div class="task-priority-dot" style="background:${priorityColor(t.priority)}"></div>
+              <div class="task-title">${escapeHTML(t.title)}</div>
+              ${t.image ? `<img src="${t.image}" style="width:22px;height:22px;border-radius:5px;object-fit:cover;flex-shrink:0;" alt="">` : ""}
+            </div>
+            ${t.due ? `<div class="task-due ${overdue ? "overdue" : ""}">Due ${formatShortDate(t.due)}</div>` : ""}
+          </div>`;
+          }).join("");
+        return `
+      <div class="kanban-column">
+        <div class="kanban-column-header"><span>${col.label}</span><span class="kanban-count">${tasks.length}</span></div>
+        <div class="kanban-tasks">${taskHTML}</div>
+      </div>`;
+      }).join("");
+    }
+
+    function priorityColor(priority) {
+      return priority === "high" ? "#ff3b30" : priority === "low" ? "#34c759" : "#ff9500";
+    }
+
+    /* Project modal */
+    function openProjectModal(id = null) {
+      editingProjectID = id;
+      if (id === null) {
+        $("projectModalTitle").textContent = "Add Project";
+        $("editProjectName").value = "";
+        selectedProjectColor = "#1769c2";
+        $("deleteProjectButton").style.display = "none";
+      } else {
+        const p = projects.find(pr => pr.id === id);
+        if (!p) return;
+        $("projectModalTitle").textContent = "Edit Project";
+        $("editProjectName").value = p.name;
+        selectedProjectColor = p.color;
+        $("deleteProjectButton").style.display = "block";
+      }
+      updateSelection("projectColorOptions", ".color-option", "color", selectedProjectColor);
+      openModal("projectModal");
+    }
+
+
+    function selectProjectColor(el) { selectedProjectColor = el.dataset.color; updateSelection("projectColorOptions", ".color-option", "color", selectedProjectColor); }
+
+    function saveProject() {
+      const name = $("editProjectName").value.trim();
+      if (!name) { alert("Please enter a project name."); return; }
+      if (editingProjectID === null) {
+        projects.push({ id: Date.now(), name, color: selectedProjectColor, tasks: [] });
+      } else {
+        const i = projects.findIndex(p => p.id === editingProjectID);
+        if (i !== -1) { projects[i].name = name; projects[i].color = selectedProjectColor; }
+      }
+      save("gccProjects", projects);
+      closeModal('projectModal');
+      if (currentProjectID !== null) {
+        $("todosPageTitle").textContent = name;
+        renderKanbanBoard();
+      } else {
+        renderProjectList();
+      }
+    }
+
+    function deleteCurrentProject() {
+      if (editingProjectID === null) return;
+      if (!confirm("Delete this project and all its tasks?")) return;
+      projects = projects.filter(p => p.id !== editingProjectID);
+      save("gccProjects", projects);
+      closeModal('projectModal');
+      currentProjectID = null;
+      $("projectDetailView").style.display = "none";
+      $("projectListView").style.display = "block";
+      $("todosEditButton").style.display = "none";
+      $("todosPageTitle").textContent = "Projects";
+      renderProjectList();
+    }
+
+    /* Task modal */
+    function openTaskModal(id = null) {
+      const p = projects.find(pr => pr.id === currentProjectID);
+      if (!p) return;
+      editingTaskID = id;
+      if (id === null) {
+        $("taskModalTitle").textContent = "Add Task";
+        $("editTaskTitle").value = "";
+        $("editTaskDue").value = "";
+        $("editTaskNotes").value = "";
+        selectedTaskStatus = "todo";
+        selectedTaskPriority = "medium";
+        pendingTaskImage = null;
+        $("deleteTaskButton").style.display = "none";
+      } else {
+        const t = p.tasks.find(task => task.id === id);
+        if (!t) return;
+        $("taskModalTitle").textContent = "Edit Task";
+        $("editTaskTitle").value = t.title;
+        $("editTaskDue").value = t.due || "";
+        $("editTaskNotes").value = t.notes || "";
+        selectedTaskStatus = t.status;
+        selectedTaskPriority = t.priority;
+        pendingTaskImage = t.image || null;
+        $("deleteTaskButton").style.display = "block";
+      }
+      updateSelection("taskStatusButtons", ".class-day-button", "status", selectedTaskStatus);
+      updateSelection("taskPriorityButtons", ".class-day-button", "priority", selectedTaskPriority);
+      $("taskImagePreviewWrap").style.display = pendingTaskImage ? "block" : "none";
+      if (pendingTaskImage) $("taskImagePreview").src = pendingTaskImage;
+      openModal("taskModal");
+    }
+
+    async function handleTaskImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      pendingTaskImage = await resizeImageFile(file, 800);
+      $("taskImagePreview").src = pendingTaskImage;
+      $("taskImagePreviewWrap").style.display = "block";
+      event.target.value = "";
+    }
+
+    function removeTaskImage() {
+      pendingTaskImage = null;
+      $("taskImagePreviewWrap").style.display = "none";
+    }
+
+    function selectTaskStatus(el) { selectedTaskStatus = el.dataset.status; updateSelection("taskStatusButtons", ".class-day-button", "status", selectedTaskStatus); }
+    function selectTaskPriority(el) { selectedTaskPriority = el.dataset.priority; updateSelection("taskPriorityButtons", ".class-day-button", "priority", selectedTaskPriority); }
+
+    function saveTask() {
+      const title = $("editTaskTitle").value.trim();
+      if (!title) { alert("Please enter a task title."); return; }
+      const p = projects.find(pr => pr.id === currentProjectID);
+      if (!p) return;
+      const taskData = {
+        title,
+        status: selectedTaskStatus,
+        priority: selectedTaskPriority,
+        due: $("editTaskDue").value,
+        notes: $("editTaskNotes").value.trim(),
+        image: pendingTaskImage
+      };
+      if (editingTaskID === null) {
+        taskData.id = Date.now();
+        p.tasks.push(taskData);
+      } else {
+        const i = p.tasks.findIndex(t => t.id === editingTaskID);
+        if (i !== -1) p.tasks[i] = { ...p.tasks[i], ...taskData };
+      }
+      save("gccProjects", projects);
+      closeModal('taskModal');
+      renderKanbanBoard();
+    }
+
+    function deleteCurrentTask() {
+      if (editingTaskID === null) return;
+      if (!confirm("Delete this task?")) return;
+      const p = projects.find(pr => pr.id === currentProjectID);
+      if (!p) return;
+      p.tasks = p.tasks.filter(t => t.id !== editingTaskID);
+      save("gccProjects", projects);
+      closeModal('taskModal');
+      renderKanbanBoard();
+    }
+
+    /* ===== STUDY SETS (FLASHCARDS & QUIZ) ===== */
+    function openStudySets() {
+      openToolPage("studysets");
+      currentSetID = null;
+      $("setDetailView").style.display = "none";
+      $("setListView").style.display = "block";
+      $("studySetsEditButton").style.display = "none";
+      $("studySetsPageTitle").textContent = "Study Sets";
+      renderSetList();
+    }
+
+    function handleStudySetsBackClick() {
+      if (currentSetID !== null) {
+        currentSetID = null;
+        $("setDetailView").style.display = "none";
+        $("setListView").style.display = "block";
+        $("studySetsEditButton").style.display = "none";
+        $("studySetsPageTitle").textContent = "Study Sets";
+        renderSetList();
+      } else {
+        showToolsFromTool();
+      }
+    }
+
+    function handleStudySetsAddClick() {
+      if (currentSetID !== null) openCardModal();
+      else openSetModal();
+    }
+
+    function renderSetList() {
+      const container = $("setList");
+      container.innerHTML = "";
+      if (studySets.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🧠</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Study Sets Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a set to start making flashcards.</div></div>`;
+        return;
+      }
+      studySets.forEach(s => {
+        const card = document.createElement("div");
+        card.className = "class-card";
+        card.style.minHeight = "auto";
+        card.onclick = () => openSetDetail(s.id);
+        card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:12px;height:12px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <div class="class-name" style="padding-right:0;font-size:17px;">${escapeHTML(s.name)}</div>
+      </div>
+      <div class="class-code" style="margin-top:8px;">${s.cards.length} card${s.cards.length === 1 ? "" : "s"}</div>
+    `;
+        container.appendChild(card);
+      });
+    }
+
+    function openSetDetail(id) {
+      currentSetID = id;
+      const s = studySets.find(st => st.id === id);
+      if (!s) return;
+      $("setListView").style.display = "none";
+      $("setDetailView").style.display = "block";
+      $("studySetsEditButton").style.display = "flex";
+      $("studySetsPageTitle").textContent = s.name;
+      renderCardList();
+    }
+
+    function renderCardList() {
+      const s = studySets.find(st => st.id === currentSetID);
+      const container = $("cardList");
+      if (!s) { container.innerHTML = ""; return; }
+      if (s.cards.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🗂️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Cards Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a card to get started.</div></div>`;
+        return;
+      }
+      container.innerHTML = s.cards.map(c => `
+    <div class="class-card" style="min-height:auto;padding:16px;${c.image ? "display:flex;align-items:center;gap:12px;" : ""}" onclick="openCardModal(${c.id})">
+      ${c.image ? `<img src="${c.image}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;" alt="">` : ""}
+      <div>
+        <div style="font-weight:700;font-size:15px;">${escapeHTML(c.front)}</div>
+        <div style="color:var(--secondary);font-size:13px;margin-top:6px;">${escapeHTML(c.back)}</div>
+      </div>
+    </div>
+  `).join("");
+    }
+
+    function openSetModal(id = null) {
+      editingSetID = id;
+      if (id === null) {
+        $("setModalTitle").textContent = "Add Study Set";
+        $("editSetName").value = "";
+        selectedSetColor = "#1769c2";
+        $("deleteSetButton").style.display = "none";
+      } else {
+        const s = studySets.find(st => st.id === id);
+        if (!s) return;
+        $("setModalTitle").textContent = "Edit Study Set";
+        $("editSetName").value = s.name;
+        selectedSetColor = s.color;
+        $("deleteSetButton").style.display = "block";
+      }
+      updateSelection("setColorOptions", ".color-option", "color", selectedSetColor);
+      openModal("setModal");
+    }
+
+    function selectSetColor(el) { selectedSetColor = el.dataset.color; updateSelection("setColorOptions", ".color-option", "color", selectedSetColor); }
+
+    function saveSet() {
+      const name = $("editSetName").value.trim();
+      if (!name) { alert("Please enter a set name."); return; }
+      if (editingSetID === null) {
+        studySets.push({ id: Date.now(), name, color: selectedSetColor, cards: [] });
+      } else {
+        const i = studySets.findIndex(s => s.id === editingSetID);
+        if (i !== -1) { studySets[i].name = name; studySets[i].color = selectedSetColor; }
+      }
+      save("gccStudySets", studySets);
+      closeModal('setModal');
+      if (currentSetID !== null) {
+        $("studySetsPageTitle").textContent = name;
+        renderCardList();
+      } else {
+        renderSetList();
+      }
+    }
+
+    function deleteCurrentSet() {
+      if (editingSetID === null) return;
+      if (!confirm("Delete this study set and all its cards?")) return;
+      studySets = studySets.filter(s => s.id !== editingSetID);
+      save("gccStudySets", studySets);
+      closeModal('setModal');
+      currentSetID = null;
+      $("setDetailView").style.display = "none";
+      $("setListView").style.display = "block";
+      $("studySetsEditButton").style.display = "none";
+      $("studySetsPageTitle").textContent = "Study Sets";
+      renderSetList();
+    }
+
+    function openCardModal(id = null) {
+      const s = studySets.find(st => st.id === currentSetID);
+      if (!s) return;
+      editingCardID = id;
+      if (id === null) {
+        $("cardModalTitle").textContent = "Add Card";
+        $("editCardFront").value = "";
+        $("editCardBack").value = "";
+        $("editCardCorrectAnswers").value = "";
+        $("editCardExtraOptions").value = "";
+        pendingCardImage = null;
+        $("deleteCardButton").style.display = "none";
+      } else {
+        const c = s.cards.find(card => card.id === id);
+        if (!c) return;
+        $("cardModalTitle").textContent = "Edit Card";
+        $("editCardFront").value = c.front;
+        $("editCardBack").value = c.back;
+        $("editCardCorrectAnswers").value = Array.isArray(c.correctAnswers) ? c.correctAnswers.join("\n") : "";
+        $("editCardExtraOptions").value = Array.isArray(c.extraOptions) ? c.extraOptions.join("\n") : "";
+        pendingCardImage = c.image || null;
+        $("deleteCardButton").style.display = "block";
+      }
+      $("cardImagePreviewWrap").style.display = pendingCardImage ? "block" : "none";
+      if (pendingCardImage) $("cardImagePreview").src = pendingCardImage;
+      openModal("cardModal");
+    }
+
+    async function handleCardImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      pendingCardImage = await resizeImageFile(file, 800);
+      $("cardImagePreview").src = pendingCardImage;
+      $("cardImagePreviewWrap").style.display = "block";
+      event.target.value = "";
+    }
+
+    function removeCardImage() {
+      pendingCardImage = null;
+      $("cardImagePreviewWrap").style.display = "none";
+    }
+
+    function saveCard() {
+      const front = $("editCardFront").value.trim();
+      const back = $("editCardBack").value.trim();
+      const correctAnswers = $("editCardCorrectAnswers").value.split("\n").map(v => v.trim()).filter(Boolean);
+      const extraOptions = $("editCardExtraOptions").value.split("\n").map(v => v.trim()).filter(Boolean);
+      if (!front || !back) { alert("Please fill in both sides of the card."); return; }
+      const s = studySets.find(st => st.id === currentSetID);
+      if (!s) return;
+      if (editingCardID === null) {
+        s.cards.push({ id: Date.now(), front, back, correctAnswers, extraOptions, image: pendingCardImage });
+      } else {
+        const i = s.cards.findIndex(c => c.id === editingCardID);
+        if (i !== -1) s.cards[i] = { ...s.cards[i], front, back, correctAnswers, extraOptions, image: pendingCardImage };
+      }
+      save("gccStudySets", studySets);
+      closeModal('cardModal');
+      renderCardList();
+    }
+
+    function deleteCurrentCard() {
+      if (editingCardID === null) return;
+      if (!confirm("Delete this card?")) return;
+      const s = studySets.find(st => st.id === currentSetID);
+      if (!s) return;
+      s.cards = s.cards.filter(c => c.id !== editingCardID);
+      save("gccStudySets", studySets);
+      closeModal('cardModal');
+      renderCardList();
+    }
+
+    /* Study (flashcard) mode */
+    function startStudyMode() {
+      const s = studySets.find(st => st.id === currentSetID);
+      if (!s || s.cards.length === 0) { alert("Add some cards first."); return; }
+      studyModeCards = [...s.cards];
+      studyModeIndex = 0;
+      renderStudyCard();
+      openModal("studyModal");
+    }
+
+
+    function renderStudyCard() {
+      const c = studyModeCards[studyModeIndex];
+      $("flipCardFront").innerHTML = (c.image ? `<img src="${c.image}" style="max-width:100%;max-height:120px;border-radius:10px;object-fit:cover;margin-bottom:10px;" alt="">` : "") + escapeHTML(c.front);
+      $("flipCardBack").textContent = c.back;
+      $("flipCardInner").classList.remove("flipped");
+      $("studyProgress").textContent = `Card ${studyModeIndex + 1} of ${studyModeCards.length} · Tap to flip`;
+    }
+
+    function flipStudyCard() { $("flipCardInner").classList.toggle("flipped"); }
+
+    function nextStudyCard() {
+      studyModeIndex = (studyModeIndex + 1) % studyModeCards.length;
+      renderStudyCard();
+    }
+
+    function prevStudyCard() {
+      studyModeIndex = (studyModeIndex - 1 + studyModeCards.length) % studyModeCards.length;
+      renderStudyCard();
+    }
+
+    function shuffleStudyCards() {
+      shuffleArray(studyModeCards);
+      studyModeIndex = 0;
+      renderStudyCard();
+    }
+
+    /* Quiz mode */
+    function startQuizMode() {
+      const s = studySets.find(st => st.id === currentSetID);
+      if (!s || s.cards.length < 2) { alert("Add at least 2 cards to take a quiz."); return; }
+      quizQuestions = shuffleArray([...s.cards]);
+      quizIndex = 0;
+      quizScore = 0;
+      quizAnswered = false;
+      quizSelectedAnswers = [];
+      renderQuizQuestion();
+      openModal("quizModal");
+    }
+
+
+    function getQuizCorrectAnswers(card) {
+      const answers = Array.isArray(card.correctAnswers) ? card.correctAnswers.filter(Boolean) : [];
+      return answers.length ? answers : [card.back];
+    }
+
+    function renderQuizQuestion() {
+      const content = $("quizContent");
+      if (quizIndex >= quizQuestions.length) {
+        const pct = Math.round((quizScore / quizQuestions.length) * 100);
+        $("quizProgress").textContent = "Complete!";
+        content.innerHTML = `
+          <div class="quiz-score">
+            <div class="quiz-score-number">${quizScore}/${quizQuestions.length}</div>
+            <div style="color:var(--secondary);margin-top:6px;">${pct}% correct</div>
+          </div>
+          <button class="primary-button" onclick="startQuizMode()">Retake Quiz</button>
+          <button class="secondary-button" onclick="closeModal('quizModal')">Done</button>
+        `;
+        return;
+      }
+
+      quizAnswered = false;
+      quizSelectedAnswers = [];
+      const q = quizQuestions[quizIndex];
+      const s = studySets.find(st => st.id === currentSetID);
+      const correctAnswers = getQuizCorrectAnswers(q);
+      const customWrongOptions = Array.isArray(q.extraOptions) ? q.extraOptions : [];
+      const fallbackWrongPool = s.cards
+        .filter(c => c.id !== q.id)
+        .flatMap(c => getQuizCorrectAnswers(c));
+      const uniqueWrong = [...new Set([...customWrongOptions, ...shuffleArray(fallbackWrongPool)])]
+        .filter(opt => !correctAnswers.includes(opt));
+      const wrongCount = Math.max(0, 4 - correctAnswers.length);
+      const wrongs = uniqueWrong.slice(0, Math.min(3, wrongCount));
+      const options = shuffleArray([...correctAnswers, ...wrongs]);
+      const multiple = correctAnswers.length > 1;
+
+      $("quizProgress").textContent = `Question ${quizIndex + 1} of ${quizQuestions.length}`;
+      content.innerHTML = `
+        <div class="quiz-question">${escapeHTML(q.front)}</div>
+        ${multiple ? `<div class="quiz-help" style="text-align:center;margin-bottom:10px;">Select all correct answers, then tap Submit.</div>` : ""}
+        <div id="quizOptions"></div>
+        ${multiple ? `<button class="primary-button" id="quizSubmitButton" onclick="submitMultipleQuizAnswer()">Submit Answer</button>` : ""}
+      `;
+
+      const optionsContainer = $("quizOptions");
+      options.forEach((opt, index) => {
+        if (multiple) {
+          const row = document.createElement("label");
+          row.className = "quiz-check-row";
+          row.innerHTML = `<input type="checkbox" value="${escapeHTML(opt)}"><span>${escapeHTML(opt)}</span>`;
+          const checkbox = row.querySelector("input");
+          checkbox.addEventListener("change", () => {
+            row.classList.toggle("selected", checkbox.checked);
+            quizSelectedAnswers = Array.from($$("#quizOptions input:checked")).map(i => i.value);
+          });
+          optionsContainer.appendChild(row);
+        } else {
+          const btn = document.createElement("button");
+          btn.className = "quiz-option";
+          btn.textContent = opt;
+          btn.onclick = () => answerQuiz(btn, opt, correctAnswers[0]);
+          optionsContainer.appendChild(btn);
+        }
+      });
+    }
+
+    function answerQuiz(button, selected, correct) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const allOptions = $$("#quizOptions .quiz-option");
+      allOptions.forEach(o => {
+        o.onclick = null;
+        if (o.textContent === correct) o.classList.add("correct");
+        else if (o === button) o.classList.add("incorrect");
+      });
+      if (selected === correct) quizScore++;
+      setTimeout(() => { quizIndex++; renderQuizQuestion(); }, 900);
+    }
+
+    function submitMultipleQuizAnswer() {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const q = quizQuestions[quizIndex];
+      const correctAnswers = getQuizCorrectAnswers(q).slice().sort();
+      const selected = Array.from($$("#quizOptions input:checked")).map(i => i.value).sort();
+      const isCorrect = selected.length === correctAnswers.length &&
+        selected.every((answer, i) => answer === correctAnswers[i]);
+
+      $$("#quizOptions .quiz-check-row").forEach(row => {
+        const input = row.querySelector("input");
+        const value = input.value;
+        if (correctAnswers.includes(value)) row.classList.add("correct");
+        else if (input.checked) row.classList.add("incorrect");
+        input.disabled = true;
+      });
+      const submit = $("quizSubmitButton");
+      if (submit) submit.disabled = true;
+      if (isCorrect) quizScore++;
+      setTimeout(() => { quizIndex++; renderQuizQuestion(); }, 1000);
+    }
+
+    /* ===== GPA CALCULATOR ===== */
+    function openGPA() {
+      openToolPage("gpa");
+      renderGpaUseCurrentUI();
+      renderGpaCourses();
+    }
+
+    function renderGpaUseCurrentUI() {
+      $("gpaUseCurrentSwitch").classList.toggle("active", !!gpaSettings.useCurrent);
+      $("gpaPriorCreditsRow").style.display = gpaSettings.useCurrent ? "flex" : "none";
+      $("gpaUseCurrentHint").style.display = gpaSettings.useCurrent ? "block" : "none";
+      $("gpaPriorCredits").value = gpaSettings.priorCredits ?? "";
+    }
+
+    function toggleGpaUseCurrent() {
+      if (!gpaSettings.useCurrent && (profile.currentGPA === "" || profile.currentGPA == null)) {
+        alert("Set your current GPA in Settings first.");
+        return;
+      }
+      gpaSettings.useCurrent = !gpaSettings.useCurrent;
+      save("gccGpaSettings", gpaSettings);
+      renderGpaUseCurrentUI();
+      renderGpaCourses();
+    }
+
+    function updateGpaPriorCredits() {
+      const raw = $("gpaPriorCredits").value;
+      const num = parseFloat(raw);
+      gpaSettings.priorCredits = raw === "" ? "" : (isNaN(num) || num < 0 ? "" : num);
+      save("gccGpaSettings", gpaSettings);
+      renderGpaCourses();
+    }
+
+    function gradeLabel(points) {
+      const map = { 4: "A", 3.7: "A-", 3.3: "B+", 3: "B", 2.7: "B-", 2.3: "C+", 2: "C", 1.7: "C-", 1.3: "D+", 1: "D", 0: "F" };
+      return map[points] ?? points;
+    }
+
+    function renderGpaCourses() {
+      const container = $("gpaCourseList");
+      container.innerHTML = "";
+      if (gpaCourses.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🎯</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Courses Added</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a course to calculate your GPA.</div></div>`;
+      } else {
+        gpaCourses.forEach(c => {
+          const btn = document.createElement("button");
+          btn.className = "list-button";
+          btn.onclick = () => openGpaModal(c.id);
+          btn.innerHTML = `
+        <div class="list-icon">${gradeLabel(c.points)}</div>
+        <div class="list-info">
+          <div class="list-title">${escapeHTML(c.name || "Course")}</div>
+          <div class="list-subtitle">${c.credits} credit${c.credits == 1 ? "" : "s"}</div>
+        </div>
+        <div class="arrow">›</div>
+      `;
+          container.appendChild(btn);
+        });
+      }
+      let totalPoints = 0, totalCredits = 0;
+      gpaCourses.forEach(c => { totalPoints += c.points * c.credits; totalCredits += Number(c.credits); });
+      if (gpaSettings.useCurrent && profile.currentGPA !== "" && profile.currentGPA != null && gpaSettings.priorCredits) {
+        const priorCredits = Number(gpaSettings.priorCredits);
+        totalPoints += Number(profile.currentGPA) * priorCredits;
+        totalCredits += priorCredits;
+      }
+      const gpaValue = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+      $("gpaResult").textContent = gpaValue;
+      $("gpaCreditTotal").textContent = `${totalCredits} credit hour${totalCredits == 1 ? "" : "s"}`;
+    }
+
+    function openGpaModal(id = null) {
+      editingGpaID = id;
+      if (id === null) {
+        $("gpaModalTitle").textContent = "Add Course";
+        $("editGpaName").value = "";
+        $("editGpaCredits").value = "3";
+        $("editGpaGrade").value = "4";
+        $("deleteGpaButton").style.display = "none";
+      } else {
+        const c = gpaCourses.find(course => course.id === id);
+        if (!c) return;
+        $("gpaModalTitle").textContent = "Edit Course";
+        $("editGpaName").value = c.name;
+        $("editGpaCredits").value = c.credits;
+        $("editGpaGrade").value = c.points;
+        $("deleteGpaButton").style.display = "block";
+      }
+      openModal("gpaModal");
+    }
+
+
+    function saveGpaCourse() {
+      const credits = parseFloat($("editGpaCredits").value);
+      if (!credits || credits <= 0) { alert("Please enter valid credit hours."); return; }
+      const data = {
+        name: $("editGpaName").value.trim(),
+        credits,
+        points: parseFloat($("editGpaGrade").value)
+      };
+      if (editingGpaID === null) {
+        data.id = Date.now();
+        gpaCourses.push(data);
+      } else {
+        const i = gpaCourses.findIndex(c => c.id === editingGpaID);
+        if (i !== -1) gpaCourses[i] = { ...gpaCourses[i], ...data };
+      }
+      save("gccGpaCourses", gpaCourses);
+      closeModal('gpaModal');
+      renderGpaCourses();
+    }
+
+    function deleteCurrentGpaCourse() {
+      if (editingGpaID === null) return;
+      if (!confirm("Delete this course?")) return;
+      gpaCourses = gpaCourses.filter(c => c.id !== editingGpaID);
+      save("gccGpaCourses", gpaCourses);
+      closeModal('gpaModal');
+      renderGpaCourses();
+    }
+
+    /* ===== STUDY TIMER ===== */
+    function openTimer() { openToolPage("timer"); }
+
+    function updateTimerDurations() {
+      if (timerRunning) return;
+      const focus = parseInt($("focusMinutes").value) || 25;
+      const brk = parseInt($("breakMinutes").value) || 5;
+      timerSeconds = (timerIsBreak ? brk : focus) * 60;
+      renderTimerDisplay();
+    }
+
+    function toggleTimer() { timerRunning ? pauseTimer() : runTimer(); }
+
+    function runTimer() {
+      timerRunning = true;
+      $("timerStartLabel").textContent = "Pause";
+      document.querySelector("#timerStartButton .icon").textContent = "⏸️";
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        if (timerSeconds <= 0) {
+          timerIsBreak = !timerIsBreak;
+          if (!timerIsBreak) timerCycle++;
+          const mins = timerIsBreak
+            ? (parseInt($("breakMinutes").value) || 5)
+            : (parseInt($("focusMinutes").value) || 25);
+          timerSeconds = mins * 60;
+          $("timerMode").textContent = timerIsBreak ? "BREAK TIME" : "FOCUS SESSION";
+          $("timerCycleLabel").textContent = "Session " + timerCycle;
+        }
+        renderTimerDisplay();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      timerRunning = false;
+      clearInterval(timerInterval);
+      $("timerStartLabel").textContent = "Start";
+      document.querySelector("#timerStartButton .icon").textContent = "▶️";
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerIsBreak = false;
+      timerCycle = 1;
+      $("timerMode").textContent = "FOCUS SESSION";
+      $("timerCycleLabel").textContent = "Session 1";
+      timerSeconds = (parseInt($("focusMinutes").value) || 25) * 60;
+      renderTimerDisplay();
+    }
+
+    function renderTimerDisplay() {
+      const m = Math.floor(timerSeconds / 60), s = timerSeconds % 60;
+      $("timerDisplay").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    /* ===== NOTES ===== */
+    function openNotes() { openToolPage("notes"); renderNotes(); }
+
+    function renderNotes() {
+      const container = $("notesList");
+      container.innerHTML = "";
+      if (notes.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🗒️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a note to jot something down.</div></div>`;
+        return;
+      }
+      [...notes].sort((a, b) => (b.updated || 0) - (a.updated || 0)).forEach(n => {
+        const btn = document.createElement("button");
+        btn.className = "list-button";
+        btn.onclick = () => openNoteModal(n.id);
+        const icon = n.image ? `<img class="thumb-icon" src="${n.image}" alt="">` : "🗒️";
+        btn.innerHTML = `
+      <div class="list-icon">${icon}</div>
+      <div class="list-info">
+        <div class="list-title">${escapeHTML(n.title || "Untitled")}</div>
+        <div class="list-subtitle">${escapeHTML((n.content || "").slice(0, 60))}${(n.content || "").length > 60 ? "…" : ""}</div>
+      </div>
+      <div class="arrow">›</div>
+    `;
+        container.appendChild(btn);
+      });
+    }
+
+    function openNoteModal(id = null) {
+      editingNoteID = id;
+      if (id === null) {
+        $("noteModalTitle").textContent = "Add Note";
+        $("editNoteTitle").value = "";
+        $("editNoteContent").value = "";
+        pendingNoteImage = null;
+        $("deleteNoteButton").style.display = "none";
+      } else {
+        const n = notes.find(note => note.id === id);
+        if (!n) return;
+        $("noteModalTitle").textContent = "Edit Note";
+        $("editNoteTitle").value = n.title;
+        $("editNoteContent").value = n.content;
+        pendingNoteImage = n.image || null;
+        $("deleteNoteButton").style.display = "block";
+      }
+      $("noteImagePreviewWrap").style.display = pendingNoteImage ? "block" : "none";
+      if (pendingNoteImage) $("noteImagePreview").src = pendingNoteImage;
+      openModal("noteModal");
+    }
+
+    async function handleNoteImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      pendingNoteImage = await resizeImageFile(file, 800);
+      $("noteImagePreview").src = pendingNoteImage;
+      $("noteImagePreviewWrap").style.display = "block";
+      event.target.value = "";
+    }
+
+    function removeNoteImage() {
+      pendingNoteImage = null;
+      $("noteImagePreviewWrap").style.display = "none";
+    }
+
+    function saveNote() {
+      const title = $("editNoteTitle").value.trim();
+      const content = $("editNoteContent").value.trim();
+      if (!title && !content) { alert("Please add a title or some content."); return; }
+      if (editingNoteID === null) {
+        notes.push({ id: Date.now(), title, content, image: pendingNoteImage, updated: Date.now() });
+      } else {
+        const i = notes.findIndex(n => n.id === editingNoteID);
+        if (i !== -1) notes[i] = { ...notes[i], title, content, image: pendingNoteImage, updated: Date.now() };
+      }
+      save("gccNotes", notes);
+      closeModal('noteModal');
+      renderNotes();
+    }
+
+    function deleteCurrentNote() {
+      if (editingNoteID === null) return;
+      if (!confirm("Delete this note?")) return;
+      notes = notes.filter(n => n.id !== editingNoteID);
+      save("gccNotes", notes);
+      closeModal('noteModal');
+      renderNotes();
+    }
+
+    /* ===== CHECKLISTS ===== */
+    function openChecklists() {
+      openToolPage("checklists");
+      currentChecklistID = null;
+      $("checklistDetailView").style.display = "none";
+      $("checklistListView").style.display = "block";
+      $("checklistsEditButton").style.display = "none";
+      $("checklistsPageTitle").textContent = "Checklists";
+      renderChecklistList();
+    }
+
+    function handleChecklistsBackClick() {
+      if (currentChecklistID !== null) {
+        currentChecklistID = null;
+        $("checklistDetailView").style.display = "none";
+        $("checklistListView").style.display = "block";
+        $("checklistsEditButton").style.display = "none";
+        $("checklistsPageTitle").textContent = "Checklists";
+        renderChecklistList();
+      } else {
+        showToolsFromTool();
+      }
+    }
+
+    function handleChecklistsAddClick() {
+      if (currentChecklistID !== null) $("newChecklistItemText").focus();
+      else openChecklistModal();
+    }
+
+    function renderChecklistList() {
+      const container = $("checklistList");
+      container.innerHTML = "";
+      if (checklists.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">☑️</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Checklists Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a checklist for packing, shopping, or anything else.</div></div>`;
+        return;
+      }
+      checklists.forEach(c => {
+        const done = c.items.filter(i => i.done).length;
+        const card = document.createElement("div");
+        card.className = "class-card";
+        card.style.minHeight = "auto";
+        card.onclick = () => openChecklistDetail(c.id);
+        card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:12px;height:12px;border-radius:50%;background:${c.color};flex-shrink:0;"></div>
+        <div class="class-name" style="padding-right:0;font-size:17px;">${escapeHTML(c.name)}</div>
+      </div>
+      <div class="class-code" style="margin-top:8px;">${done} of ${c.items.length} done</div>
+    `;
+        container.appendChild(card);
+      });
+    }
+
+    function openChecklistDetail(id) {
+      currentChecklistID = id;
+      const c = checklists.find(cl => cl.id === id);
+      if (!c) return;
+      $("checklistListView").style.display = "none";
+      $("checklistDetailView").style.display = "block";
+      $("checklistsEditButton").style.display = "flex";
+      $("checklistsPageTitle").textContent = c.name;
+      renderChecklistItems();
+    }
+
+    function renderChecklistItems() {
+      const c = checklists.find(cl => cl.id === currentChecklistID);
+      const container = $("checklistItemsList");
+      if (!c) { container.innerHTML = ""; return; }
+      if (c.items.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">✅</div><div style="font-size:15px;color:var(--secondary);margin-top:6px;">Add your first item above.</div></div>`;
+        return;
+      }
+      container.innerHTML = c.items.map(i => `
+    <div class="checklist-item">
+      <button class="checklist-checkbox ${i.done ? "checked" : ""}" onclick="toggleChecklistItem(${i.id})">${i.done ? "✓" : ""}</button>
+      <div class="checklist-item-text ${i.done ? "checked" : ""}" onclick="toggleChecklistItem(${i.id})">${escapeHTML(i.text)}</div>
+      <button class="checklist-item-delete" onclick="deleteChecklistItem(${i.id})">×</button>
+    </div>
+  `).join("");
+    }
+
+    function addChecklistItem() {
+      const input = $("newChecklistItemText");
+      const text = input.value.trim();
+      if (!text) return;
+      const c = checklists.find(cl => cl.id === currentChecklistID);
+      if (!c) return;
+      c.items.push({ id: Date.now(), text, done: false });
+      save("gccChecklists", checklists);
+      input.value = "";
+      renderChecklistItems();
+    }
+
+    function toggleChecklistItem(itemID) {
+      const c = checklists.find(cl => cl.id === currentChecklistID);
+      if (!c) return;
+      const item = c.items.find(i => i.id === itemID);
+      if (!item) return;
+      item.done = !item.done;
+      save("gccChecklists", checklists);
+      renderChecklistItems();
+    }
+
+    function deleteChecklistItem(itemID) {
+      const c = checklists.find(cl => cl.id === currentChecklistID);
+      if (!c) return;
+      c.items = c.items.filter(i => i.id !== itemID);
+      save("gccChecklists", checklists);
+      renderChecklistItems();
+    }
+
+    function openChecklistModal(id = null) {
+      editingChecklistID = id;
+      if (id === null) {
+        $("checklistModalTitle").textContent = "Add Checklist";
+        $("editChecklistName").value = "";
+        selectedChecklistColor = "#1769c2";
+        $("deleteChecklistButton").style.display = "none";
+      } else {
+        const c = checklists.find(cl => cl.id === id);
+        if (!c) return;
+        $("checklistModalTitle").textContent = "Edit Checklist";
+        $("editChecklistName").value = c.name;
+        selectedChecklistColor = c.color;
+        $("deleteChecklistButton").style.display = "block";
+      }
+      updateSelection("checklistColorOptions", ".color-option", "color", selectedChecklistColor);
+      openModal("checklistModal");
+    }
+
+    function selectChecklistColor(el) { selectedChecklistColor = el.dataset.color; updateSelection("checklistColorOptions", ".color-option", "color", selectedChecklistColor); }
+
+    function saveChecklist() {
+      const name = $("editChecklistName").value.trim();
+      if (!name) { alert("Please enter a checklist name."); return; }
+      if (editingChecklistID === null) {
+        checklists.push({ id: Date.now(), name, color: selectedChecklistColor, items: [] });
+      } else {
+        const i = checklists.findIndex(c => c.id === editingChecklistID);
+        if (i !== -1) { checklists[i].name = name; checklists[i].color = selectedChecklistColor; }
+      }
+      save("gccChecklists", checklists);
+      closeModal('checklistModal');
+      if (currentChecklistID !== null) {
+        $("checklistsPageTitle").textContent = name;
+        renderChecklistItems();
+      } else {
+        renderChecklistList();
+      }
+    }
+
+    function deleteCurrentChecklist() {
+      if (editingChecklistID === null) return;
+      if (!confirm("Delete this checklist and all its items?")) return;
+      checklists = checklists.filter(c => c.id !== editingChecklistID);
+      save("gccChecklists", checklists);
+      closeModal('checklistModal');
+      currentChecklistID = null;
+      $("checklistDetailView").style.display = "none";
+      $("checklistListView").style.display = "block";
+      $("checklistsEditButton").style.display = "none";
+      $("checklistsPageTitle").textContent = "Checklists";
+      renderChecklistList();
+    }
+
+    /* ===== RICH NOTES ===== */
+    let richNoteSaveTimer = null;
+
+    function openRichNotes() { openToolPage("richnotes"); renderRichNotesList(); }
+
+    function renderRichNotesList() {
+      const container = $("richNotesList");
+      container.innerHTML = "";
+      if (richNotes.length === 0) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">📝</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a note with formatting, images, and math.</div></div>`;
+        return;
+      }
+      [...richNotes].sort((a, b) => (b.updated || 0) - (a.updated || 0)).forEach(n => {
+        const snippet = (n.content || "").replace(/[#*_`>-]/g, "").replace(/!\[.*?\]\(.*?\)/g, "[image]").slice(0, 70);
+        const btn = document.createElement("button");
+        btn.className = "list-button";
+        btn.onclick = () => openRichNoteEditor(n.id);
+        btn.innerHTML = `
+      <div class="list-icon">📝</div>
+      <div class="list-info">
+        <div class="list-title">${escapeHTML(n.title || "Untitled")}</div>
+        <div class="list-subtitle">${escapeHTML(snippet)}${snippet.length >= 70 ? "…" : ""}</div>
+      </div>
+      <div class="arrow">›</div>
+    `;
+        container.appendChild(btn);
+      });
+    }
+
+    function openRichNoteEditor(id = null) {
+      editingRichNoteID = id;
+      if (id === null) {
+        $("richNoteTitle").value = "";
+        $("richNoteContent").value = "";
+        $("deleteRichNoteButton").style.display = "none";
+      } else {
+        const n = richNotes.find(note => note.id === id);
+        if (!n) return;
+        $("richNoteTitle").value = n.title;
+        $("richNoteContent").value = n.content;
+        $("deleteRichNoteButton").style.display = "block";
+      }
+      setRichNoteMode("edit");
+      openToolPage("richNoteEditor");
+    }
+
+    function closeRichNoteEditor() {
+      clearTimeout(richNoteSaveTimer);
+      commitRichNote();
+      openToolPage("richnotes");
+      renderRichNotesList();
+    }
+
+    function commitRichNote() {
+      const title = $("richNoteTitle").value.trim();
+      const content = $("richNoteContent").value;
+      if (!title && !content.trim()) {
+        if (editingRichNoteID !== null) {
+          richNotes = richNotes.filter(n => n.id !== editingRichNoteID);
+          save("gccRichNotes", richNotes);
+        }
+        return;
+      }
+      if (editingRichNoteID === null) {
+        editingRichNoteID = Date.now();
+        richNotes.push({ id: editingRichNoteID, title, content, updated: Date.now() });
+      } else {
+        const i = richNotes.findIndex(n => n.id === editingRichNoteID);
+        if (i !== -1) richNotes[i] = { ...richNotes[i], title, content, updated: Date.now() };
+      }
+      save("gccRichNotes", richNotes);
+    }
+
+    function onRichNoteChange() {
+      clearTimeout(richNoteSaveTimer);
+      richNoteSaveTimer = setTimeout(commitRichNote, 600);
+    }
+
+    function deleteCurrentRichNote() {
+      if (editingRichNoteID === null) return;
+      if (!confirm("Delete this note?")) return;
+      richNotes = richNotes.filter(n => n.id !== editingRichNoteID);
+      save("gccRichNotes", richNotes);
+      editingRichNoteID = null;
+      openToolPage("richnotes");
+      renderRichNotesList();
+    }
+
+    function setRichNoteMode(mode) {
+      const isEdit = mode === "edit";
+      $("richNoteEditView").style.display = isEdit ? "block" : "none";
+      $("richNotePreviewView").style.display = isEdit ? "none" : "block";
+      $("richNoteEditModeBtn").classList.toggle("active", isEdit);
+      $("richNotePreviewModeBtn").classList.toggle("active", !isEdit);
+      if (!isEdit) renderRichNotePreview();
+    }
+
+    function renderRichNotePreview() {
+      const raw = $("richNoteContent").value || "";
+      const mathBlocks = [];
+      let text = raw.replace(/\$\$([\s\S]+?)\$\$/g, (m, expr) => {
+        mathBlocks.push({ expr, display: true });
+        return `%%MATH${mathBlocks.length - 1}%%`;
+      });
+      text = text.replace(/\$([^$\n]+?)\$/g, (m, expr) => {
+        mathBlocks.push({ expr, display: false });
+        return `%%MATH${mathBlocks.length - 1}%%`;
+      });
+      let html = typeof marked !== "undefined" ? marked.parse(text) : escapeHTML(text);
+      html = html.replace(/%%MATH(\d+)%%/g, (m, i) => {
+        const { expr, display } = mathBlocks[i];
+        try { return typeof katex !== "undefined" ? katex.renderToString(expr, { throwOnError: false, displayMode: display }) : m; }
+        catch { return m; }
+      });
+      $("richNotePreviewView").innerHTML = html;
+    }
+
+    function richNoteWrap(before, after, placeholder) {
+      const ta = $("richNoteContent");
+      const start = ta.selectionStart, end = ta.selectionEnd;
+      const text = ta.value;
+      const selected = text.slice(start, end) || placeholder;
+      ta.value = text.slice(0, start) + before + selected + after + text.slice(end);
+      const pos = start + before.length + selected.length + after.length;
+      ta.focus();
+      ta.setSelectionRange(pos, pos);
+      onRichNoteChange();
+    }
+
+    function richNotePrefixLine(prefix) {
+      const ta = $("richNoteContent");
+      const start = ta.selectionStart;
+      const text = ta.value;
+      const lineStart = text.lastIndexOf("\n", start - 1) + 1;
+      ta.value = text.slice(0, lineStart) + prefix + text.slice(lineStart);
+      const pos = start + prefix.length;
+      ta.focus();
+      ta.setSelectionRange(pos, pos);
+      onRichNoteChange();
+    }
+
+    async function handleRichNoteImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const dataUrl = await resizeImageFile(file, 900);
+      const ta = $("richNoteContent");
+      const start = ta.selectionStart;
+      const md = `\n![](${dataUrl})\n`;
+      ta.value = ta.value.slice(0, start) + md + ta.value.slice(start);
+      ta.focus();
+      ta.setSelectionRange(start + md.length, start + md.length);
+      onRichNoteChange();
+      event.target.value = "";
+    }
+
+    /* ===== PASSWORDS ===== */
+    let viewingPasswordID = null;
+    function openPasswordVault() { openToolPage("passwords"); renderPasswordEntries(); }
+    function renderPasswordEntries() {
+      const container = $("passwordList"); container.innerHTML = "";
+      if (!passwordEntries.length) { container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🔐</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Passwords Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a login or other information below.</div></div>`; return; }
+      passwordEntries.forEach(entry => {
+        const btn = document.createElement("button"); btn.className = "password-card"; btn.onclick = () => openPasswordDetail(entry.id);
+        btn.innerHTML = `<div class="password-card-top"><div class="list-icon" style="margin-right:0;">🔐</div><div class="list-info"><div class="list-title">${escapeHTML(entry.name || "Untitled")}</div><div class="password-type">${escapeHTML(entry.website || entry.email || entry.username || entry.phone || "Login information")}</div></div><div class="arrow">›</div></div>`;
+        container.appendChild(btn);
+      });
+    }
+    function openPasswordDetail(id) {
+      const entry = passwordEntries.find(e => e.id === id); if (!entry) return; viewingPasswordID = id;
+      const text = (v) => v ? escapeHTML(v) : "—";
+      $("passwordDetailTitle").textContent = entry.name || "Password";
+      $("detailUsername").innerHTML = text(entry.username);
+      $("detailEmail").innerHTML = text(entry.email);
+      $("detailPassword").innerHTML = entry.password ? `<span style="font-family:monospace;word-break:break-all;">${escapeHTML(entry.password)}</span>` : "—";
+      $("detailWebsite").innerHTML = text(entry.website);
+      $("detailPhone").innerHTML = formatPhone(entry.phone) || "—";
+      $("detailNotes").innerHTML = text(entry.notes);
+      openModal("passwordDetailModal");
+    }
+    function closePasswordDetail() { closeModal("passwordDetailModal"); viewingPasswordID = null; }
+    function editPasswordFromDetail() { const id = viewingPasswordID; closePasswordDetail(); if (id !== null) openPasswordModal(id); }
+    function openPasswordModal(id = null) {
+      editingPasswordID = id;
+      const fields = ["editPasswordName", "editPasswordUsername", "editPasswordEmail", "editPasswordPassword", "editPasswordWebsite", "editPasswordPhone", "editPasswordNotes"];
+      if (id === null) { $("passwordModalTitle").textContent = "Add Password / Info"; fields.forEach(x => $(x).value = ""); $("deletePasswordButton").style.display = "none"; }
+      else { const entry = passwordEntries.find(e => e.id === id); if (!entry) return; $("passwordModalTitle").textContent = "Edit Password / Info"; $("editPasswordName").value = entry.name || ""; $("editPasswordUsername").value = entry.username || ""; $("editPasswordEmail").value = entry.email || ""; $("editPasswordPassword").value = entry.password || ""; $("editPasswordWebsite").value = entry.website || ""; $("editPasswordPhone").value = entry.phone || ""; $("editPasswordNotes").value = entry.notes || ""; $("deletePasswordButton").style.display = "block"; }
+      setPasswordInputVisibility(false); openModal("passwordModal");
+    }
+    const EYE_ICON_PATHS = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+    const EYE_OFF_ICON_PATHS = `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+    function setPasswordInputVisibility(show) {
+      const input = $("editPasswordPassword");
+      if (input) input.type = show ? "text" : "password";
+      const icon = $("passwordVisibilityIcon");
+      if (icon) icon.innerHTML = show ? EYE_OFF_ICON_PATHS : EYE_ICON_PATHS;
+      const toggle = $("passwordVisibilityToggle");
+      if (toggle) toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    }
+    function togglePasswordInputVisibility() { const input = $("editPasswordPassword"); setPasswordInputVisibility(input.type === "password"); }
+    function savePasswordEntry() {
+      const data = { name: $("editPasswordName").value.trim(), username: $("editPasswordUsername").value.trim(), email: $("editPasswordEmail").value.trim(), password: $("editPasswordPassword").value, website: $("editPasswordWebsite").value.trim(), phone: $("editPasswordPhone").value.trim(), notes: $("editPasswordNotes").value.trim() };
+      if (!data.name) { alert("Please enter a name or service."); return; } if (editingPasswordID === null) { data.id = Date.now(); passwordEntries.push(data); } else { const i = passwordEntries.findIndex(e => e.id === editingPasswordID); if (i !== -1) passwordEntries[i] = { ...passwordEntries[i], ...data }; } save("gccPasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries();
+    }
+    function deleteCurrentPasswordEntry() { if (editingPasswordID === null) return; if (!confirm("Delete this entry?")) return; passwordEntries = passwordEntries.filter(e => e.id !== editingPasswordID); save("gccPasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries(); }
+
+    /* ===== RESET ===== */
+    function resetAllData() {
+      if (!confirm("This will delete your profile, school info, classes, calendar events, calendar colors, links, projects, study sets, GPA courses, checklists, and notes. Continue?")) return;
+      ["gccProfile", "gccSchoolInfo", "gccClasses", "gccCalendarEvents", "gccDayColors", "gccProjects", "gccHomeLinks", "gccStudySets", "gccGpaCourses", "gccGpaSettings", "gccNotes", "gccRichNotes", "gccChecklists", "gccPasswordEntries"].forEach(k => localStorage.removeItem(k));
+      location.reload();
+    }
+
+    /* ===== START ===== */
+    loadDarkMode();
+    renderProfile();
+    renderSchoolInfo();
+    renderClasses();
+    renderCalendar();
+    renderHomeLinks();
+    renderTimerDisplay();
+    setupAvatarCropDragHandlers();
+  </script>
+</body>
+
+</html>
