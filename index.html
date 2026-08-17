@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f4f5f7">
-  <link rel="icon" type="image/svg+xml" href="Icons/Favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="Favicon.svg">
   <link rel="alternate icon" type="image/png" sizes="512x512" href="Icons/My Student (Classic).png"
     id="alternateIconLink">
   <link rel="apple-touch-icon" href="Icons/My Student (Classic).png" id="appleTouchIconLink">
@@ -37,11 +37,6 @@
       --nav: rgba(255, 255, 255, .92);
       --danger: #ff3b30;
       --shadow: 0 4px 16px rgba(0, 0, 0, .05);
-      --glass-bg: rgba(255, 255, 255, .55);
-      --glass-bg-strong: rgba(255, 255, 255, .68);
-      --glass-border: rgba(255, 255, 255, .8);
-      --glass-highlight: rgba(255, 255, 255, .9);
-      --glass-shadow: 0 8px 32px rgba(31, 38, 68, .12), 0 1px 1px rgba(255, 255, 255, .4) inset;
     }
 
     body.dark {
@@ -53,11 +48,6 @@
       --blue-light: #202d3e;
       --nav: rgba(27, 28, 32, .94);
       --shadow: 0 5px 18px rgba(0, 0, 0, .25);
-      --glass-bg: rgba(40, 42, 48, .5);
-      --glass-bg-strong: rgba(40, 42, 48, .62);
-      --glass-border: rgba(255, 255, 255, .14);
-      --glass-highlight: rgba(255, 255, 255, .18);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, .4), 0 1px 1px rgba(255, 255, 255, .06) inset;
     }
 
     body {
@@ -86,7 +76,6 @@
     .page {
       display: none;
       animation: pageIn .25s ease;
-      transition: transform .25s ease, opacity .25s ease;
     }
 
     .page.active {
@@ -732,6 +721,7 @@
       height: 64px;
       border-radius: 16px;
       box-shadow: var(--shadow);
+      background-color: #0b0b0e;
       border: 2px solid transparent;
     }
 
@@ -1256,9 +1246,7 @@
       position: fixed;
       inset: 0;
       z-index: 500;
-      background: rgba(0, 0, 0, .35);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, .45);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -1268,17 +1256,6 @@
 
     .modal-background.show {
       display: flex;
-      animation: modalFade .2s ease;
-    }
-
-    @keyframes modalFade {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
     }
 
     .modal {
@@ -1290,52 +1267,20 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      position: relative;
-      background: linear-gradient(180deg, var(--glass-bg-strong), var(--glass-bg));
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--card);
       color: var(--text);
-      border: 1px solid var(--glass-border);
-      border-radius: 28px 28px 18px 18px;
-      padding: 32px 22px 22px;
-      animation: modalUp .32s cubic-bezier(.25, 1, .4, 1);
-      box-shadow: var(--glass-shadow), 0 20px 50px rgba(0, 0, 0, .2);
-    }
-
-    .modal::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      background: linear-gradient(135deg, var(--glass-highlight) 0%, transparent 35%);
-      opacity: .5;
-      mix-blend-mode: overlay;
-    }
-
-    .modal::after {
-      content: "";
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 36px;
-      height: 5px;
-      border-radius: 3px;
-      background: var(--secondary);
-      opacity: .35;
-      pointer-events: none;
+      border-radius: 25px 25px 18px 18px;
+      padding: 22px;
+      animation: modalUp .25s ease;
     }
 
     @keyframes modalUp {
       from {
-        transform: translateY(60px) scale(.96);
-        opacity: 0;
+        transform: translateY(100%);
       }
 
       to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+        transform: translateY(0);
       }
     }
 
@@ -1359,11 +1304,6 @@
       border-radius: 12px;
       font-size: 18px;
       cursor: pointer;
-      transition: transform .12s ease, background .12s ease;
-    }
-
-    .close-button:active {
-      transform: scale(.88);
     }
 
     .class-day-buttons {
@@ -1665,26 +1605,15 @@
       transform: translateX(-50%);
       width: min(calc(100% - 24px), 470px);
       height: 67px;
-      background: linear-gradient(180deg, var(--glass-bg-strong), var(--glass-bg));
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid var(--glass-border);
+      background: var(--nav);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
       border-radius: 23px;
       display: flex;
       align-items: center;
       justify-content: space-around;
-      box-shadow: var(--glass-shadow), 0 10px 35px rgba(0, 0, 0, .13);
-    }
-
-    .bottom-nav::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      background: linear-gradient(135deg, var(--glass-highlight) 0%, transparent 35%);
-      opacity: .5;
-      mix-blend-mode: overlay;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, .13);
     }
 
     .nav-button {
@@ -1699,56 +1628,20 @@
       justify-content: center;
       gap: 3px;
       cursor: pointer;
-      position: relative;
-      transition: transform .12s ease, color .15s ease;
-    }
-
-    .nav-button:active {
-      transform: scale(.9);
     }
 
     .nav-icon {
       font-size: 21px;
       line-height: 22px;
-      position: relative;
-      transition: transform .18s cubic-bezier(.34, 1.56, .64, 1);
     }
 
     .nav-label {
       font-size: 10px;
       font-weight: 600;
-      position: relative;
     }
 
     .nav-button.active {
       color: var(--blue);
-    }
-
-    .nav-button.active .nav-icon {
-      transform: translateY(-1px) scale(1.08);
-    }
-
-    .nav-button.active::before {
-      content: "";
-      position: absolute;
-      inset: 6px 8px;
-      border-radius: 16px;
-      background: var(--blue-light);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
-      z-index: -1;
-      animation: navPillIn .22s cubic-bezier(.34, 1.56, .64, 1);
-    }
-
-    @keyframes navPillIn {
-      from {
-        transform: scale(.6);
-        opacity: 0;
-      }
-
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
     }
 
     /* Flashcards */
@@ -2086,7 +1979,7 @@
     <div id="gpa" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
           <h1>GPA Calculator</h1>
         </div>
       </div>
@@ -2121,7 +2014,7 @@
     <div id="timer" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
           <h1>Study Timer</h1>
         </div>
       </div>
@@ -2162,7 +2055,7 @@
     <div id="notes" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
           <h1>Quick Notes</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openNoteModal()">+</button></div>
@@ -2176,7 +2069,7 @@
     <div id="richnotes" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
           <h1>Notes</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openRichNoteEditor()">+</button></div>
@@ -2190,7 +2083,7 @@
     <div id="richNoteEditor" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="closeRichNoteEditor()">‹</button>
+          <button class="icon-button" onclick="closeRichNoteEditor()">‹</button>
         </div>
         <div class="top-bar-actions">
           <div class="mode-toggle">
@@ -2338,7 +2231,7 @@
     <div id="passwords" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
           <h1>Passwords</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openPasswordModal()">+</button></div>
@@ -2482,7 +2375,7 @@
     <div id="accountPage" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showSettingsFromTools()">‹</button>
+          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
           <h1>Account &amp; Sync</h1>
         </div>
       </div>
@@ -2525,7 +2418,7 @@
     <div id="profileInfo" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button page-back-button" onclick="showSettingsFromTools()">‹</button>
+          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
           <h1>Profile</h1>
         </div>
       </div>
@@ -5870,9 +5763,9 @@
        home screen won't update itself — it has to be removed and re-added. */
     const ICON_OPTIONS = [
       { id: "default", name: "Classic", icon: "Icons/My Student (Classic).png" },
-      { id: "duotone-dark", name: "Classic Duotone Dark", icon: "Icons/My Student (Duotone Dark).png" },
-      { id: "duotone-light", name: "Classic Duotone Light", icon: "Icons/My Student (Duotone Light).png" },
-      { id: "vibrant", name: "Classic Vibrant", icon: "Icons/My Student (Vibrant).png" },
+      { id: "duotone-dark", name: "Classic Duotone Dark", icon: "Icons/My Student (Classic Duotone Dark).png" },
+      { id: "duotone-light", name: "Classic Duotone Light", icon: "Icons/My Student (Classic Duotone Light).png" },
+      { id: "Red", name: "Red", icon: "Icons/My Student (Red).png" },
       { id: "blue", name: "Blue", icon: "Icons/My Student (Blue).png" },
       { id: "green", name: "Green", icon: "Icons/My Student (Green).png" },
       { id: "purple", name: "Purple", icon: "Icons/My Student (Purple).png" },
@@ -5933,93 +5826,6 @@
         };
       } catch (e) { /* IndexedDB unavailable — icon still applies via the link tags above */ }
     }
-
-    /* ===== SWIPE GESTURES ===== */
-
-    /* Edge swipe-right to go back on any page that has a back button */
-    (function setupSwipeBack() {
-      const EDGE_ZONE = 35;      // must start within this many px of the left edge
-      const THRESHOLD = 90;      // px of horizontal travel to trigger back
-      let tracking = false, startX = 0, startY = 0, activePage = null, backBtn = null;
-
-      document.addEventListener("touchstart", e => {
-        if (e.touches.length !== 1) return;
-        const touch = e.touches[0];
-        if (touch.clientX > EDGE_ZONE) return;
-        activePage = document.querySelector(".page.active");
-        backBtn = activePage ? activePage.querySelector(".page-back-button") : null;
-        if (!backBtn) return;
-        tracking = true;
-        startX = touch.clientX;
-        startY = touch.clientY;
-        activePage.style.transition = "none";
-      }, { passive: true });
-
-      document.addEventListener("touchmove", e => {
-        if (!tracking) return;
-        const touch = e.touches[0];
-        const dx = touch.clientX - startX;
-        const dy = touch.clientY - startY;
-        if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) { tracking = false; return; }
-        if (activePage && dx > 0) {
-          activePage.style.transform = `translateX(${Math.min(dx, 120)}px)`;
-          activePage.style.opacity = String(1 - Math.min(dx, 120) / 200);
-        }
-      }, { passive: true });
-
-      document.addEventListener("touchend", e => {
-        if (!tracking) return;
-        tracking = false;
-        const touch = e.changedTouches[0];
-        const dx = touch.clientX - startX;
-        if (activePage) {
-          activePage.style.transition = "";
-          activePage.style.transform = "";
-          activePage.style.opacity = "";
-        }
-        if (dx > THRESHOLD && backBtn) backBtn.click();
-        activePage = null; backBtn = null;
-      }, { passive: true });
-    })();
-
-    /* Swipe down from a modal's top handle to dismiss it */
-    (function setupSwipeCloseModal() {
-      const HANDLE_ZONE = 40;    // px from the modal's top edge that counts as the handle area
-      const THRESHOLD = 90;      // px of downward travel to trigger close
-      let tracking = false, startY = 0, modalEl = null, bgEl = null;
-
-      document.addEventListener("touchstart", e => {
-        if (e.touches.length !== 1) return;
-        const modal = e.target.closest(".modal");
-        if (!modal) return;
-        const rect = modal.getBoundingClientRect();
-        const touch = e.touches[0];
-        if (touch.clientY - rect.top > HANDLE_ZONE) return;
-        tracking = true;
-        startY = touch.clientY;
-        modalEl = modal;
-        bgEl = modal.closest(".modal-background");
-        modalEl.style.transition = "none";
-      }, { passive: true });
-
-      document.addEventListener("touchmove", e => {
-        if (!tracking) return;
-        const touch = e.touches[0];
-        const dy = touch.clientY - startY;
-        if (dy > 0) modalEl.style.transform = `translateY(${dy}px)`;
-      }, { passive: true });
-
-      document.addEventListener("touchend", e => {
-        if (!tracking) return;
-        tracking = false;
-        const touch = e.changedTouches[0];
-        const dy = touch.clientY - startY;
-        modalEl.style.transition = "";
-        modalEl.style.transform = "";
-        if (dy > THRESHOLD && bgEl) closeModal(bgEl.id);
-        modalEl = null; bgEl = null;
-      }, { passive: true });
-    })();
 
     /* ===== START ===== */
     loadDarkMode();
