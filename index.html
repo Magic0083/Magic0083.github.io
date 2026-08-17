@@ -11,10 +11,12 @@
   <link rel="alternate icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
   <title>My Student Hub</title>
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore-compat.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -612,6 +614,84 @@
       justify-content: center;
       font-size: 12px;
       cursor: pointer;
+    }
+
+    .slide-confirm-track {
+      position: relative;
+      height: 54px;
+      border-radius: 27px;
+      background: var(--background);
+      box-shadow: inset 0 0 0 1px var(--border);
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .slide-confirm-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+      pointer-events: none;
+      transition: color .15s;
+    }
+
+    .slide-confirm-track.armed .slide-confirm-label {
+      color: var(--danger);
+    }
+
+    .slide-confirm-handle {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: grab;
+      transition: left .2s;
+      touch-action: none;
+    }
+
+    .slide-confirm-handle.dragging {
+      transition: none;
+      cursor: grabbing;
+    }
+
+    .recent-account-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 10px 8px 14px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .recent-account-remove {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--secondary);
+      font-size: 12px;
+      line-height: 1;
     }
 
     .avatar-crop-viewport {
@@ -2107,8 +2187,9 @@
         <div class="top-bar-actions"><button class="icon-button" onclick="openPasswordModal()">+</button></div>
       </div>
       <div class="security-note">
-        Your entries are stored only in this browser's local storage. This is a convenience tool, not an encrypted
-        password manager. Avoid storing anything highly sensitive here.
+        This is a convenience tool, not an encrypted password manager. Entries are stored in this browser, and if
+        you're signed in to an account, they also sync to your private cloud storage. Avoid storing anything highly
+        sensitive here.
       </div>
       <div id="passwordList" class="list"></div>
       <button class="add-class-button" onclick="openPasswordModal()">+ Add Password / Info</button>
@@ -2170,6 +2251,18 @@
       </div>
 
       <div class="settings-section">
+        <div class="settings-label">ACCOUNT</div>
+        <button class="setting-row" onclick="openAccountPage()">
+          <div class="setting-icon">☁️</div>
+          <div class="setting-info">
+            <div class="setting-title">Account &amp; Sync</div>
+            <div id="accountSettingsSubtitle" class="setting-description">Sign in to sync across devices</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+      </div>
+
+      <div class="settings-section">
         <div class="settings-label">SCHOOL</div>
         <button class="setting-row" onclick="openSchoolInfoModal()">
           <div class="setting-icon">🏫</div>
@@ -2206,7 +2299,7 @@
 
       <div class="settings-section">
         <div class="settings-label">DATA</div>
-        <button class="setting-row" onclick="resetAllData()">
+        <button class="setting-row" onclick="openResetConfirm()">
           <div class="setting-icon">🗑️</div>
           <div class="setting-info">
             <div class="setting-title">Reset App Data</div>
@@ -2216,6 +2309,48 @@
         </button>
       </div>
       <div class="footer">My Student Hub<br>Version 5.1</div>
+    </div>
+
+    <!-- ACCOUNT & SYNC -->
+    <div id="accountPage" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
+          <h1>Account &amp; Sync</h1>
+        </div>
+      </div>
+
+      <div id="accountSignedOutView">
+        <div class="quiz-help" style="margin-bottom:18px;">Create an account to back up your data and pick up right
+          where you left off on another computer. Everything still works offline — changes sync automatically once
+          you're back online.</div>
+        <div id="recentAccountsWrap" style="display:none;margin-bottom:18px;">
+          <label class="form-label">RECENT ACCOUNTS</label>
+          <div id="recentAccountsList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+        </div>
+        <div class="form-group"><label class="form-label">EMAIL</label><input id="accountEmail" class="form-input"
+            type="email" autocomplete="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">PASSWORD</label><input id="accountPassword" class="form-input"
+            type="password" autocomplete="current-password" placeholder="At least 6 characters">
+        </div>
+        <div id="accountError" style="color:#e5484d;font-size:13px;margin:-6px 0 14px;display:none;"></div>
+        <button class="primary-button" onclick="accountLogIn()">Log In</button>
+        <button class="secondary-button" onclick="accountSignUp()">Create Account</button>
+      </div>
+
+      <div id="accountSignedInView" style="display:none;">
+        <div class="info-card" style="margin-bottom:20px;">
+          <div class="info-row">
+            <div class="info-label">Email</div>
+            <div id="accountEmailDisplay" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Status</div>
+            <div id="accountSyncStatus" class="info-value">—</div>
+          </div>
+        </div>
+        <button class="secondary-button" onclick="accountLogOut()">Log Out</button>
+      </div>
     </div>
 
     <!-- PROFILE INFO -->
@@ -2314,6 +2449,23 @@
     </div>
   </div>
 
+  <!-- RESET CONFIRM MODAL -->
+  <div id="resetConfirmModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Reset App Data</h2><button class="close-button" onclick="closeResetConfirm()">×</button>
+      </div>
+      <div class="quiz-help" style="margin-bottom:22px;">This will permanently delete your profile, school info,
+        classes, calendar events, calendar colors, links, projects, study sets, GPA courses, checklists, notes, and
+        passwords<span id="resetConfirmCloudNote"></span>. This can't be undone.</div>
+      <div class="slide-confirm-track" id="resetSlideTrack">
+        <div class="slide-confirm-label" id="resetSlideLabel">Slide to confirm reset</div>
+        <div class="slide-confirm-handle" id="resetSlideHandle">›</div>
+      </div>
+      <button class="secondary-button" onclick="closeResetConfirm()" style="margin-top:18px;">Cancel</button>
+    </div>
+  </div>
+
   <!-- PROFILE MODAL -->
   <div id="profileModal" class="modal-background">
     <div class="modal">
@@ -2342,7 +2494,8 @@
       </div>
       <div class="form-group">
         <label class="form-label">CURRENT GPA</label>
-        <input id="editCurrentGPA" class="form-input" type="number" min="0" max="4" step="0.01" inputmode="decimal" placeholder="3.50">
+        <input id="editCurrentGPA" class="form-input" type="number" min="0" max="4" step="0.01" inputmode="decimal"
+          placeholder="3.50">
       </div>
       <div class="quiz-help">Enter your current overall GPA from 0.00 to 4.00.</div>
       <button class="primary-button" onclick="saveCurrentGPA()">Save GPA</button>
@@ -2890,19 +3043,228 @@
   </div>
 
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./service-worker.js");
-    }
-
     /* ===== SHORTCUTS ===== */
     const $ = id => document.getElementById(id);
     const $$ = sel => document.querySelectorAll(sel);
-    const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+    const save = (key, val) => { localStorage.setItem(key, JSON.stringify(val)); queueCloudSync(key); };
     const load = key => JSON.parse(localStorage.getItem(key));
     const openModal = id => $(id).classList.add("show");
     const closeModal = id => $(id).classList.remove("show");
     const updateSelection = (containerId, itemSel, attr, value) =>
       $$(`#${containerId} ${itemSel}`).forEach(el => el.classList.toggle("selected", el.dataset[attr] === value));
+
+    /* ===== ACCOUNT & CLOUD SYNC ===== */
+    const SYNC_KEYS = ["gccProfile", "gccSchoolInfo", "gccClasses", "gccCalendarEvents", "gccDayColors", "gccProjects", "gccHomeLinks", "gccStudySets", "gccGpaCourses", "gccGpaSettings", "gccNotes", "gccRichNotes", "gccChecklists", "gccPasswordEntries"];
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpDhllQm24yZNAKn9gy3sF7zSGTKnXY0Y",
+      authDomain: "my-student-hub-4c697.firebaseapp.com",
+      projectId: "my-student-hub-4c697",
+      storageBucket: "my-student-hub-4c697.firebasestorage.app",
+      messagingSenderId: "651985103374",
+      appId: "1:651985103374:web:20e38ec776e683704bea5f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    try {
+      db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+        console.warn("Offline cache unavailable:", err.code);
+      });
+    } catch (e) { console.warn("Offline cache unavailable:", e); }
+
+    let cloudSyncTimer = null;
+    let applyingRemoteData = false;
+    let cloudUnsubscribe = null;
+    let initialSyncDone = false;
+
+    function localSnapshot() {
+      const snap = {};
+      SYNC_KEYS.forEach(k => { snap[k] = load(k) ?? null; });
+      return snap;
+    }
+
+    function canonicalJSON(obj) {
+      if (obj === null || typeof obj !== "object") return JSON.stringify(obj);
+      if (Array.isArray(obj)) return "[" + obj.map(canonicalJSON).join(",") + "]";
+      const keys = Object.keys(obj).sort();
+      return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJSON(obj[k])).join(",") + "}";
+    }
+
+    function snapshotsEqual(a, b) { return canonicalJSON(a) === canonicalJSON(b); }
+
+    function queueCloudSync(key) {
+      if (!auth.currentUser || applyingRemoteData || !SYNC_KEYS.includes(key)) return;
+      setSyncStatus("Syncing…");
+      clearTimeout(cloudSyncTimer);
+      cloudSyncTimer = setTimeout(pushLocalToCloud, 800);
+    }
+
+    function pushLocalToCloud() {
+      const user = auth.currentUser;
+      if (!user) return;
+      db.collection("users").doc(user.uid).set(localSnapshot(), { merge: true })
+        .then(() => setSyncStatus("Synced"))
+        .catch(err => { console.error("Sync failed:", err); setSyncStatus("Sync error — will retry"); });
+    }
+
+    function applyCloudSnapshot(data) {
+      applyingRemoteData = true;
+      SYNC_KEYS.forEach(k => {
+        if (data[k] !== undefined && data[k] !== null) localStorage.setItem(k, JSON.stringify(data[k]));
+      });
+      applyingRemoteData = false;
+    }
+
+    function setSyncStatus(text) {
+      const el = $("accountSyncStatus");
+      if (el) el.textContent = text;
+    }
+
+    function showSyncBanner() {
+      if ($("cloudSyncBanner")) return;
+      const banner = document.createElement("div");
+      banner.id = "cloudSyncBanner";
+      banner.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--blue);color:#fff;padding:10px 18px;border-radius:14px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:999;cursor:pointer;max-width:85vw;text-align:center;";
+      banner.textContent = "Updated on another device — tap to refresh";
+      banner.onclick = () => location.reload();
+      document.body.appendChild(banner);
+    }
+
+    function renderAccountUI(user) {
+      const subtitle = $("accountSettingsSubtitle");
+      const outView = $("accountSignedOutView");
+      const inView = $("accountSignedInView");
+      if (user) {
+        if (subtitle) subtitle.textContent = user.email;
+        if (outView) outView.style.display = "none";
+        if (inView) inView.style.display = "block";
+        const emailEl = $("accountEmailDisplay");
+        if (emailEl) emailEl.textContent = user.email;
+        setSyncStatus(navigator.onLine ? "Syncing…" : "Offline — will sync when back online");
+      } else {
+        if (subtitle) subtitle.textContent = "Sign in to sync across devices";
+        if (outView) outView.style.display = "block";
+        if (inView) inView.style.display = "none";
+      }
+    }
+
+    function accountShowError(msg) {
+      const el = $("accountError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function accountClearError() {
+      const el = $("accountError");
+      el.style.display = "none";
+      el.textContent = "";
+    }
+
+    /* ===== REMEMBERED ACCOUNTS (device-local only, never synced) ===== */
+    const REMEMBERED_ACCOUNTS_KEY = "gccRememberedAccounts";
+    function getRememberedAccounts() { return JSON.parse(localStorage.getItem(REMEMBERED_ACCOUNTS_KEY)) || []; }
+    function setRememberedAccounts(list) { localStorage.setItem(REMEMBERED_ACCOUNTS_KEY, JSON.stringify(list)); }
+
+    function rememberAccountEmail(email) {
+      if (!email) return;
+      let list = getRememberedAccounts().filter(e => e.toLowerCase() !== email.toLowerCase());
+      list.unshift(email);
+      setRememberedAccounts(list.slice(0, 5));
+      renderRecentAccounts();
+    }
+
+    function forgetAccountEmail(email, event) {
+      if (event) event.stopPropagation();
+      setRememberedAccounts(getRememberedAccounts().filter(e => e.toLowerCase() !== email.toLowerCase()));
+      renderRecentAccounts();
+    }
+
+    function selectRecentAccount(email) {
+      $("accountEmail").value = email;
+      $("accountPassword").value = "";
+      accountClearError();
+      $("accountPassword").focus();
+    }
+
+    function renderRecentAccounts() {
+      const wrap = $("recentAccountsWrap");
+      const list = $("recentAccountsList");
+      if (!wrap || !list) return;
+      const accounts = getRememberedAccounts();
+      if (!accounts.length) { wrap.style.display = "none"; list.innerHTML = ""; return; }
+      wrap.style.display = "block";
+      list.innerHTML = accounts.map(email => `
+        <button type="button" class="recent-account-chip" onclick="selectRecentAccount('${escapeHTML(email)}')">
+          <span>${escapeHTML(email)}</span>
+          <span class="recent-account-remove" onclick="forgetAccountEmail('${escapeHTML(email)}', event)">×</span>
+        </button>
+      `).join("");
+    }
+
+    function openAccountPage() { accountClearError(); renderRecentAccounts(); openToolPage("accountPage"); }
+
+    function accountSignUp() {
+      accountClearError();
+      const email = $("accountEmail").value.trim();
+      const password = $("accountPassword").value;
+      if (!email || !password) { accountShowError("Enter an email and password."); return; }
+      if (password.length < 6) { accountShowError("Password must be at least 6 characters."); return; }
+      auth.createUserWithEmailAndPassword(email, password).catch(err => accountShowError(err.message));
+    }
+
+    function accountLogIn() {
+      accountClearError();
+      const email = $("accountEmail").value.trim();
+      const password = $("accountPassword").value;
+      if (!email || !password) { accountShowError("Enter an email and password."); return; }
+      auth.signInWithEmailAndPassword(email, password).catch(err => accountShowError(err.message));
+    }
+
+    function accountLogOut() {
+      if (!confirm("Log out? Your data stays on this device and will sync again next time you log in.")) return;
+      if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
+      auth.signOut();
+    }
+
+    auth.onAuthStateChanged(user => {
+      renderAccountUI(user);
+      if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
+      if (!user) { initialSyncDone = false; return; }
+      initialSyncDone = false;
+      rememberAccountEmail(user.email);
+      const docRef = db.collection("users").doc(user.uid);
+      cloudUnsubscribe = docRef.onSnapshot(snap => {
+        if (snap.metadata.hasPendingWrites) return;
+        if (!snap.exists) {
+          if (!initialSyncDone) { initialSyncDone = true; pushLocalToCloud(); }
+          return;
+        }
+        const incoming = snap.data() || {};
+        if (!initialSyncDone) {
+          initialSyncDone = true;
+          const reloadGuardKey = "gccSyncReloaded_" + user.uid;
+          if (!snapshotsEqual(incoming, localSnapshot())) {
+            applyCloudSnapshot(incoming);
+            if (!sessionStorage.getItem(reloadGuardKey)) {
+              sessionStorage.setItem(reloadGuardKey, "1");
+              location.reload();
+            } else {
+              setSyncStatus("Synced");
+            }
+          } else {
+            sessionStorage.removeItem(reloadGuardKey);
+            setSyncStatus("Synced");
+          }
+          return;
+        }
+        if (snapshotsEqual(incoming, localSnapshot())) { setSyncStatus("Synced"); return; }
+        applyCloudSnapshot(incoming);
+        showSyncBanner();
+      }, err => { console.error("Sync listener error:", err); setSyncStatus("Sync error"); });
+    });
+
+    window.addEventListener("online", () => { if (auth.currentUser) setSyncStatus("Back online — syncing…"); });
+    window.addEventListener("offline", () => { if (auth.currentUser) setSyncStatus("Offline — changes will sync when back online"); });
 
     /* ===== DATA ===== */
     let profile = load("gccProfile") || { name: "", grade: "", birthday: "", meid: "", major: "", email: "", phone: "", currentGPA: "", avatar: "", avatarSource: "", avatarCrop: null };
@@ -5144,14 +5506,76 @@
     function deleteCurrentPasswordEntry() { if (editingPasswordID === null) return; if (!confirm("Delete this entry?")) return; passwordEntries = passwordEntries.filter(e => e.id !== editingPasswordID); save("gccPasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries(); }
 
     /* ===== RESET ===== */
-    function resetAllData() {
-      if (!confirm("This will delete your profile, school info, classes, calendar events, calendar colors, links, projects, study sets, GPA courses, checklists, and notes. Continue?")) return;
-      ["gccProfile", "gccSchoolInfo", "gccClasses", "gccCalendarEvents", "gccDayColors", "gccProjects", "gccHomeLinks", "gccStudySets", "gccGpaCourses", "gccGpaSettings", "gccNotes", "gccRichNotes", "gccChecklists", "gccPasswordEntries"].forEach(k => localStorage.removeItem(k));
+    let resetSlideDragging = false, resetSlideStartX = 0, resetSlideHandleStartLeft = 0, resetSlideMax = 0;
+
+    function openResetConfirm() {
+      const cloudNote = $("resetConfirmCloudNote");
+      if (cloudNote) cloudNote.textContent = auth.currentUser ? ", including your synced copy in the cloud" : "";
+      resetSlideReset();
+      openModal("resetConfirmModal");
+    }
+
+    function closeResetConfirm() {
+      closeModal("resetConfirmModal");
+      resetSlideReset();
+    }
+
+    function resetSlideReset() {
+      const handle = $("resetSlideHandle");
+      const track = $("resetSlideTrack");
+      if (!handle || !track) return;
+      handle.style.left = "3px";
+      track.classList.remove("armed");
+    }
+
+    function setupResetSlideHandlers() {
+      const handle = $("resetSlideHandle");
+      const track = $("resetSlideTrack");
+      if (!handle || !track || handle.dataset.bound) return;
+      handle.dataset.bound = "1";
+      handle.addEventListener("pointerdown", e => {
+        resetSlideDragging = true;
+        handle.classList.add("dragging");
+        handle.setPointerCapture(e.pointerId);
+        resetSlideStartX = e.clientX;
+        resetSlideHandleStartLeft = handle.offsetLeft;
+        resetSlideMax = track.clientWidth - handle.offsetWidth - 6;
+      });
+      handle.addEventListener("pointermove", e => {
+        if (!resetSlideDragging) return;
+        let newLeft = resetSlideHandleStartLeft + (e.clientX - resetSlideStartX);
+        newLeft = Math.max(3, Math.min(resetSlideMax, newLeft));
+        handle.style.left = newLeft + "px";
+        track.classList.toggle("armed", newLeft >= resetSlideMax * 0.85);
+      });
+      const endDrag = () => {
+        if (!resetSlideDragging) return;
+        resetSlideDragging = false;
+        handle.classList.remove("dragging");
+        if (handle.offsetLeft >= resetSlideMax * 0.85) {
+          handle.style.left = resetSlideMax + "px";
+          setTimeout(performReset, 150);
+        } else {
+          resetSlideReset();
+        }
+      };
+      handle.addEventListener("pointerup", endDrag);
+      handle.addEventListener("pointercancel", endDrag);
+      handle.addEventListener("pointerleave", e => { if (resetSlideDragging && e.buttons === 0) endDrag(); });
+    }
+
+    function performReset() {
+      SYNC_KEYS.forEach(k => localStorage.removeItem(k));
+      if (auth.currentUser) {
+        db.collection("users").doc(auth.currentUser.uid).delete().catch(err => console.error("Cloud reset failed:", err));
+      }
       location.reload();
     }
 
     /* ===== START ===== */
     loadDarkMode();
+    renderAccountUI(auth.currentUser);
+    renderRecentAccounts();
     renderProfile();
     renderSchoolInfo();
     renderClasses();
@@ -5159,6 +5583,7 @@
     renderHomeLinks();
     renderTimerDisplay();
     setupAvatarCropDragHandlers();
+    setupResetSlideHandlers();
   </script>
 </body>
 
