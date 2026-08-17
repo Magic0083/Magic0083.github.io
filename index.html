@@ -679,6 +679,14 @@
       font-size: 13px;
       color: var(--text);
       cursor: pointer;
+      max-width: 100%;
+    }
+
+    .recent-account-chip span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
     }
 
     .recent-account-remove {
@@ -774,6 +782,8 @@
 
     .info-value {
       flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
       font-size: 14px;
       font-weight: 600;
     }
@@ -856,17 +866,20 @@
 
     .setting-info {
       flex: 1;
+      min-width: 0;
     }
 
     .setting-title {
       font-size: 15px;
       font-weight: 650;
+      overflow-wrap: break-word;
     }
 
     .setting-description {
       color: var(--secondary);
       font-size: 12px;
       margin-top: 3px;
+      overflow-wrap: break-word;
     }
 
     .switch {
@@ -2441,13 +2454,8 @@
       <div class="avatar-crop-viewport" id="avatarCropViewport">
         <img id="avatarCropImg" alt="" draggable="false">
       </div>
-      <div class="quiz-help" style="text-align:center;margin-top:12px;">Drag to reposition, use the slider to zoom.
-      </div>
-      <div class="form-group" style="margin-top:10px;">
-        <label class="form-label">ZOOM</label>
-        <input id="avatarCropZoom" type="range" min="100" max="300" value="100" step="1"
-          style="width:100%;accent-color:var(--blue);" oninput="onAvatarCropZoomInput()">
-      </div>
+      <div class="quiz-help" style="text-align:center;margin-top:12px;">Drag to reposition. Pinch, or scroll on
+        desktop, to zoom.</div>
       <button class="primary-button" onclick="saveAvatarCrop()">Save Photo</button>
       <button class="secondary-button" onclick="closeAvatarCrop()">Cancel</button>
     </div>
@@ -3644,6 +3652,11 @@
     let avatarCropDragging = false;
     let avatarCropDragStart = { x: 0, y: 0 };
     let avatarCropStartOffset = { x: 0, y: 0 };
+    const avatarCropActivePointers = new Map();
+    let avatarCropPinchStartDist = 0;
+    let avatarCropPinchStartZoom = 1;
+    const AVATAR_CROP_MIN_ZOOM = 1;
+    const AVATAR_CROP_MAX_ZOOM = 3;
 
     function openAvatarCrop(sourceDataUrl, existingCropState = null) {
       avatarCropSourceDataUrl = sourceDataUrl;
@@ -3669,7 +3682,6 @@
           avatarCropDX = 0;
           avatarCropDY = 0;
         }
-        $("avatarCropZoom").value = Math.round(avatarCropZoom * 100);
         clampAvatarCropOffset();
         applyAvatarCropTransform();
       };
@@ -3679,6 +3691,9 @@
     function closeAvatarCrop() {
       closeModal("avatarCropModal");
       avatarCropSourceDataUrl = null;
+      avatarCropActivePointers.clear();
+      avatarCropPinchStartDist = 0;
+      avatarCropDragging = false;
     }
 
     function clampAvatarCropOffset() {
@@ -3694,8 +3709,8 @@
       avatarCropImgEl.style.transform = `translate(-50%, -50%) scale(${avatarCropZoom}) translate(${avatarCropDX}px, ${avatarCropDY}px)`;
     }
 
-    function onAvatarCropZoomInput() {
-      avatarCropZoom = $("avatarCropZoom").value / 100;
+    function setAvatarCropZoom(newZoom) {
+      avatarCropZoom = Math.min(AVATAR_CROP_MAX_ZOOM, Math.max(AVATAR_CROP_MIN_ZOOM, newZoom));
       clampAvatarCropOffset();
       applyAvatarCropTransform();
     }
@@ -3704,15 +3719,39 @@
       const viewport = $("avatarCropViewport");
       if (!viewport || viewport.dataset.bound) return;
       viewport.dataset.bound = "1";
+
       viewport.addEventListener("pointerdown", e => {
         if (!avatarCropImgEl) return;
-        avatarCropDragging = true;
-        viewport.classList.add("dragging");
         viewport.setPointerCapture(e.pointerId);
-        avatarCropDragStart = { x: e.clientX, y: e.clientY };
-        avatarCropStartOffset = { x: avatarCropDX, y: avatarCropDY };
+        avatarCropActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (avatarCropActivePointers.size === 2) {
+          // Two fingers down: switch to pinch-to-zoom, stop single-finger panning.
+          avatarCropDragging = false;
+          const pts = [...avatarCropActivePointers.values()];
+          avatarCropPinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+          avatarCropPinchStartZoom = avatarCropZoom;
+        } else if (avatarCropActivePointers.size === 1) {
+          avatarCropDragging = true;
+          viewport.classList.add("dragging");
+          avatarCropDragStart = { x: e.clientX, y: e.clientY };
+          avatarCropStartOffset = { x: avatarCropDX, y: avatarCropDY };
+        }
       });
+
       viewport.addEventListener("pointermove", e => {
+        if (!avatarCropActivePointers.has(e.pointerId)) return;
+        avatarCropActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (avatarCropActivePointers.size === 2) {
+          const pts = [...avatarCropActivePointers.values()];
+          const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+          if (avatarCropPinchStartDist > 0) {
+            setAvatarCropZoom(avatarCropPinchStartZoom * (dist / avatarCropPinchStartDist));
+          }
+          return;
+        }
+
         if (!avatarCropDragging) return;
         const dx = (e.clientX - avatarCropDragStart.x) / avatarCropZoom;
         const dy = (e.clientY - avatarCropDragStart.y) / avatarCropZoom;
@@ -3721,21 +3760,30 @@
         clampAvatarCropOffset();
         applyAvatarCropTransform();
       });
-      const endDrag = () => {
-        if (!avatarCropDragging) return;
-        avatarCropDragging = false;
-        viewport.classList.remove("dragging");
+
+      const releasePointer = e => {
+        avatarCropActivePointers.delete(e.pointerId);
+        if (avatarCropActivePointers.size < 2) avatarCropPinchStartDist = 0;
+        if (avatarCropActivePointers.size === 1) {
+          // One finger remains after a pinch: resume panning from its current spot, no jump.
+          const [remaining] = avatarCropActivePointers.values();
+          avatarCropDragStart = { x: remaining.x, y: remaining.y };
+          avatarCropStartOffset = { x: avatarCropDX, y: avatarCropDY };
+          avatarCropDragging = true;
+        } else {
+          avatarCropDragging = false;
+          viewport.classList.remove("dragging");
+        }
       };
-      viewport.addEventListener("pointerup", endDrag);
-      viewport.addEventListener("pointercancel", endDrag);
-      viewport.addEventListener("pointerleave", endDrag);
+      viewport.addEventListener("pointerup", releasePointer);
+      viewport.addEventListener("pointercancel", releasePointer);
+      viewport.addEventListener("pointerleave", releasePointer);
+
       viewport.addEventListener("wheel", e => {
         if (!avatarCropImgEl) return;
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -5 : 5;
-        const newZoomPct = Math.min(300, Math.max(100, Number($("avatarCropZoom").value) + delta));
-        $("avatarCropZoom").value = newZoomPct;
-        onAvatarCropZoomInput();
+        const delta = e.deltaY > 0 ? -0.05 : 0.05;
+        setAvatarCropZoom(avatarCropZoom + delta);
       }, { passive: false });
     }
 
