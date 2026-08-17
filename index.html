@@ -86,6 +86,7 @@
     .page {
       display: none;
       animation: pageIn .25s ease;
+      transition: transform .25s ease, opacity .25s ease;
     }
 
     .page.active {
@@ -2085,7 +2086,7 @@
     <div id="gpa" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
           <h1>GPA Calculator</h1>
         </div>
       </div>
@@ -2120,7 +2121,7 @@
     <div id="timer" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
           <h1>Study Timer</h1>
         </div>
       </div>
@@ -2161,7 +2162,7 @@
     <div id="notes" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
           <h1>Quick Notes</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openNoteModal()">+</button></div>
@@ -2175,7 +2176,7 @@
     <div id="richnotes" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
           <h1>Notes</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openRichNoteEditor()">+</button></div>
@@ -2189,7 +2190,7 @@
     <div id="richNoteEditor" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="closeRichNoteEditor()">‹</button>
+          <button class="icon-button page-back-button" onclick="closeRichNoteEditor()">‹</button>
         </div>
         <div class="top-bar-actions">
           <div class="mode-toggle">
@@ -2337,7 +2338,7 @@
     <div id="passwords" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showToolsFromTool()">‹</button>
+          <button class="icon-button page-back-button" onclick="showToolsFromTool()">‹</button>
           <h1>Passwords</h1>
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openPasswordModal()">+</button></div>
@@ -2481,7 +2482,7 @@
     <div id="accountPage" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
+          <button class="icon-button page-back-button" onclick="showSettingsFromTools()">‹</button>
           <h1>Account &amp; Sync</h1>
         </div>
       </div>
@@ -2524,7 +2525,7 @@
     <div id="profileInfo" class="page">
       <div class="top-bar">
         <div class="top-bar-left">
-          <button class="icon-button" onclick="showSettingsFromTools()">‹</button>
+          <button class="icon-button page-back-button" onclick="showSettingsFromTools()">‹</button>
           <h1>Profile</h1>
         </div>
       </div>
@@ -5932,6 +5933,93 @@
         };
       } catch (e) { /* IndexedDB unavailable — icon still applies via the link tags above */ }
     }
+
+    /* ===== SWIPE GESTURES ===== */
+
+    /* Edge swipe-right to go back on any page that has a back button */
+    (function setupSwipeBack() {
+      const EDGE_ZONE = 35;      // must start within this many px of the left edge
+      const THRESHOLD = 90;      // px of horizontal travel to trigger back
+      let tracking = false, startX = 0, startY = 0, activePage = null, backBtn = null;
+
+      document.addEventListener("touchstart", e => {
+        if (e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        if (touch.clientX > EDGE_ZONE) return;
+        activePage = document.querySelector(".page.active");
+        backBtn = activePage ? activePage.querySelector(".page-back-button") : null;
+        if (!backBtn) return;
+        tracking = true;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        activePage.style.transition = "none";
+      }, { passive: true });
+
+      document.addEventListener("touchmove", e => {
+        if (!tracking) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) { tracking = false; return; }
+        if (activePage && dx > 0) {
+          activePage.style.transform = `translateX(${Math.min(dx, 120)}px)`;
+          activePage.style.opacity = String(1 - Math.min(dx, 120) / 200);
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchend", e => {
+        if (!tracking) return;
+        tracking = false;
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - startX;
+        if (activePage) {
+          activePage.style.transition = "";
+          activePage.style.transform = "";
+          activePage.style.opacity = "";
+        }
+        if (dx > THRESHOLD && backBtn) backBtn.click();
+        activePage = null; backBtn = null;
+      }, { passive: true });
+    })();
+
+    /* Swipe down from a modal's top handle to dismiss it */
+    (function setupSwipeCloseModal() {
+      const HANDLE_ZONE = 40;    // px from the modal's top edge that counts as the handle area
+      const THRESHOLD = 90;      // px of downward travel to trigger close
+      let tracking = false, startY = 0, modalEl = null, bgEl = null;
+
+      document.addEventListener("touchstart", e => {
+        if (e.touches.length !== 1) return;
+        const modal = e.target.closest(".modal");
+        if (!modal) return;
+        const rect = modal.getBoundingClientRect();
+        const touch = e.touches[0];
+        if (touch.clientY - rect.top > HANDLE_ZONE) return;
+        tracking = true;
+        startY = touch.clientY;
+        modalEl = modal;
+        bgEl = modal.closest(".modal-background");
+        modalEl.style.transition = "none";
+      }, { passive: true });
+
+      document.addEventListener("touchmove", e => {
+        if (!tracking) return;
+        const touch = e.touches[0];
+        const dy = touch.clientY - startY;
+        if (dy > 0) modalEl.style.transform = `translateY(${dy}px)`;
+      }, { passive: true });
+
+      document.addEventListener("touchend", e => {
+        if (!tracking) return;
+        tracking = false;
+        const touch = e.changedTouches[0];
+        const dy = touch.clientY - startY;
+        modalEl.style.transition = "";
+        modalEl.style.transform = "";
+        if (dy > THRESHOLD && bgEl) closeModal(bgEl.id);
+        modalEl = null; bgEl = null;
+      }, { passive: true });
+    })();
 
     /* ===== START ===== */
     loadDarkMode();
