@@ -8,8 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f4f5f7">
   <link rel="icon" type="image/svg+xml" href="Favicon.svg">
-  <link rel="alternate icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="alternate icon" type="image/png" sizes="512x512" href="Icons/My Student (Classic).png"
+    id="alternateIconLink">
+  <link rel="apple-touch-icon" href="Icons/My Student (Classic).png" id="appleTouchIconLink">
   <title>My Student Hub</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.js"></script>
@@ -700,6 +701,38 @@
       color: var(--secondary);
       font-size: 12px;
       line-height: 1;
+    }
+
+    .app-icon-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 14px;
+      width: 84px;
+    }
+
+    .app-icon-option img {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+    }
+
+    .app-icon-option.selected img {
+      border-color: var(--blue);
+    }
+
+    .app-icon-option span {
+      font-size: 12px;
+      color: var(--text);
+      text-align: center;
+      overflow-wrap: break-word;
     }
 
     .avatar-crop-viewport {
@@ -2311,6 +2344,16 @@
             <div class="switch-circle"></div>
           </div>
         </div>
+        <button class="setting-row" onclick="openAppIconModal()">
+          <div class="setting-icon" id="currentAppIconPreview" style="padding:0;overflow:hidden;"><img
+              id="currentAppIconPreviewImg" src="" alt=""
+              style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></div>
+          <div class="setting-info">
+            <div class="setting-title">App Icon</div>
+            <div class="setting-description">Choose the icon shown on your home screen</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
       </div>
 
       <div class="settings-section">
@@ -3051,6 +3094,18 @@
       <button class="primary-button" onclick="savePasswordEntry()">Save Entry</button>
       <button id="deletePasswordButton" class="danger-button" onclick="deleteCurrentPasswordEntry()"
         style="display:none;">Delete Entry</button>
+    </div>
+  </div>
+
+  <!-- APP ICON MODAL -->
+  <div id="appIconModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>App Icon</h2><button class="close-button" onclick="closeModal('appIconModal')">×</button>
+      </div>
+      <div class="quiz-help" style="margin-bottom:14px;">Pick an icon below. Then remove this app from your home
+        screen and add it again — that's the only way the new icon will show up.</div>
+      <div id="appIconOptionsList" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;"></div>
     </div>
   </div>
 
@@ -5697,8 +5752,83 @@
       location.reload();
     }
 
+    /* ===== APP ICON PICKER =====
+       iOS reads <link rel="apple-touch-icon"> straight off the page the moment someone
+       taps "Add to Home Screen," so updating that link's href here takes effect on the
+       next add. Android/Chrome instead reads manifest.json, which a static file can't
+       change on its own — so the choice is also handed to the service worker (via
+       IndexedDB, since service workers can't see localStorage), which rewrites the
+       manifest's icons on the fly when it's fetched. Either way, an icon already on a
+       home screen won't update itself — it has to be removed and re-added. */
+    const ICON_OPTIONS = [
+      { id: "default", name: "Classic", icon: "Icons/My Student (Classic).png" },
+      { id: "duotone-dark", name: "Classic Duotone Dark", icon: "Icons/My Student (Classic Duotone Dark).png" },
+      { id: "duotone-light", name: "Classic Duotone Light", icon: "Icons/My Student (Classic Duotone Light).png" },
+      { id: "vibrant", name: "Classic Vibrant", icon: "Icons/My Student (Classic Vibrant).png" },
+      { id: "blue", name: "Blue", icon: "Icons/My Student (Blue).png" },
+      { id: "green", name: "Green", icon: "Icons/My Student (Green).png" },
+      { id: "purple", name: "Purple", icon: "Icons/My Student (Purple).png" },
+      { id: "teal", name: "Teal", icon: "Icons/My Student (Teal).png" },
+      { id: "gold", name: "Gold", icon: "Icons/My Student (Gold).png" }
+    ];
+    const APP_ICON_CHOICE_KEY = "AppIconChoice";
+
+    function getAppIconChoiceId() {
+      return localStorage.getItem(APP_ICON_CHOICE_KEY) || ICON_OPTIONS[0].id;
+    }
+
+    function applyStoredAppIconLinks() {
+      const opt = ICON_OPTIONS.find(o => o.id === getAppIconChoiceId()) || ICON_OPTIONS[0];
+      const appleLink = $("appleTouchIconLink");
+      const altLink = $("alternateIconLink");
+      if (appleLink) appleLink.href = opt.icon;
+      if (altLink) altLink.href = opt.icon;
+      const previewImg = $("currentAppIconPreviewImg");
+      if (previewImg) { previewImg.src = opt.icon; previewImg.alt = opt.name; }
+    }
+
+    function openAppIconModal() {
+      renderAppIconOptions();
+      openModal("appIconModal");
+    }
+
+    function renderAppIconOptions() {
+      const wrap = $("appIconOptionsList");
+      if (!wrap) return;
+      const current = getAppIconChoiceId();
+      wrap.innerHTML = ICON_OPTIONS.map(opt => `
+        <button type="button" class="app-icon-option ${opt.id === current ? "selected" : ""}"
+          onclick="selectAppIcon('${opt.id}')">
+          <img src="${opt.icon}" alt="${escapeHTML(opt.name)}">
+          <span>${escapeHTML(opt.name)}</span>
+        </button>
+      `).join("");
+    }
+
+    function selectAppIcon(id) {
+      const opt = ICON_OPTIONS.find(o => o.id === id);
+      if (!opt) return;
+      localStorage.setItem(APP_ICON_CHOICE_KEY, id);
+      applyStoredAppIconLinks();
+      storeIconChoiceForServiceWorker(opt.icon);
+      renderAppIconOptions();
+    }
+
+    function storeIconChoiceForServiceWorker(icon) {
+      try {
+        const dbReq = indexedDB.open("AppHubIconDB", 1);
+        dbReq.onupgradeneeded = () => dbReq.result.createObjectStore("settings");
+        dbReq.onsuccess = () => {
+          const db = dbReq.result;
+          const tx = db.transaction("settings", "readwrite");
+          tx.objectStore("settings").put({ icon192: icon, icon512: icon }, "iconChoice");
+        };
+      } catch (e) { /* IndexedDB unavailable — icon still applies via the link tags above */ }
+    }
+
     /* ===== START ===== */
     loadDarkMode();
+    applyStoredAppIconLinks();
     renderAccountUI(auth.currentUser);
     renderRecentAccounts();
     renderProfile();
