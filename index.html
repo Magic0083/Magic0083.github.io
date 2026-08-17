@@ -180,7 +180,7 @@
       align-items: center;
     }
 
-    .gcc-logo {
+    .school-logo {
       width: auto;
       height: 48px;
       border-radius: 15px;
@@ -983,6 +983,7 @@
 
     .calendar-day {
       min-height: 70px;
+      min-width: 0;
       border-radius: 14px;
       display: flex;
       flex-direction: column;
@@ -1029,6 +1030,7 @@
 
     .calendar-day-events {
       width: 100%;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 2px;
@@ -1037,6 +1039,7 @@
 
     .day-event-chip {
       width: 100%;
+      min-width: 0;
       font-size: 9px;
       font-weight: 650;
       line-height: 1.3;
@@ -1818,7 +1821,7 @@
       </div>
       <div class="student-card">
         <div class="student-card-top">
-          <div class="gcc-logo" id="schoolLogoAbbr">—</div>
+          <div class="school-logo" id="schoolLogoAbbr">—</div>
           <div class="student-status" id="homeGradeBadge">—</div>
         </div>
         <div id="homeName" class="student-name">Student 👋</div>
@@ -2350,6 +2353,7 @@
           </div>
         </div>
         <button class="secondary-button" onclick="accountLogOut()">Log Out</button>
+        <button class="danger-button" onclick="openDeleteAccountModal()">Delete Account Permanently</button>
       </div>
     </div>
 
@@ -3042,6 +3046,23 @@
     </div>
   </div>
 
+  <!-- DELETE ACCOUNT MODAL -->
+  <div id="deleteAccountModal" class="modal-background">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Delete Account</h2><button class="close-button" onclick="closeModal('deleteAccountModal')">×</button>
+      </div>
+      <div class="quiz-help" style="margin-bottom:14px;">This permanently deletes your account and all synced data
+        in the cloud. Your local data on this device will not be touched, but it will no longer sync anywhere. This
+        cannot be undone.</div>
+      <div class="form-group"><label class="form-label">CONFIRM YOUR PASSWORD</label><input id="deleteAccountPassword"
+          class="form-input" type="password" autocomplete="current-password" placeholder="Password"></div>
+      <div id="deleteAccountError" style="color:#e5484d;font-size:13px;margin:-6px 0 14px;display:none;"></div>
+      <button class="danger-button" onclick="confirmDeleteAccount()">Delete Account Permanently</button>
+      <button class="secondary-button" onclick="closeModal('deleteAccountModal')">Cancel</button>
+    </div>
+  </div>
+
   <script>
     /* ===== SHORTCUTS ===== */
     const $ = id => document.getElementById(id);
@@ -3054,7 +3075,7 @@
       $$(`#${containerId} ${itemSel}`).forEach(el => el.classList.toggle("selected", el.dataset[attr] === value));
 
     /* ===== ACCOUNT & CLOUD SYNC ===== */
-    const SYNC_KEYS = ["gccProfile", "gccSchoolInfo", "gccClasses", "gccCalendarEvents", "gccDayColors", "gccProjects", "gccHomeLinks", "gccStudySets", "gccGpaCourses", "gccGpaSettings", "gccNotes", "gccRichNotes", "gccChecklists", "gccPasswordEntries"];
+    const SYNC_KEYS = ["Profile", "SchoolInfo", "Classes", "CalendarEvents", "DayColors", "Projects", "HomeLinks", "StudySets", "GpaCourses", "GpaSettings", "Notes", "RichNotes", "Checklists", "PasswordEntries"];
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpDhllQm24yZNAKn9gy3sF7zSGTKnXY0Y",
@@ -3160,30 +3181,48 @@
       el.textContent = "";
     }
 
-    /* ===== REMEMBERED ACCOUNTS (device-local only, never synced) ===== */
-    const REMEMBERED_ACCOUNTS_KEY = "gccRememberedAccounts";
-    function getRememberedAccounts() { return JSON.parse(localStorage.getItem(REMEMBERED_ACCOUNTS_KEY)) || []; }
+    /* ===== REMEMBERED ACCOUNTS (device-local only, never synced) =====
+       Note: to allow one-tap login, the password is stored locally on this
+       device (localStorage) alongside the email. It is never synced to the
+       cloud or sent anywhere except back to Firebase to sign in. */
+    const REMEMBERED_ACCOUNTS_KEY = "RememberedAccounts";
+    function getRememberedAccounts() {
+      let list = JSON.parse(localStorage.getItem(REMEMBERED_ACCOUNTS_KEY)) || [];
+      // migrate old format (plain email strings) to {email, password}
+      return list.map(item => typeof item === "string" ? { email: item, password: null } : item);
+    }
     function setRememberedAccounts(list) { localStorage.setItem(REMEMBERED_ACCOUNTS_KEY, JSON.stringify(list)); }
 
-    function rememberAccountEmail(email) {
+    function rememberAccountEmail(email, password) {
       if (!email) return;
-      let list = getRememberedAccounts().filter(e => e.toLowerCase() !== email.toLowerCase());
-      list.unshift(email);
+      let list = getRememberedAccounts();
+      const existing = list.find(a => a.email.toLowerCase() === email.toLowerCase());
+      const finalPassword = (password !== undefined && password !== null && password !== "")
+        ? password
+        : (existing ? existing.password : null);
+      list = list.filter(a => a.email.toLowerCase() !== email.toLowerCase());
+      list.unshift({ email, password: finalPassword });
       setRememberedAccounts(list.slice(0, 5));
       renderRecentAccounts();
     }
 
     function forgetAccountEmail(email, event) {
       if (event) event.stopPropagation();
-      setRememberedAccounts(getRememberedAccounts().filter(e => e.toLowerCase() !== email.toLowerCase()));
+      setRememberedAccounts(getRememberedAccounts().filter(a => a.email.toLowerCase() !== email.toLowerCase()));
       renderRecentAccounts();
     }
 
     function selectRecentAccount(email) {
-      $("accountEmail").value = email;
-      $("accountPassword").value = "";
+      const account = getRememberedAccounts().find(a => a.email.toLowerCase() === email.toLowerCase());
       accountClearError();
-      $("accountPassword").focus();
+      $("accountEmail").value = email;
+      if (account && account.password) {
+        $("accountPassword").value = account.password;
+        accountLogIn();
+      } else {
+        $("accountPassword").value = "";
+        $("accountPassword").focus();
+      }
     }
 
     function renderRecentAccounts() {
@@ -3193,10 +3232,10 @@
       const accounts = getRememberedAccounts();
       if (!accounts.length) { wrap.style.display = "none"; list.innerHTML = ""; return; }
       wrap.style.display = "block";
-      list.innerHTML = accounts.map(email => `
-        <button type="button" class="recent-account-chip" onclick="selectRecentAccount('${escapeHTML(email)}')">
-          <span>${escapeHTML(email)}</span>
-          <span class="recent-account-remove" onclick="forgetAccountEmail('${escapeHTML(email)}', event)">×</span>
+      list.innerHTML = accounts.map(a => `
+        <button type="button" class="recent-account-chip" onclick="selectRecentAccount('${escapeHTML(a.email)}')">
+          <span>${escapeHTML(a.email)}</span>
+          <span class="recent-account-remove" onclick="forgetAccountEmail('${escapeHTML(a.email)}', event)">×</span>
         </button>
       `).join("");
     }
@@ -3209,7 +3248,9 @@
       const password = $("accountPassword").value;
       if (!email || !password) { accountShowError("Enter an email and password."); return; }
       if (password.length < 6) { accountShowError("Password must be at least 6 characters."); return; }
-      auth.createUserWithEmailAndPassword(email, password).catch(err => accountShowError(err.message));
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => rememberAccountEmail(email, password))
+        .catch(err => accountShowError(err.message));
     }
 
     function accountLogIn() {
@@ -3217,13 +3258,49 @@
       const email = $("accountEmail").value.trim();
       const password = $("accountPassword").value;
       if (!email || !password) { accountShowError("Enter an email and password."); return; }
-      auth.signInWithEmailAndPassword(email, password).catch(err => accountShowError(err.message));
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => rememberAccountEmail(email, password))
+        .catch(err => accountShowError(err.message));
     }
 
     function accountLogOut() {
       if (!confirm("Log out? Your data stays on this device and will sync again next time you log in.")) return;
       if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
       auth.signOut();
+    }
+
+    function openDeleteAccountModal() {
+      const pwd = $("deleteAccountPassword");
+      const err = $("deleteAccountError");
+      if (pwd) pwd.value = "";
+      if (err) { err.style.display = "none"; err.textContent = ""; }
+      openModal("deleteAccountModal");
+    }
+
+    function confirmDeleteAccount() {
+      const user = auth.currentUser;
+      const err = $("deleteAccountError");
+      if (!user) return;
+      const password = $("deleteAccountPassword").value;
+      err.style.display = "none";
+      if (!password) { err.textContent = "Enter your password to confirm."; err.style.display = "block"; return; }
+
+      const email = user.email;
+      const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+
+      user.reauthenticateWithCredential(credential)
+        .then(() => db.collection("users").doc(user.uid).delete().catch(() => { }))
+        .then(() => user.delete())
+        .then(() => {
+          if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
+          forgetAccountEmail(email);
+          closeModal("deleteAccountModal");
+          alert("Your account has been permanently deleted.");
+        })
+        .catch(e => {
+          err.textContent = e.code === "auth/wrong-password" ? "Incorrect password." : e.message;
+          err.style.display = "block";
+        });
     }
 
     auth.onAuthStateChanged(user => {
@@ -3242,7 +3319,7 @@
         const incoming = snap.data() || {};
         if (!initialSyncDone) {
           initialSyncDone = true;
-          const reloadGuardKey = "gccSyncReloaded_" + user.uid;
+          const reloadGuardKey = "SyncReloaded_" + user.uid;
           if (!snapshotsEqual(incoming, localSnapshot())) {
             applyCloudSnapshot(incoming);
             if (!sessionStorage.getItem(reloadGuardKey)) {
@@ -3267,28 +3344,28 @@
     window.addEventListener("offline", () => { if (auth.currentUser) setSyncStatus("Offline — changes will sync when back online"); });
 
     /* ===== DATA ===== */
-    let profile = load("gccProfile") || { name: "", grade: "", birthday: "", meid: "", major: "", email: "", phone: "", currentGPA: "", avatar: "", avatarSource: "", avatarCrop: null };
+    let profile = load("Profile") || { name: "", grade: "", birthday: "", meid: "", major: "", email: "", phone: "", currentGPA: "", avatar: "", avatarSource: "", avatarCrop: null };
     (function sanitizeProfile() {
       let changed = false;
       ["name", "grade", "birthday", "meid", "major", "email", "phone"].forEach(k => {
         if (profile[k] === "undefined" || profile[k] === "null") { profile[k] = ""; changed = true; }
       });
-      if (changed) save("gccProfile", profile);
+      if (changed) save("Profile", profile);
     })();
-    let schoolInfo = load("gccSchoolInfo") || { name: "", abbr: "" };
+    let schoolInfo = load("SchoolInfo") || { name: "", abbr: "" };
     profile.currentGPA = profile.currentGPA ?? "";
-    let classes = load("gccClasses") || [];
-    let calendarEvents = load("gccCalendarEvents") || [];
-    let dayColors = load("gccDayColors") || {};
+    let classes = load("Classes") || [];
+    let calendarEvents = load("CalendarEvents") || [];
+    let dayColors = load("DayColors") || {};
 
     let editingClassID = null, editingEventID = null, selectedEventColor = "#1769c2", selectedDayForColor = null;
     let calendarDate = new Date(), calendarView = "month";
 
-    let projects = load("gccProjects") || [];
+    let projects = load("Projects") || [];
     let currentProjectID = null, editingProjectID = null, editingTaskID = null, pendingTaskImage = null;
     let selectedProjectColor = "#1769c2", selectedTaskStatus = "todo", selectedTaskPriority = "medium";
 
-    let homeLinks = load("gccHomeLinks") || {
+    let homeLinks = load("HomeLinks") || {
       student: [
         { id: 1, icon: "🎓", title: "Student Center", description: "Classes, grades and account", url: "https://redirect.maricopa.edu/student-center" },
         { id: 2, icon: "📚", title: "Canvas", description: "Courses and assignments", url: "https://learn.maricopa.edu/" },
@@ -3303,26 +3380,26 @@
     };
     let homeEditMode = false, editingLinkType = null, editingLinkID = null;
 
-    let studySets = load("gccStudySets") || [];
+    let studySets = load("StudySets") || [];
     let currentSetID = null, editingSetID = null, editingCardID = null, selectedSetColor = "#1769c2", pendingCardImage = null;
     let studyModeCards = [], studyModeIndex = 0;
     let quizQuestions = [], quizIndex = 0, quizScore = 0, quizAnswered = false, quizSelectedAnswers = [];
 
-    let passwordEntries = load("gccPasswordEntries") || [];
+    let passwordEntries = load("PasswordEntries") || [];
     let editingPasswordID = null;
 
-    let gpaCourses = load("gccGpaCourses") || [];
+    let gpaCourses = load("GpaCourses") || [];
     let editingGpaID = null;
-    let gpaSettings = load("gccGpaSettings") || { useCurrent: false, priorCredits: "" };
+    let gpaSettings = load("GpaSettings") || { useCurrent: false, priorCredits: "" };
 
-    let notes = load("gccNotes") || [];
+    let notes = load("Notes") || [];
     let editingNoteID = null;
     let pendingNoteImage = null;
 
-    let richNotes = load("gccRichNotes") || [];
+    let richNotes = load("RichNotes") || [];
     let editingRichNoteID = null;
 
-    let checklists = load("gccChecklists") || [];
+    let checklists = load("Checklists") || [];
     let currentChecklistID = null, editingChecklistID = null, selectedChecklistColor = "#1769c2";
 
     let timerInterval = null, timerSeconds = 25 * 60, timerIsBreak = false, timerRunning = false, timerCycle = 1;
@@ -3421,7 +3498,7 @@
     function deleteLinkQuick(type, id) {
       if (!confirm("Remove this link?")) return;
       homeLinks[type] = homeLinks[type].filter(l => l.id !== id);
-      save("gccHomeLinks", homeLinks);
+      save("HomeLinks", homeLinks);
       renderHomeLinks();
     }
 
@@ -3467,7 +3544,7 @@
         const i = homeLinks[editingLinkType].findIndex(l => l.id === editingLinkID);
         if (i !== -1) homeLinks[editingLinkType][i] = { ...homeLinks[editingLinkType][i], ...linkData };
       }
-      save("gccHomeLinks", homeLinks);
+      save("HomeLinks", homeLinks);
       closeModal('linkModal');
       renderHomeLinks();
     }
@@ -3476,7 +3553,7 @@
       if (editingLinkID === null) return;
       if (!confirm("Delete this link?")) return;
       homeLinks[editingLinkType] = homeLinks[editingLinkType].filter(l => l.id !== editingLinkID);
-      save("gccHomeLinks", homeLinks);
+      save("HomeLinks", homeLinks);
       closeModal('linkModal');
       renderHomeLinks();
     }
@@ -3552,7 +3629,7 @@
       profile.avatar = "";
       profile.avatarSource = "";
       profile.avatarCrop = null;
-      save("gccProfile", profile);
+      save("Profile", profile);
       renderProfile();
     }
 
@@ -3680,7 +3757,7 @@
       profile.avatar = canvas.toDataURL("image/jpeg", 0.9);
       profile.avatarSource = avatarCropSourceDataUrl;
       profile.avatarCrop = { zoom: avatarCropZoom, dx: avatarCropDX, dy: avatarCropDY };
-      save("gccProfile", profile);
+      save("Profile", profile);
       renderProfile();
       closeAvatarCrop();
     }
@@ -3722,10 +3799,10 @@
       const abbr = $("editSchoolAbbr").value.trim();
       profile.grade = $("editSchoolGrade").value;
       profile.major = COLLEGE_GRADES.includes(profile.grade) ? $("editSchoolMajor").value.trim() : "";
-      save("gccProfile", profile);
+      save("Profile", profile);
       schoolInfo.name = name;
       schoolInfo.abbr = abbr;
-      save("gccSchoolInfo", schoolInfo);
+      save("SchoolInfo", schoolInfo);
       renderSchoolInfo();
       renderProfile();
       closeModal('schoolInfoModal');
@@ -3758,14 +3835,14 @@
         }
         profile.currentGPA = num.toFixed(2);
       }
-      save("gccProfile", profile);
+      save("Profile", profile);
       renderProfile();
       closeModal('gpaProfileModal');
     }
 
     function clearCurrentGPA() {
       profile.currentGPA = "";
-      save("gccProfile", profile);
+      save("Profile", profile);
       renderProfile();
       closeModal('gpaProfileModal');
     }
@@ -3776,7 +3853,7 @@
       profile.meid = $("editMEID").value.trim();
       profile.email = $("editEmail").value.trim();
       profile.phone = $("editPhone").value.trim();
-      save("gccProfile", profile);
+      save("Profile", profile);
       renderProfile();
       closeModal('profileModal');
     }
@@ -3870,7 +3947,7 @@
         const i = classes.findIndex(item => item.id === editingClassID);
         if (i !== -1) classes[i] = { ...classes[i], ...classData };
       }
-      save("gccClasses", classes);
+      save("Classes", classes);
       renderClasses();
       closeModal('classModal');
     }
@@ -3879,7 +3956,7 @@
       if (editingClassID === null) return;
       if (!confirm("Delete this class?")) return;
       classes = classes.filter(item => item.id !== editingClassID);
-      save("gccClasses", classes);
+      save("Classes", classes);
       renderClasses();
       closeModal('classModal');
     }
@@ -4109,7 +4186,7 @@
         const i = calendarEvents.findIndex(e => e.id === editingEventID);
         if (i !== -1) calendarEvents[i] = { ...calendarEvents[i], ...eventData };
       }
-      save("gccCalendarEvents", calendarEvents);
+      save("CalendarEvents", calendarEvents);
       renderCalendar();
       closeModal('calendarModal');
     }
@@ -4118,7 +4195,7 @@
       if (editingEventID === null) return;
       if (!confirm("Delete this event?")) return;
       calendarEvents = calendarEvents.filter(e => e.id !== editingEventID);
-      save("gccCalendarEvents", calendarEvents);
+      save("CalendarEvents", calendarEvents);
       renderCalendar();
       closeModal('calendarModal');
     }
@@ -4174,7 +4251,7 @@
     function saveDayColor(color) {
       if (color) dayColors[selectedDayForColor] = color;
       else delete dayColors[selectedDayForColor];
-      save("gccDayColors", dayColors);
+      save("DayColors", dayColors);
       closeModal('dayColorModal');
       renderCalendar();
     }
@@ -4249,12 +4326,12 @@
       document.body.classList.toggle("dark");
       const isDark = document.body.classList.contains("dark");
       $("darkSwitch").classList.toggle("active", isDark);
-      localStorage.setItem("gccDarkMode", isDark ? "true" : "false");
+      localStorage.setItem("DarkMode", isDark ? "true" : "false");
       document.querySelector('meta[name="theme-color"]').setAttribute("content", isDark ? "#101114" : "#f4f5f7");
     }
 
     function loadDarkMode() {
-      if (localStorage.getItem("gccDarkMode") === "true") {
+      if (localStorage.getItem("DarkMode") === "true") {
         document.body.classList.add("dark");
         $("darkSwitch").classList.add("active");
         document.querySelector('meta[name="theme-color"]').setAttribute("content", "#101114");
@@ -4401,7 +4478,7 @@
         const i = projects.findIndex(p => p.id === editingProjectID);
         if (i !== -1) { projects[i].name = name; projects[i].color = selectedProjectColor; }
       }
-      save("gccProjects", projects);
+      save("Projects", projects);
       closeModal('projectModal');
       if (currentProjectID !== null) {
         $("todosPageTitle").textContent = name;
@@ -4415,7 +4492,7 @@
       if (editingProjectID === null) return;
       if (!confirm("Delete this project and all its tasks?")) return;
       projects = projects.filter(p => p.id !== editingProjectID);
-      save("gccProjects", projects);
+      save("Projects", projects);
       closeModal('projectModal');
       currentProjectID = null;
       $("projectDetailView").style.display = "none";
@@ -4495,7 +4572,7 @@
         const i = p.tasks.findIndex(t => t.id === editingTaskID);
         if (i !== -1) p.tasks[i] = { ...p.tasks[i], ...taskData };
       }
-      save("gccProjects", projects);
+      save("Projects", projects);
       closeModal('taskModal');
       renderKanbanBoard();
     }
@@ -4506,7 +4583,7 @@
       const p = projects.find(pr => pr.id === currentProjectID);
       if (!p) return;
       p.tasks = p.tasks.filter(t => t.id !== editingTaskID);
-      save("gccProjects", projects);
+      save("Projects", projects);
       closeModal('taskModal');
       renderKanbanBoard();
     }
@@ -4623,7 +4700,7 @@
         const i = studySets.findIndex(s => s.id === editingSetID);
         if (i !== -1) { studySets[i].name = name; studySets[i].color = selectedSetColor; }
       }
-      save("gccStudySets", studySets);
+      save("StudySets", studySets);
       closeModal('setModal');
       if (currentSetID !== null) {
         $("studySetsPageTitle").textContent = name;
@@ -4637,7 +4714,7 @@
       if (editingSetID === null) return;
       if (!confirm("Delete this study set and all its cards?")) return;
       studySets = studySets.filter(s => s.id !== editingSetID);
-      save("gccStudySets", studySets);
+      save("StudySets", studySets);
       closeModal('setModal');
       currentSetID = null;
       $("setDetailView").style.display = "none";
@@ -4703,7 +4780,7 @@
         const i = s.cards.findIndex(c => c.id === editingCardID);
         if (i !== -1) s.cards[i] = { ...s.cards[i], front, back, correctAnswers, extraOptions, image: pendingCardImage };
       }
-      save("gccStudySets", studySets);
+      save("StudySets", studySets);
       closeModal('cardModal');
       renderCardList();
     }
@@ -4714,7 +4791,7 @@
       const s = studySets.find(st => st.id === currentSetID);
       if (!s) return;
       s.cards = s.cards.filter(c => c.id !== editingCardID);
-      save("gccStudySets", studySets);
+      save("StudySets", studySets);
       closeModal('cardModal');
       renderCardList();
     }
@@ -4892,7 +4969,7 @@
         return;
       }
       gpaSettings.useCurrent = !gpaSettings.useCurrent;
-      save("gccGpaSettings", gpaSettings);
+      save("GpaSettings", gpaSettings);
       renderGpaUseCurrentUI();
       renderGpaCourses();
     }
@@ -4901,7 +4978,7 @@
       const raw = $("gpaPriorCredits").value;
       const num = parseFloat(raw);
       gpaSettings.priorCredits = raw === "" ? "" : (isNaN(num) || num < 0 ? "" : num);
-      save("gccGpaSettings", gpaSettings);
+      save("GpaSettings", gpaSettings);
       renderGpaCourses();
     }
 
@@ -4979,7 +5056,7 @@
         const i = gpaCourses.findIndex(c => c.id === editingGpaID);
         if (i !== -1) gpaCourses[i] = { ...gpaCourses[i], ...data };
       }
-      save("gccGpaCourses", gpaCourses);
+      save("GpaCourses", gpaCourses);
       closeModal('gpaModal');
       renderGpaCourses();
     }
@@ -4988,7 +5065,7 @@
       if (editingGpaID === null) return;
       if (!confirm("Delete this course?")) return;
       gpaCourses = gpaCourses.filter(c => c.id !== editingGpaID);
-      save("gccGpaCourses", gpaCourses);
+      save("GpaCourses", gpaCourses);
       closeModal('gpaModal');
       renderGpaCourses();
     }
@@ -5121,7 +5198,7 @@
         const i = notes.findIndex(n => n.id === editingNoteID);
         if (i !== -1) notes[i] = { ...notes[i], title, content, image: pendingNoteImage, updated: Date.now() };
       }
-      save("gccNotes", notes);
+      save("Notes", notes);
       closeModal('noteModal');
       renderNotes();
     }
@@ -5130,7 +5207,7 @@
       if (editingNoteID === null) return;
       if (!confirm("Delete this note?")) return;
       notes = notes.filter(n => n.id !== editingNoteID);
-      save("gccNotes", notes);
+      save("Notes", notes);
       closeModal('noteModal');
       renderNotes();
     }
@@ -5223,7 +5300,7 @@
       const c = checklists.find(cl => cl.id === currentChecklistID);
       if (!c) return;
       c.items.push({ id: Date.now(), text, done: false });
-      save("gccChecklists", checklists);
+      save("Checklists", checklists);
       input.value = "";
       renderChecklistItems();
     }
@@ -5234,7 +5311,7 @@
       const item = c.items.find(i => i.id === itemID);
       if (!item) return;
       item.done = !item.done;
-      save("gccChecklists", checklists);
+      save("Checklists", checklists);
       renderChecklistItems();
     }
 
@@ -5242,7 +5319,7 @@
       const c = checklists.find(cl => cl.id === currentChecklistID);
       if (!c) return;
       c.items = c.items.filter(i => i.id !== itemID);
-      save("gccChecklists", checklists);
+      save("Checklists", checklists);
       renderChecklistItems();
     }
 
@@ -5276,7 +5353,7 @@
         const i = checklists.findIndex(c => c.id === editingChecklistID);
         if (i !== -1) { checklists[i].name = name; checklists[i].color = selectedChecklistColor; }
       }
-      save("gccChecklists", checklists);
+      save("Checklists", checklists);
       closeModal('checklistModal');
       if (currentChecklistID !== null) {
         $("checklistsPageTitle").textContent = name;
@@ -5290,7 +5367,7 @@
       if (editingChecklistID === null) return;
       if (!confirm("Delete this checklist and all its items?")) return;
       checklists = checklists.filter(c => c.id !== editingChecklistID);
-      save("gccChecklists", checklists);
+      save("Checklists", checklists);
       closeModal('checklistModal');
       currentChecklistID = null;
       $("checklistDetailView").style.display = "none";
@@ -5359,7 +5436,7 @@
       if (!title && !content.trim()) {
         if (editingRichNoteID !== null) {
           richNotes = richNotes.filter(n => n.id !== editingRichNoteID);
-          save("gccRichNotes", richNotes);
+          save("RichNotes", richNotes);
         }
         return;
       }
@@ -5370,7 +5447,7 @@
         const i = richNotes.findIndex(n => n.id === editingRichNoteID);
         if (i !== -1) richNotes[i] = { ...richNotes[i], title, content, updated: Date.now() };
       }
-      save("gccRichNotes", richNotes);
+      save("RichNotes", richNotes);
     }
 
     function onRichNoteChange() {
@@ -5382,7 +5459,7 @@
       if (editingRichNoteID === null) return;
       if (!confirm("Delete this note?")) return;
       richNotes = richNotes.filter(n => n.id !== editingRichNoteID);
-      save("gccRichNotes", richNotes);
+      save("RichNotes", richNotes);
       editingRichNoteID = null;
       openToolPage("richnotes");
       renderRichNotesList();
@@ -5501,9 +5578,9 @@
     function togglePasswordInputVisibility() { const input = $("editPasswordPassword"); setPasswordInputVisibility(input.type === "password"); }
     function savePasswordEntry() {
       const data = { name: $("editPasswordName").value.trim(), username: $("editPasswordUsername").value.trim(), email: $("editPasswordEmail").value.trim(), password: $("editPasswordPassword").value, website: $("editPasswordWebsite").value.trim(), phone: $("editPasswordPhone").value.trim(), notes: $("editPasswordNotes").value.trim() };
-      if (!data.name) { alert("Please enter a name or service."); return; } if (editingPasswordID === null) { data.id = Date.now(); passwordEntries.push(data); } else { const i = passwordEntries.findIndex(e => e.id === editingPasswordID); if (i !== -1) passwordEntries[i] = { ...passwordEntries[i], ...data }; } save("gccPasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries();
+      if (!data.name) { alert("Please enter a name or service."); return; } if (editingPasswordID === null) { data.id = Date.now(); passwordEntries.push(data); } else { const i = passwordEntries.findIndex(e => e.id === editingPasswordID); if (i !== -1) passwordEntries[i] = { ...passwordEntries[i], ...data }; } save("PasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries();
     }
-    function deleteCurrentPasswordEntry() { if (editingPasswordID === null) return; if (!confirm("Delete this entry?")) return; passwordEntries = passwordEntries.filter(e => e.id !== editingPasswordID); save("gccPasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries(); }
+    function deleteCurrentPasswordEntry() { if (editingPasswordID === null) return; if (!confirm("Delete this entry?")) return; passwordEntries = passwordEntries.filter(e => e.id !== editingPasswordID); save("PasswordEntries", passwordEntries); closeModal('passwordModal'); renderPasswordEntries(); }
 
     /* ===== RESET ===== */
     let resetSlideDragging = false, resetSlideStartX = 0, resetSlideHandleStartLeft = 0, resetSlideMax = 0;
