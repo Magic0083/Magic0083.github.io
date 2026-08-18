@@ -2302,7 +2302,12 @@
           <div id="svReportingPeriod" style="font-size:22px;font-weight:800;margin-top:6px;">—</div>
           <div id="svLastUpdated" style="font-size:12px;opacity:.8;margin-top:4px;">—</div>
         </div>
+        <div id="svPeriodPicker" class="form-group" style="display:none;">
+          <label class="form-label">GRADING PERIOD</label>
+        </div>
         <div id="svClassList" class="class-list"></div>
+        <pre id="svRawResponse"
+          style="display:none;white-space:pre-wrap;word-break:break-all;background:var(--blue-light);border-radius:14px;padding:14px;font-size:11px;max-height:260px;overflow:auto;margin-top:12px;"></pre>
         <button class="danger-button" onclick="svSignOut()">Sign Out of StudentVUE</button>
         <div class="footer">Grades pulled directly from StudentVUE. Tap ↻ above to refresh.</div>
       </div>
@@ -5763,19 +5768,23 @@
 
     function svRefresh() {
       const creds = load("StudentVueCreds");
-      if (creds) svFetchGrades(creds, { showLoginOnFail: false });
+      if (creds) svFetchGrades(creds, { showLoginOnFail: false, reportPeriod: svData ? svData.currentPeriodIndex : null });
     }
 
     function svFetchGrades(creds, opts = {}) {
+      const requestBody = {
+        username: creds.username,
+        password: creds.password,
+        portalUrl: creds.portalUrl,
+        method: "grades"
+      };
+      if (opts.reportPeriod !== undefined && opts.reportPeriod !== null) {
+        requestBody.reportPeriod = opts.reportPeriod;
+      }
       fetch(creds.workerUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: creds.username,
-          password: creds.password,
-          portalUrl: creds.portalUrl,
-          method: "grades"
-        })
+        body: JSON.stringify(requestBody)
       })
         .then(r => r.json().then(body => ({ ok: r.ok, body })))
         .then(({ ok, body }) => {
@@ -5784,8 +5793,9 @@
             if (opts.showLoginOnFail) svShowLoginView();
             return;
           }
+          console.log("[StudentVUE] raw response:", body.xml);
           const parsed = parseGradebookXML(body.xml);
-          svData = { ...parsed, fetchedAt: Date.now() };
+          svData = { ...parsed, fetchedAt: Date.now(), rawXml: body.xml };
           save("StudentVueData", svData);
           renderStudentVue(svData);
           svSetError(null);
@@ -5800,8 +5810,19 @@
 
     function parseGradebookXML(xmlString) {
       const doc = new DOMParser().parseFromString(xmlString, "text/xml");
+      const parseError = doc.querySelector("parsererror");
+      if (parseError) {
+        return { courses: [], periods: [], currentPeriodIndex: null, reportingPeriod: "—", parseFailed: true };
+      }
       const reportingPeriodEl = doc.querySelector("ReportingPeriod");
       const reportingPeriod = reportingPeriodEl ? reportingPeriodEl.getAttribute("GradePeriod") : "—";
+      const periods = Array.from(doc.querySelectorAll("ReportingPeriods > ReportPeriod")).map(el => ({
+        index: el.getAttribute("Index"),
+        label: el.getAttribute("GradePeriod"),
+      }));
+      // Figure out which period index is currently showing, by matching its label.
+      const currentMatch = periods.find(p => p.label === reportingPeriod);
+      const currentPeriodIndex = currentMatch ? currentMatch.index : null;
       const courses = Array.from(doc.querySelectorAll("Courses > Course")).map(courseEl => {
         const markEl = courseEl.querySelector("Marks > Mark");
         return {
@@ -5813,21 +5834,53 @@
           scoreRaw: markEl ? markEl.getAttribute("CalculatedScoreRaw") || "" : "",
         };
       });
-      return { reportingPeriod, courses };
+      return { reportingPeriod, periods, currentPeriodIndex, courses };
+    }
+
+    function svChangePeriod(index) {
+      const creds = load("StudentVueCreds");
+      if (!creds) return;
+      svFetchGrades(creds, { showLoginOnFail: false, reportPeriod: index });
+    }
+
+    function svToggleRaw() {
+      const el = $("svRawResponse");
+      el.style.display = el.style.display === "none" ? "block" : "none";
     }
 
     function renderStudentVue(data) {
       $("svLoginView").style.display = "none";
       $("svDataView").style.display = "block";
       $("svRefreshButton").style.display = "flex";
-      $("svReportingPeriod").textContent = data.reportingPeriod || "—";
       $("svLastUpdated").textContent = data.fetchedAt
         ? "Updated " + new Date(data.fetchedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
         : "";
+
+      $("svReportingPeriod").textContent = data.reportingPeriod || "—";
+      const periodWrap = $("svPeriodPicker");
+      if (data.periods && data.periods.length > 0) {
+        periodWrap.style.display = "block";
+        periodWrap.innerHTML = `<label class="form-label">GRADING PERIOD</label><select id="svPeriodSelect" class="form-input" onchange="svChangePeriod(this.value)">
+          ${data.periods.map(p => `<option value="${escapeHTML(p.index)}" ${p.index === data.currentPeriodIndex ? "selected" : ""}>${escapeHTML(p.label)}</option>`).join("")}
+        </select>`;
+      } else {
+        periodWrap.style.display = "none";
+      }
+
       const container = $("svClassList");
       container.innerHTML = "";
+      $("svRawResponse").style.display = "none";
+      $("svRawResponse").textContent = data.rawXml || "";
+
+      if (data.parseFailed) {
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">⚠️</div><div style="font-size:18px;font-weight:700;margin-top:10px;">Couldn't Read Response</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE sent back something that wasn't valid XML. Tap below to see the raw response.</div></div>
+        <button class="secondary-button" onclick="svToggleRaw()">Show Raw Response</button>`;
+        return;
+      }
+
       if (!data.courses || data.courses.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any courses for this period.</div></div>`;
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any courses for this period. Try a different reporting period above, or check the raw response below.</div></div>
+        <button class="secondary-button" onclick="svToggleRaw()">Show Raw Response</button>`;
         return;
       }
       data.courses.forEach(c => {
@@ -5844,6 +5897,7 @@
         container.appendChild(card);
       });
     }
+
 
     function svSignOut() {
       if (!confirm("Sign out of StudentVUE? Your saved login and cached grades on this device will be cleared.")) return;
