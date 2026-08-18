@@ -166,6 +166,26 @@
       color: #fff;
     }
 
+    .icon-button.spinning {
+      pointer-events: none;
+      opacity: .6;
+    }
+
+    .icon-button.spinning #svRefreshIcon {
+      display: inline-block;
+      animation: iconSpin .8s linear infinite;
+    }
+
+    @keyframes iconSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .student-card {
       background: linear-gradient(135deg, #174a8b, #2767b8);
       color: white;
@@ -179,6 +199,212 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .sv-profile-card {
+      background: var(--card);
+      border-radius: 21px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 16px;
+    }
+
+    .sv-profile-photo {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: var(--blue-light);
+      flex-shrink: 0;
+    }
+
+    .sv-profile-placeholder {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: var(--blue-light);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sv-profile-name {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .sv-profile-school {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .sv-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .sv-summary-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .sv-summary-label {
+      color: var(--secondary);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sv-summary-value {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .sv-summary-sub {
+      color: var(--secondary);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .sv-section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 20px 2px 10px;
+    }
+
+    .sv-calendar-card {
+      background: var(--card);
+      border-radius: 21px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .sv-calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .sv-calendar-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .sv-calendar-nav {
+      display: flex;
+      gap: 5px;
+    }
+
+    .sv-calendar-nav button {
+      border: none;
+      background: var(--blue-light);
+      color: var(--blue);
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 10px;
+      font-size: 16px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .sv-calendar-nav button.sv-calendar-today-btn {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 0 14px;
+    }
+
+    .sv-calendar-weekdays,
+    .sv-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .sv-calendar-weekday {
+      text-align: center;
+      color: var(--secondary);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 0;
+    }
+
+    .sv-calendar-day {
+      min-height: 72px;
+      border-radius: 12px;
+      padding: 5px 3px;
+      background: var(--background);
+      min-width: 0;
+    }
+
+    .sv-calendar-day.other {
+      opacity: .3;
+    }
+
+    .sv-calendar-day.today {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
+    }
+
+    .sv-calendar-number {
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 3px;
+      text-align: center;
+    }
+
+    .sv-calendar-events {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sv-calendar-event {
+      font-size: 8px;
+      line-height: 1.2;
+      padding: 3px 4px;
+      border-radius: 5px;
+      background: var(--blue-light);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sv-calendar-event.assignment {
+      background: color-mix(in srgb, var(--blue) 18%, transparent);
+    }
+
+    .sv-class-percent {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue);
+      margin-top: 7px;
+    }
+
+    .sv-class-time {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .sv-history-button {
+      margin-top: 10px;
     }
 
     .school-logo {
@@ -2262,14 +2488,15 @@
           <h1>StudentVUE</h1>
         </div>
         <div class="top-bar-actions">
-          <button id="svRefreshButton" class="icon-button" onclick="svRefresh()" style="display:none;">↻</button>
+          <button id="svRefreshButton" class="icon-button" onclick="svRefresh()" style="display:none;"><span
+              id="svRefreshIcon">↻</span></button>
         </div>
       </div>
 
       <div id="svLoginView">
         <div class="security-note">
-          This connects using an unofficial StudentVUE API, not something Edupoint (StudentVUE's maker)
-          publishes or supports — it could stop working if they change something on their end. Your login
+          This connects to the current StudentVUE web portal through your Cloudflare Worker. The Worker handles the
+          StudentVUE web login and returns the information to this app. Your login
           goes to the small proxy address below and then straight to your district's own StudentVUE server;
           it isn't sent anywhere else. Your username and password are saved on this device (and to your
           private cloud sync if you're signed in) the same way entries in Passwords are, so only store this
@@ -2297,19 +2524,83 @@
       </div>
 
       <div id="svDataView" style="display:none;">
-        <div class="student-card" style="margin-bottom:16px;">
-          <div style="font-size:13px;opacity:.8;font-weight:700;letter-spacing:.3px;">REPORTING PERIOD</div>
-          <div id="svReportingPeriod" style="font-size:22px;font-weight:800;margin-top:6px;">—</div>
-          <div id="svLastUpdated" style="font-size:12px;opacity:.8;margin-top:4px;">—</div>
+        <div id="svErrorBanner"
+          style="display:none;background:var(--blue-light);color:var(--text);font-size:12.5px;border-radius:12px;padding:10px 12px;margin-bottom:14px;">
         </div>
-        <div id="svPeriodPicker" class="form-group" style="display:none;">
-          <label class="form-label">GRADING PERIOD</label>
+        <div id="svProfileCard" class="sv-profile-card"></div>
+        <div id="svLastUpdated" style="font-size:12px;color:var(--secondary);margin:8px 2px 16px;"></div>
+
+        <div class="sv-summary-grid">
+          <div class="sv-summary-card">
+            <div class="sv-summary-label">GPA</div>
+            <div id="svGpaValue" class="sv-summary-value">—</div>
+            <div id="svGpaLabel" class="sv-summary-sub">StudentVUE</div>
+          </div>
+          <div class="sv-summary-card">
+            <div class="sv-summary-label">Class Rank</div>
+            <div id="svRankValue" class="sv-summary-value">—</div>
+            <div id="svRankLabel" class="sv-summary-sub">StudentVUE</div>
+          </div>
         </div>
+
+        <div class="sv-summary-card" style="margin-bottom:16px;">
+          <div class="sv-summary-label">Course History</div>
+          <div style="font-size:14px;margin-top:5px;color:var(--secondary);">View all completed and current courses from
+            StudentVUE.</div>
+          <button class="secondary-button sv-history-button" onclick="openSvCourseHistory()">View Course
+            History</button>
+        </div>
+
+        <div class="sv-section-title">Classes</div>
         <div id="svClassList" class="class-list"></div>
+
+        <div class="sv-section-title">Calendar & Assignments</div>
+        <div class="sv-calendar-card">
+          <div class="sv-calendar-controls">
+            <div id="svCalendarTitle" class="sv-calendar-title">—</div>
+            <div class="sv-calendar-nav">
+              <button onclick="svCalendarPrev()">‹</button>
+              <button class="sv-calendar-today-btn" onclick="svCalendarToday()">Today</button>
+              <button onclick="svCalendarNext()">›</button>
+            </div>
+          </div>
+          <div class="sv-calendar-weekdays">
+            <div class="sv-calendar-weekday">Sun</div>
+            <div class="sv-calendar-weekday">Mon</div>
+            <div class="sv-calendar-weekday">Tue</div>
+            <div class="sv-calendar-weekday">Wed</div>
+            <div class="sv-calendar-weekday">Thu</div>
+            <div class="sv-calendar-weekday">Fri</div>
+            <div class="sv-calendar-weekday">Sat</div>
+          </div>
+          <div id="svCalendarGrid" class="sv-calendar-grid"></div>
+        </div>
+
         <pre id="svRawResponse"
           style="display:none;white-space:pre-wrap;word-break:break-all;background:var(--blue-light);border-radius:14px;padding:14px;font-size:11px;max-height:260px;overflow:auto;margin-top:12px;"></pre>
+        <button id="svRawToggleButton" class="secondary-button" onclick="svToggleRaw()">Show Raw Response</button>
         <button class="danger-button" onclick="svSignOut()">Sign Out of StudentVUE</button>
-        <div class="footer">Grades pulled directly from StudentVUE. Tap ↻ above to refresh.</div>
+        <div class="footer">Information pulled from the current StudentVUE web portal. Tap ↻ above to refresh.</div>
+      </div>
+    </div>
+
+    <!-- STUDENTVUE DAY DETAIL MODAL -->
+    <div id="svDayModal" class="modal-background">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="svDayModalTitle">Day</h2><button class="close-button" onclick="closeModal('svDayModal')">×</button>
+        </div>
+        <div id="svDayModalContent"></div>
+      </div>
+    </div>
+
+    <!-- STUDENTVUE COURSE HISTORY MODAL -->
+    <div id="svCourseHistoryModal" class="modal-background">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Course History</h2><button class="close-button" onclick="closeModal('svCourseHistoryModal')">×</button>
+        </div>
+        <div id="svCourseHistoryContent"></div>
       </div>
     </div>
 
@@ -5708,11 +5999,8 @@
     function openPasswordVault() { openToolPage("passwords"); renderPasswordEntries(); }
 
     /* ===== STUDENTVUE ===== */
-    /* Talks to a small proxy Worker (see studentvue-worker.js) that forwards
-       requests to StudentVUE's own SOAP API using unofficial, community-documented
-       endpoints. StudentVUE credentials are stored the same way Password Vault
-       entries are — in localStorage, and synced to your private cloud if signed in. */
     let svData = load("StudentVueData");
+    let svCalendarDate = new Date();
 
     function openStudentVue() {
       openToolPage("studentvue");
@@ -5723,11 +6011,10 @@
         $("svUsername").value = creds.username;
         $("svPassword").value = creds.password;
         $("svRefreshButton").style.display = "flex";
-        if (svData && svData.courses) {
-          renderStudentVue(svData);
-        } else {
-          svFetchGrades(creds, { showLoginOnFail: true });
-        }
+        // Always refresh StudentVUE data when opening this page. Cached data can be
+        // incomplete from an older version of the StudentVUE integration.
+        if (svData && svData.courses) renderStudentVue(svData);
+        svFetchGrades(creds, { showLoginOnFail: true });
       } else {
         svShowLoginView();
       }
@@ -5768,136 +6055,356 @@
 
     function svRefresh() {
       const creds = load("StudentVueCreds");
-      if (creds) svFetchGrades(creds, { showLoginOnFail: false, reportPeriod: svData ? svData.currentPeriodIndex : null });
+      if (creds) svFetchGrades(creds, { showLoginOnFail: false });
     }
 
-    function svFetchGrades(creds, opts = {}) {
-      const requestBody = {
-        username: creds.username,
-        password: creds.password,
-        portalUrl: creds.portalUrl,
-        method: "grades"
-      };
-      if (opts.reportPeriod !== undefined && opts.reportPeriod !== null) {
-        requestBody.reportPeriod = opts.reportPeriod;
+    async function svFetchGrades(creds, opts = {}) {
+      const refreshBtn = $("svRefreshButton");
+      if (refreshBtn && refreshBtn.style.display !== "none") refreshBtn.classList.add("spinning");
+      try {
+        const methods = ["webGradebook", "webCalendar", "webProfile", "webSchedule", "webCourseHistory"];
+        const results = await Promise.all(methods.map(method =>
+          svWorkerRequest(creds, method).catch(error => ({ __error: error.message, __method: method }))
+        ));
+        const byMethod = Object.fromEntries(methods.map((m, i) => [m, results[i]]));
+
+        if (byMethod.webGradebook.__error) throw new Error(byMethod.webGradebook.__error);
+
+        const classes = (byMethod.webGradebook.classes || []).map(c => {
+          const periods = Array.isArray(c.gradingPeriods) ? c.gradingPeriods : [];
+          const current = periods.length ? periods[periods.length - 1] : null;
+          return {
+            title: c.name || "Untitled",
+            teacher: c.teacher || "",
+            room: c.room || "",
+            period: c.period || "",
+            gradingPeriods: periods,
+            scoreString: current?.mark || "—",
+            scoreRaw: current?.score || "",
+            percent: current?.score || "",
+            classID: c.classID || ""
+          };
+        });
+
+        svData = {
+          courses: classes,
+          calendar: byMethod.webCalendar.__error ? null : byMethod.webCalendar,
+          profile: byMethod.webProfile.__error ? null : byMethod.webProfile,
+          schedule: byMethod.webSchedule.__error ? null : byMethod.webSchedule,
+          courseHistory: byMethod.webCourseHistory.__error ? null : byMethod.webCourseHistory,
+          fetchedAt: Date.now(),
+          errors: results.filter(r => r.__error).map(r => `${r.__method}: ${r.__error}`),
+          rawJson: byMethod
+        };
+        save("StudentVueData", svData);
+        renderStudentVue(svData);
+        svSetError(null);
+        if (opts.onSuccess) opts.onSuccess();
+      } catch (err) {
+        console.error("[StudentVUE]", err);
+        svSetError(err.message || "Couldn't connect to StudentVUE. Check your details and try again.");
+        if (opts.showLoginOnFail) svShowLoginView();
+      } finally {
+        if (refreshBtn) refreshBtn.classList.remove("spinning");
+        if (opts.onDone) opts.onDone();
       }
-      fetch(creds.workerUrl, {
+    }
+
+    async function svWorkerRequest(creds, method) {
+      const response = await fetch(creds.workerUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
-      })
-        .then(r => r.json().then(body => ({ ok: r.ok, body })))
-        .then(({ ok, body }) => {
-          if (!ok || body.error) {
-            svSetError(body.error || "Couldn't connect. Check your details and try again.");
-            if (opts.showLoginOnFail) svShowLoginView();
-            return;
-          }
-          console.log("[StudentVUE] raw response:", body.xml);
-          const parsed = parseGradebookXML(body.xml);
-          svData = { ...parsed, fetchedAt: Date.now(), rawXml: body.xml };
-          save("StudentVueData", svData);
-          renderStudentVue(svData);
-          svSetError(null);
-          if (opts.onSuccess) opts.onSuccess();
-        })
-        .catch(() => {
-          svSetError("Couldn't reach the proxy. Check the Worker URL and your connection.");
-          if (opts.showLoginOnFail) svShowLoginView();
-        })
-        .finally(() => { if (opts.onDone) opts.onDone(); });
-    }
-
-    function parseGradebookXML(xmlString) {
-      const doc = new DOMParser().parseFromString(xmlString, "text/xml");
-      const parseError = doc.querySelector("parsererror");
-      if (parseError) {
-        return { courses: [], periods: [], currentPeriodIndex: null, reportingPeriod: "—", parseFailed: true };
-      }
-      const reportingPeriodEl = doc.querySelector("ReportingPeriod");
-      const reportingPeriod = reportingPeriodEl ? reportingPeriodEl.getAttribute("GradePeriod") : "—";
-      const periods = Array.from(doc.querySelectorAll("ReportingPeriods > ReportPeriod")).map(el => ({
-        index: el.getAttribute("Index"),
-        label: el.getAttribute("GradePeriod"),
-      }));
-      // Figure out which period index is currently showing, by matching its label.
-      const currentMatch = periods.find(p => p.label === reportingPeriod);
-      const currentPeriodIndex = currentMatch ? currentMatch.index : null;
-      const courses = Array.from(doc.querySelectorAll("Courses > Course")).map(courseEl => {
-        const markEl = courseEl.querySelector("Marks > Mark");
-        return {
-          title: courseEl.getAttribute("Title") || "Untitled",
-          period: courseEl.getAttribute("Period") || "",
-          room: courseEl.getAttribute("Room") || "",
-          teacher: courseEl.getAttribute("Staff") || "",
-          scoreString: markEl ? markEl.getAttribute("CalculatedScoreString") || "—" : "—",
-          scoreRaw: markEl ? markEl.getAttribute("CalculatedScoreRaw") || "" : "",
-        };
+        body: JSON.stringify({ method, username: creds.username, password: creds.password, portalUrl: creds.portalUrl })
       });
-      return { reportingPeriod, periods, currentPeriodIndex, courses };
+      let body;
+      try { body = await response.json(); } catch { throw new Error(`Worker returned an invalid response for ${method}.`); }
+      if (!response.ok || body.error) throw new Error(body.error || `StudentVUE request failed (${method}).`);
+      return body;
     }
 
-    function svChangePeriod(index) {
-      const creds = load("StudentVueCreds");
-      if (!creds) return;
-      svFetchGrades(creds, { showLoginOnFail: false, reportPeriod: index });
+    function svNormalizeDate(value) {
+      if (!value) return null;
+      const str = String(value).trim();
+
+      // ISO / PXP2 formats such as 2026-08-18 or 20260818.
+      let match = str.match(/(\d{4})[-\/]?(\d{2})[-\/]?(\d{2})/);
+      if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+
+      // Common StudentVUE formats such as 08/18/2026 or 8/18/2026.
+      match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (match) return `${match[3]}-${String(match[1]).padStart(2, "0")}-${String(match[2]).padStart(2, "0")}`;
+
+      // Fall back to the browser's date parser for values containing a time.
+      const parsed = new Date(str);
+      if (!Number.isNaN(parsed.getTime())) {
+        return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+      }
+      return null;
     }
 
-    function svToggleRaw() {
-      const el = $("svRawResponse");
-      el.style.display = el.style.display === "none" ? "block" : "none";
+    function svFormatTime(value) {
+      if (!value) return "";
+      const str = String(value).trim();
+      const d = new Date(`1970-01-01T${str}`);
+      if (!Number.isNaN(d.getTime()) && /\d/.test(str)) {
+        return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      }
+      return str;
+    }
+
+    // Reads the first present key from an object, tolerant of different casing
+    // / naming conventions a Worker's JSON might use for the same field.
+    function svField(obj, ...keys) {
+      if (!obj) return null;
+      for (const k of keys) {
+        if (obj[k] != null && obj[k] !== "") return obj[k];
+      }
+      return null;
+    }
+
+    // Schedule responses can come back shaped a few different ways depending on
+    // how the Worker built them — try the common shapes rather than assume one.
+    function svExtractScheduleEntries(scheduleResponse) {
+      if (!scheduleResponse) return [];
+      const schools = svField(scheduleResponse, "schools", "Schools") || svField(scheduleResponse.schedule || {}, "schools", "Schools");
+      if (Array.isArray(schools)) {
+        const flat = schools.flatMap(s => svField(s, "classes", "Classes") || []);
+        if (flat.length) return flat;
+      }
+      const direct = svField(scheduleResponse, "classes", "Classes") || svField(scheduleResponse.schedule || {}, "classes", "Classes");
+      if (Array.isArray(direct) && direct.length) return direct;
+      return [];
+    }
+
+    function svGetClassTime(course) {
+      const entries = svExtractScheduleEntries(svData?.schedule);
+      if (!entries.length) return "";
+      const coursePeriodDigits = course.period != null ? String(course.period).replace(/\D/g, "") : "";
+      const coursePeriodNum = coursePeriodDigits ? parseInt(coursePeriodDigits, 10) : NaN;
+      const courseTitle = (course.title || "").toLowerCase().trim();
+
+      let match = null;
+      if (!Number.isNaN(coursePeriodNum)) {
+        match = entries.find(c => {
+          const p = svField(c, "period", "Period", "periodName", "PeriodName");
+          if (p == null) return false;
+          const pNum = parseInt(String(p).replace(/\D/g, ""), 10);
+          return !Number.isNaN(pNum) && pNum === coursePeriodNum;
+        });
+      }
+      if (!match && courseTitle) {
+        match = entries.find(c => {
+          const name = (svField(c, "className", "CourseName", "courseName", "name", "Name", "title", "Title") || "").toLowerCase();
+          // Schedule class names often include a course code and section number
+          // around the title (e.g. "12600 Environmental Science - 12600-00002"),
+          // so a substring match works better here than an exact match.
+          return name && (name.includes(courseTitle) || courseTitle.includes(name));
+        });
+      }
+      if (!match) return "";
+      const start = svFormatTime(svField(match, "startTime", "StartTime", "start", "Start"));
+      const end = svFormatTime(svField(match, "endTime", "EndTime", "end", "End"));
+      return start && end ? `${start} – ${end}` : start || end || "";
+    }
+
+    function svGetRankSummary() {
+      const summaries = svData?.courseHistory?.gpa || [];
+      if (!summaries.length) return null;
+      return summaries.find(x => x && x.classRank != null) || summaries.find(x => x && x.gpa != null) || summaries[0];
     }
 
     function renderStudentVue(data) {
       $("svLoginView").style.display = "none";
       $("svDataView").style.display = "block";
       $("svRefreshButton").style.display = "flex";
-      $("svLastUpdated").textContent = data.fetchedAt
-        ? "Updated " + new Date(data.fetchedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
-        : "";
-
-      $("svReportingPeriod").textContent = data.reportingPeriod || "—";
-      const periodWrap = $("svPeriodPicker");
-      if (data.periods && data.periods.length > 0) {
-        periodWrap.style.display = "block";
-        periodWrap.innerHTML = `<label class="form-label">GRADING PERIOD</label><select id="svPeriodSelect" class="form-input" onchange="svChangePeriod(this.value)">
-          ${data.periods.map(p => `<option value="${escapeHTML(p.index)}" ${p.index === data.currentPeriodIndex ? "selected" : ""}>${escapeHTML(p.label)}</option>`).join("")}
-        </select>`;
-      } else {
-        periodWrap.style.display = "none";
+      const lastUpdated = $("svLastUpdated");
+      if (lastUpdated) {
+        lastUpdated.textContent = data.fetchedAt
+          ? "Updated " + new Date(data.fetchedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
+          : "";
       }
+
+      // webProfile returns the profile object directly. Keep this tolerant of
+      // cached/older response shapes, and of different key names the Worker's
+      // JSON might use for the same fields, since photo/name/school naming
+      // varies a lot between StudentVUE implementations.
+      const profileResponse = data.profile || {};
+      const profile = profileResponse.profile || profileResponse.student || profileResponse;
+      const profileName = svField(profile, "name", "Name", "studentName", "StudentName", "fullName", "FullName") || "Student";
+      const profileSchool = svField(profile, "school", "School", "schoolName", "SchoolName", "currentSchool", "CurrentSchool") || "StudentVUE";
+      let profilePhoto = svField(profile, "photoDataUri", "photo", "Photo", "photoUrl", "PhotoUrl", "pictureUrl", "PictureUrl", "image", "Image", "imageData", "ImageData", "base64Photo", "PhotoData", "studentPhoto", "StudentPhoto");
+      if (profilePhoto && typeof profilePhoto === "string" && !profilePhoto.startsWith("data:") && !profilePhoto.startsWith("http")) {
+        profilePhoto = `data:image/jpeg;base64,${profilePhoto}`;
+      }
+      const initials = profileName.split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "S";
+      const profileCard = $("svProfileCard");
+      if (profileCard) {
+        profileCard.innerHTML = profilePhoto
+          ? `<img class="sv-profile-photo" src="${profilePhoto}" alt="Student profile picture" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="sv-profile-placeholder" style="display:none;">${escapeHTML(initials)}</div>`
+          : `<div class="sv-profile-placeholder">${escapeHTML(initials)}</div>`;
+        profileCard.innerHTML += `<div><div class="sv-profile-name">${escapeHTML(profileName)}</div><div class="sv-profile-school">${escapeHTML(profileSchool)}</div></div>`;
+      }
+
+      const courseHistory = data.courseHistory || {};
+      const summary = svGetRankSummary();
+      const summaries = Array.isArray(courseHistory.gpa) ? courseHistory.gpa : [];
+      const gpaEl = $("svGpaValue");
+      const gpaLabelEl = $("svGpaLabel");
+      const rankEl = $("svRankValue");
+      const rankLabelEl = $("svRankLabel");
+      if (gpaEl) gpaEl.textContent = summary?.gpa != null ? Number(summary.gpa).toFixed(2) : "—";
+      if (gpaLabelEl) gpaLabelEl.textContent = summaries.length ? (summaries.find(x => x.label === "HS Cumulative GPA")?.label || summary?.label || "StudentVUE") : "StudentVUE";
+      if (rankEl) rankEl.textContent = summary?.classRank != null && summary?.classSize != null ? `${summary.classRank} / ${summary.classSize}` : "—";
+      if (rankLabelEl) rankLabelEl.textContent = summary?.classRank != null ? "Class rank" : "StudentVUE";
+
+      const errorBanner = $("svErrorBanner");
+      if (errorBanner) {
+        const friendlyNames = { webCalendar: "Calendar", webProfile: "Profile", webSchedule: "Schedule", webCourseHistory: "Course History" };
+        const failed = (data.errors || []).map(e => e.split(":")[0]).map(m => friendlyNames[m] || m);
+        if (failed.length) {
+          errorBanner.style.display = "block";
+          errorBanner.textContent = `Couldn't load: ${failed.join(", ")}. Grades still loaded fine — tap ↻ to try those again.`;
+        } else {
+          errorBanner.style.display = "none";
+        }
+      }
+
+      renderSvCalendar();
 
       const container = $("svClassList");
       container.innerHTML = "";
       $("svRawResponse").style.display = "none";
-      $("svRawResponse").textContent = data.rawXml || "";
-
-      if (data.parseFailed) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">⚠️</div><div style="font-size:18px;font-weight:700;margin-top:10px;">Couldn't Read Response</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE sent back something that wasn't valid XML. Tap below to see the raw response.</div></div>
-        <button class="secondary-button" onclick="svToggleRaw()">Show Raw Response</button>`;
-        return;
-      }
+      $("svRawResponse").textContent = data.rawJson ? JSON.stringify(data.rawJson, null, 2) : "";
+      const rawToggleBtn = $("svRawToggleButton");
+      if (rawToggleBtn) rawToggleBtn.textContent = "Show Raw Response";
 
       if (!data.courses || data.courses.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any courses for this period. Try a different reporting period above, or check the raw response below.</div></div>
-        <button class="secondary-button" onclick="svToggleRaw()">Show Raw Response</button>`;
-        return;
+        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any classes.</div></div>`;
+      } else {
+        data.courses.forEach(c => {
+          const card = document.createElement("div");
+          card.className = "class-card";
+          card.style.cursor = "default";
+          const time = svGetClassTime(c);
+          const percent = c.percent ? String(c.percent) : "";
+          card.innerHTML = `
+            <div class="class-name">${escapeHTML(c.title)}</div>
+            <div class="class-code">${escapeHTML(c.teacher)}</div>
+            ${time ? `<div class="sv-class-time">${escapeHTML(time)}</div>` : ""}
+            ${c.room ? `<div class="class-room">${escapeHTML(c.room)}</div>` : ""}
+            <div class="class-grade">${escapeHTML(c.scoreString || "—")}</div>
+            ${percent ? `<div class="sv-class-percent">${escapeHTML(percent)}</div>` : ""}
+          `;
+          container.appendChild(card);
+        });
       }
-      data.courses.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "class-card";
-        card.style.cursor = "default";
-        card.innerHTML = `
-          <div class="class-name">${escapeHTML(c.title)}</div>
-          <div class="class-code">${escapeHTML(c.teacher)}</div>
-          <div class="class-details">${c.period ? "Period " + escapeHTML(c.period) : ""}</div>
-          <div class="class-grade">${escapeHTML(c.scoreString)}</div>
-          ${c.room ? `<div class="class-room">Rm ${escapeHTML(c.room)}</div>` : ""}
-        `;
-        container.appendChild(card);
-      });
     }
 
+    let svCalendarEventMap = {};
+
+    function svCalendarPrev() { svCalendarDate = new Date(svCalendarDate.getFullYear(), svCalendarDate.getMonth() - 1, 1); renderSvCalendar(); }
+    function svCalendarNext() { svCalendarDate = new Date(svCalendarDate.getFullYear(), svCalendarDate.getMonth() + 1, 1); renderSvCalendar(); }
+    function svCalendarToday() { svCalendarDate = new Date(); renderSvCalendar(); }
+
+    function renderSvCalendar() {
+      const grid = $("svCalendarGrid");
+      const title = $("svCalendarTitle");
+      if (!grid || !title) return;
+      const year = svCalendarDate.getFullYear();
+      const month = svCalendarDate.getMonth();
+      title.textContent = new Date(year, month, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      const first = new Date(year, month, 1);
+      const startDay = first.getDay();
+      const days = new Date(year, month + 1, 0).getDate();
+      const prevDays = new Date(year, month, 0).getDate();
+      const events = Array.isArray(svData?.calendar?.events) ? svData.calendar.events : [];
+      const eventMap = {};
+      events.forEach(e => { const key = svNormalizeDate(e.date); if (key) (eventMap[key] ||= []).push(e); });
+      svCalendarEventMap = eventMap;
+      let html = "";
+      const todayKey = formatDateKey(new Date());
+      for (let i = 0; i < 42; i++) {
+        const dayIndex = i - startDay + 1;
+        let d, other = false;
+        if (dayIndex < 1) { d = new Date(year, month - 1, prevDays + dayIndex); other = true; }
+        else if (dayIndex > days) { d = new Date(year, month + 1, dayIndex - days); other = true; }
+        else d = new Date(year, month, dayIndex);
+        const key = formatDateKey(d);
+        const dayEvents = eventMap[key] || [];
+        html += `<div class="sv-calendar-day ${other ? "other" : ""} ${key === todayKey ? "today" : ""}" onclick="openSvDayModal('${key}')" role="button" tabindex="0">`;
+        html += `<div class="sv-calendar-number">${d.getDate()}</div><div class="sv-calendar-events">`;
+        dayEvents.slice(0, 4).forEach(e => {
+          const assignment = Number(e.type) === 2;
+          html += `<div class="sv-calendar-event ${assignment ? "assignment" : ""}" title="${escapeHTML(e.description || e.title || "")}">${escapeHTML(e.title || "Event")}</div>`;
+        });
+        if (dayEvents.length > 4) html += `<div class="sv-calendar-event">+${dayEvents.length - 4} more</div>`;
+        html += `</div></div>`;
+      }
+      grid.innerHTML = html;
+    }
+
+    function openSvDayModal(dateKey) {
+      const events = svCalendarEventMap[dateKey] || [];
+      const d = new Date(`${dateKey}T00:00:00`);
+      const titleEl = $("svDayModalTitle");
+      if (titleEl) {
+        titleEl.textContent = Number.isNaN(d.getTime())
+          ? "Day"
+          : d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+      }
+      const content = $("svDayModalContent");
+      if (!events.length) {
+        content.innerHTML = `<div class="calendar-empty"><div class="calendar-empty-icon">📅</div>No events on this day.</div>`;
+      } else {
+        content.innerHTML = events.map(e => {
+          const assignment = Number(e.type) === 2;
+          return `<div class="profile-card" style="margin-bottom:10px;text-align:left;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-size:20px;">${assignment ? "📝" : "📌"}</div>
+              <div>
+                <div style="font-weight:700;">${escapeHTML(e.title || "Event")}</div>
+                ${e.description ? `<div style="color:var(--secondary);font-size:13px;margin-top:4px;">${escapeHTML(e.description)}</div>` : ""}
+              </div>
+            </div>
+          </div>`;
+        }).join("");
+      }
+      openModal("svDayModal");
+    }
+
+
+    function openSvCourseHistory() {
+      const modal = $("svCourseHistoryModal");
+      const content = $("svCourseHistoryContent");
+      const historyResponse = svData?.courseHistory || {};
+      const history = Array.isArray(historyResponse)
+        ? historyResponse
+        : (Array.isArray(historyResponse.history) ? historyResponse.history : []);
+      if (!history.length) {
+        content.innerHTML = `<div class="calendar-empty"><div class="calendar-empty-icon">📚</div>No course history was returned.</div>`;
+      } else {
+        content.innerHTML = history.map(g => `
+          <div class="section-title" style="margin-top:8px;">${escapeHTML(g.grade || "Grade")}</div>
+          ${(g.terms || []).map(t => `
+            <div class="profile-card" style="margin-bottom:10px;">
+              <div style="font-weight:800;">${escapeHTML(t.schoolName || "School")}</div>
+              <div style="color:var(--secondary);font-size:12px;margin-top:3px;">${escapeHTML([t.year, t.termName].filter(Boolean).join(" · "))}</div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:7px;">
+                ${(t.courses || []).map(c => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;"><span>${escapeHTML(c.title || "Course")}</span><strong>${escapeHTML(c.mark || "—")}</strong></div>`).join("")}
+              </div>
+            </div>`).join("")}
+        `).join("");
+      }
+      modal.classList.add("show");
+    }
+
+    function svToggleRaw() {
+      const el = $("svRawResponse");
+      const showing = el.style.display !== "none";
+      el.style.display = showing ? "none" : "block";
+      const btn = $("svRawToggleButton");
+      if (btn) btn.textContent = showing ? "Show Raw Response" : "Hide Raw Response";
+    }
 
     function svSignOut() {
       if (!confirm("Sign out of StudentVUE? Your saved login and cached grades on this device will be cleared.")) return;
