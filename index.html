@@ -6573,28 +6573,41 @@
       modal.classList.add("show");
     }
 
-  async function svDownloadTranscript() {
-    const creds = load("StudentVueCreds");
-    if (!creds) { alert("Connect to StudentVUE first."); return; }
-    const btn = $("svTranscriptButton");
-    const original = btn.textContent;
-    btn.textContent = "Preparing…";
-    btn.disabled = true;
-    try {
-      const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
-      const response = await fetch(result.dataUri);
-      const blob = await response.blob();
-      const pdfUrl = URL.createObjectURL(blob);
-      window.open(pdfUrl, "_blank");
-      setTimeout(() => URL.revokeObjectURL(pdfUrl), 60000);
-    } catch (err) {
-      console.error("[StudentVUE]", err);
-      alert(err.message || "Couldn't open the transcript.");
-    } finally {
-      btn.textContent = original;
-      btn.disabled = false;
+    async function svDownloadTranscript() {
+      const creds = load("StudentVueCreds");
+      if (!creds) { alert("Connect to StudentVUE first."); return; }
+      const btn = $("svTranscriptButton");
+      const original = btn.textContent;
+      btn.textContent = "Preparing…";
+      btn.disabled = true;
+      try {
+        const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
+
+        const isHomeScreen = window.navigator.standalone === true ||
+          window.matchMedia("(display-mode: standalone)").matches;
+
+        if (isHomeScreen) {
+          const response = await fetch(result.dataUri);
+          const blob = await response.blob();
+          const pdfUrl = URL.createObjectURL(blob);
+          window.open(pdfUrl, "_blank");
+          setTimeout(() => URL.revokeObjectURL(pdfUrl), 60000);
+        } else {
+          const link = document.createElement("a");
+          link.href = result.dataUri;
+          link.download = result.filename || "Unofficial_Transcript.pdf";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }
+      } catch (err) {
+        console.error("[StudentVUE]", err);
+        alert(err.message || "Couldn't open the transcript.");
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
     }
-  }
 
     function svToggleRaw() {
       const el = $("svRawResponse");
