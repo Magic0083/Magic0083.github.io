@@ -6572,29 +6572,57 @@
       modal.classList.add("show");
     }
 
-    async function svDownloadTranscript() {
-      const creds = load("StudentVueCreds");
-      if (!creds) { alert("Connect to StudentVUE first."); return; }
-      const btn = $("svTranscriptButton");
-      const original = btn.textContent;
-      btn.textContent = "Preparing…";
-      btn.disabled = true;
-      try {
-        const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
-        const link = document.createElement("a");
-        link.href = result.dataUri;
-        link.download = result.filename || "Unofficial_Transcript.pdf";
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } catch (err) {
-        console.error("[StudentVUE]", err);
-        alert(err.message || "Couldn't download the transcript.");
-      } finally {
-        btn.textContent = original;
-        btn.disabled = false;
-      }
+  async function svDownloadTranscript() {
+    const creds = load("StudentVueCreds");
+    if (!creds) {
+      alert("Connect to StudentVUE first.");
+      return;
     }
+
+    const btn = $("svTranscriptButton");
+    const original = btn.textContent;
+
+    btn.textContent = "Preparing…";
+    btn.disabled = true;
+
+    try {
+      const result = await svWorkerRequest(
+        creds,
+        "webReport",
+        { reportKey: "transcriptLegacy" }
+      );
+
+      const dataUri = result.dataUri;
+      const filename = result.filename || "Unofficial_Transcript.pdf";
+
+      // Detect if the app is running as an iPhone Home Screen web app
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      if (isStandalone) {
+        // iOS Home Screen apps don't reliably support <a download>.
+        // Open the PDF directly so iOS can display it.
+        window.location.href = dataUri;
+        return;
+      }
+
+      // Normal browser behavior
+      const link = document.createElement("a");
+      link.href = dataUri;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+    } catch (err) {
+      console.error("[StudentVUE]", err);
+      alert(err.message || "Couldn't download the transcript.");
+    } finally {
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  }
 
     function svToggleRaw() {
       const el = $("svRawResponse");
