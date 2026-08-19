@@ -2793,7 +2793,8 @@
       <div class="settings-section">
         <div class="settings-label">STARTUP</div>
         <div class="setting-row">
-          <div class="setting-icon" style="padding:0;overflow:hidden;"><img src="Icons/StudentVUE/StudentVUE (Classic).png" alt=""
+          <div class="setting-icon" style="padding:0;overflow:hidden;"><img
+              src="Icons/StudentVUE/StudentVUE (Classic).png" alt=""
               style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></div>
           <div class="setting-info">
             <div class="setting-title">Open StudentVUE by Default</div>
@@ -6574,50 +6575,21 @@
 
   async function svDownloadTranscript() {
     const creds = load("StudentVueCreds");
-    if (!creds) {
-      alert("Connect to StudentVUE first.");
-      return;
-    }
-
+    if (!creds) { alert("Connect to StudentVUE first."); return; }
     const btn = $("svTranscriptButton");
     const original = btn.textContent;
-
     btn.textContent = "Preparing…";
     btn.disabled = true;
-
     try {
-      const result = await svWorkerRequest(
-        creds,
-        "webReport",
-        { reportKey: "transcriptLegacy" }
-      );
-
-      const dataUri = result.dataUri;
-      const filename = result.filename || "Unofficial_Transcript.pdf";
-
-      // Detect if the app is running as an iPhone Home Screen web app
-      const isStandalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone === true;
-
-      if (isStandalone) {
-        // iOS Home Screen apps don't reliably support <a download>.
-        // Open the PDF directly so iOS can display it.
-        window.location.href = dataUri;
-        return;
-      }
-
-      // Normal browser behavior
-      const link = document.createElement("a");
-      link.href = dataUri;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
+      const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
+      const response = await fetch(result.dataUri);
+      const blob = await response.blob();
+      const pdfUrl = URL.createObjectURL(blob);
+      window.open(pdfUrl, "_blank");
+      setTimeout(() => URL.revokeObjectURL(pdfUrl), 60000);
     } catch (err) {
       console.error("[StudentVUE]", err);
-      alert(err.message || "Couldn't download the transcript.");
+      alert(err.message || "Couldn't open the transcript.");
     } finally {
       btn.textContent = original;
       btn.disabled = false;
