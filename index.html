@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f4f5f7">
   <link rel="icon" type="image/svg+xml" href="Favicon.svg">
-  <link rel="alternate icon" type="image/png" sizes="512x512" href="Icons/My Student (Classic).png"
+  <link rel="alternate icon" type="image/png" sizes="512x512" href="Icons/StudentVUE/StudentVUE (Classic).png"
     id="alternateIconLink">
-  <link rel="apple-touch-icon" href="Icons/My Student (Classic).png" id="appleTouchIconLink">
+  <link rel="apple-touch-icon" href="Icons/My Student/ Student (Classic).png" id="appleTouchIconLink">
   <title>My Student Hub</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.17.0/katex.min.js"></script>
@@ -391,16 +391,63 @@
     }
 
     .sv-class-percent {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: var(--blue);
-      margin-top: 7px;
     }
 
     .sv-class-time {
       color: var(--secondary);
       font-size: 12px;
-      margin-top: 4px;
+      text-align: left;
+    }
+
+    .sv-card-bottom-left {
+      position: absolute;
+      left: 18px;
+      bottom: 17px;
+      max-width: calc(100% - 130px);
+    }
+
+    .sv-card-top-right {
+      position: absolute;
+      right: 17px;
+      top: 17px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sv-class-grade {
+      min-width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: var(--blue-light);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .sv-card-bottom-right {
+      position: absolute;
+      right: 17px;
+      bottom: 17px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      max-width: 130px;
+    }
+
+    .sv-card-room {
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
     }
 
     .sv-history-button {
@@ -2527,7 +2574,8 @@
         <div id="svErrorBanner"
           style="display:none;background:var(--blue-light);color:var(--text);font-size:12.5px;border-radius:12px;padding:10px 12px;margin-bottom:14px;">
         </div>
-        <div id="svProfileCard" class="sv-profile-card"></div>
+        <div id="svProfileCard" class="sv-profile-card" onclick="openSvProfileModal()" role="button" tabindex="0"
+          style="cursor:pointer;"></div>
         <div id="svLastUpdated" style="font-size:12px;color:var(--secondary);margin:8px 2px 16px;"></div>
 
         <div class="sv-summary-grid">
@@ -2541,14 +2589,6 @@
             <div id="svRankValue" class="sv-summary-value">—</div>
             <div id="svRankLabel" class="sv-summary-sub">StudentVUE</div>
           </div>
-        </div>
-
-        <div class="sv-summary-card" style="margin-bottom:16px;">
-          <div class="sv-summary-label">Course History</div>
-          <div style="font-size:14px;margin-top:5px;color:var(--secondary);">View all completed and current courses from
-            StudentVUE.</div>
-          <button class="secondary-button sv-history-button" onclick="openSvCourseHistory()">View Course
-            History</button>
         </div>
 
         <div class="sv-section-title">Classes</div>
@@ -2601,6 +2641,41 @@
           <h2>Course History</h2><button class="close-button" onclick="closeModal('svCourseHistoryModal')">×</button>
         </div>
         <div id="svCourseHistoryContent"></div>
+      </div>
+    </div>
+
+    <!-- STUDENTVUE PROFILE DETAIL MODAL -->
+    <div id="svProfileModal" class="modal-background">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Student Info</h2><button class="close-button" onclick="closeModal('svProfileModal')">×</button>
+        </div>
+        <div class="info-card">
+          <div class="info-row">
+            <div class="info-label">Name</div>
+            <div id="svModalName" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">School</div>
+            <div id="svModalSchool" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">ID</div>
+            <div id="svModalId" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Gender</div>
+            <div id="svModalGender" class="info-value">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Grade</div>
+            <div id="svModalGrade" class="info-value">—</div>
+          </div>
+        </div>
+        <button class="secondary-button sv-history-button" onclick="openSvCourseHistory()">View Course
+          History</button>
+        <button id="svTranscriptButton" class="secondary-button sv-history-button"
+          onclick="svDownloadTranscript()">Download Unofficial Transcript (legacy)</button>
       </div>
     </div>
 
@@ -2713,6 +2788,21 @@
           </div>
           <div class="arrow">›</div>
         </button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">STARTUP</div>
+        <div class="setting-row">
+          <div class="setting-icon" style="padding:0;overflow:hidden;"><img src="Icons/StudentVUE/StudentVUE (Classic).png" alt=""
+              style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></div>
+          <div class="setting-info">
+            <div class="setting-title">Open StudentVUE by Default</div>
+            <div class="setting-description">Skip Home and go straight to StudentVUE when you open the app</div>
+          </div>
+          <div id="defaultToStudentVueSwitch" class="switch" onclick="toggleDefaultToStudentVue()">
+            <div class="switch-circle"></div>
+          </div>
+        </div>
       </div>
 
       <div class="settings-section">
@@ -2837,7 +2927,7 @@
       <div class="nav-icon">📅</div>
       <div class="nav-label">Calendar</div>
     </button>
-    <button class="nav-button" onclick="showPage('tools', this)">
+    <button id="navToolsButton" class="nav-button" onclick="showPage('tools', this)">
       <div class="nav-icon">🧰</div>
       <div class="nav-label">Tools</div>
     </button>
@@ -3464,7 +3554,8 @@
       </div>
       <div class="quiz-help" style="margin-bottom:14px;">Pick an icon below. Then remove this app from your home
         screen and add it again — that's the only way the new icon will show up.</div>
-      <div id="appIconOptionsList" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;"></div>
+      <div id="appIconGroupSwitcher" class="calendar-view-switcher"></div>
+      <div id="appIconOptionsList"></div>
     </div>
   </div>
 
@@ -4800,6 +4891,33 @@
       }
     }
 
+    /* ===== STARTUP PAGE ===== */
+    function toggleDefaultToStudentVue() {
+      const enabled = localStorage.getItem("DefaultToStudentVue") !== "true";
+      localStorage.setItem("DefaultToStudentVue", enabled ? "true" : "false");
+      $("defaultToStudentVueSwitch").classList.toggle("active", enabled);
+    }
+
+    function loadDefaultToStudentVuePref() {
+      if (localStorage.getItem("DefaultToStudentVue") === "true") {
+        $("defaultToStudentVueSwitch").classList.add("active");
+      }
+    }
+
+    // Called once at startup (after everything else has rendered) to skip
+    // Home and jump straight into StudentVUE, if the person turned that on
+    // in Settings. Mirrors what happens when someone taps Tools then
+    // StudentVUE by hand: the Tools nav button stays highlighted as the
+    // "section" they're in, and openStudentVue() takes care of showing
+    // cached data immediately and refreshing in the background.
+    function applyDefaultStartupPage() {
+      if (localStorage.getItem("DefaultToStudentVue") !== "true") return;
+      $$(".nav-button").forEach(n => n.classList.remove("active"));
+      const toolsBtn = $("navToolsButton");
+      if (toolsBtn) toolsBtn.classList.add("active");
+      openStudentVue();
+    }
+
     /* ===== PROJECTS & TO-DOS ===== */
     function openTodos() {
       openToolPage("todos");
@@ -6001,6 +6119,7 @@
     /* ===== STUDENTVUE ===== */
     let svData = load("StudentVueData");
     let svCalendarDate = new Date();
+    let svProfileDetails = null;
 
     function openStudentVue() {
       openToolPage("studentvue");
@@ -6062,15 +6181,14 @@
       const refreshBtn = $("svRefreshButton");
       if (refreshBtn && refreshBtn.style.display !== "none") refreshBtn.classList.add("spinning");
       try {
-        const methods = ["webGradebook", "webCalendar", "webProfile", "webSchedule", "webCourseHistory"];
-        const results = await Promise.all(methods.map(method =>
-          svWorkerRequest(creds, method).catch(error => ({ __error: error.message, __method: method }))
-        ));
-        const byMethod = Object.fromEntries(methods.map((m, i) => [m, results[i]]));
+        // One request, one login, one shared session server-side — the Worker
+        // fetches gradebook/calendar/profile/schedule/course-history together
+        // instead of the app firing five separate logins in parallel (which
+        // could race each other on the district's server and intermittently
+        // fail — see the "webAll" note in the Worker's own comments).
+        const result = await svWorkerRequest(creds, "webAll");
 
-        if (byMethod.webGradebook.__error) throw new Error(byMethod.webGradebook.__error);
-
-        const classes = (byMethod.webGradebook.classes || []).map(c => {
+        const classes = (result.classes || []).map(c => {
           const periods = Array.isArray(c.gradingPeriods) ? c.gradingPeriods : [];
           const current = periods.length ? periods[periods.length - 1] : null;
           return {
@@ -6088,13 +6206,14 @@
 
         svData = {
           courses: classes,
-          calendar: byMethod.webCalendar.__error ? null : byMethod.webCalendar,
-          profile: byMethod.webProfile.__error ? null : byMethod.webProfile,
-          schedule: byMethod.webSchedule.__error ? null : byMethod.webSchedule,
-          courseHistory: byMethod.webCourseHistory.__error ? null : byMethod.webCourseHistory,
+          calendar: result.calendar || null,
+          profile: result.profile || null,
+          studentInfo: result.studentInfo || null,
+          schedule: result.schedule || null,
+          courseHistory: result.courseHistory || null,
           fetchedAt: Date.now(),
-          errors: results.filter(r => r.__error).map(r => `${r.__method}: ${r.__error}`),
-          rawJson: byMethod
+          errors: result.errors || [],
+          rawJson: result
         };
         save("StudentVueData", svData);
         renderStudentVue(svData);
@@ -6110,11 +6229,11 @@
       }
     }
 
-    async function svWorkerRequest(creds, method) {
+    async function svWorkerRequest(creds, method, extra = {}) {
       const response = await fetch(creds.workerUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, username: creds.username, password: creds.password, portalUrl: creds.portalUrl })
+        body: JSON.stringify({ method, username: creds.username, password: creds.password, portalUrl: creds.portalUrl, ...extra })
       });
       let body;
       try { body = await response.json(); } catch { throw new Error(`Worker returned an invalid response for ${method}.`); }
@@ -6230,19 +6349,35 @@
       // varies a lot between StudentVUE implementations.
       const profileResponse = data.profile || {};
       const profile = profileResponse.profile || profileResponse.student || profileResponse;
-      const profileName = svField(profile, "name", "Name", "studentName", "StudentName", "fullName", "FullName") || "Student";
+      const studentInfo = data.studentInfo || {};
+      // Student Information (PXP2_Student.aspx) has the cleanest full name
+      // (first + middle initial + last) and the ID/gender/grade fields;
+      // fall back to whatever the landing-page profile has if that page
+      // couldn't be reached.
+      const profileFullName = svField(studentInfo, "name") || svField(profile, "name", "Name", "studentName", "StudentName", "fullName", "FullName") || "Student";
+      const profileFirst = svField(studentInfo, "firstName");
+      const profileLast = svField(studentInfo, "lastName");
+      // Card shows just first + last; falls back to the full name if the
+      // Worker couldn't split it (e.g. webStudentInfo failed).
+      const profileShortName = (profileFirst && profileLast) ? `${profileFirst} ${profileLast}` : profileFullName;
       const profileSchool = svField(profile, "school", "School", "schoolName", "SchoolName", "currentSchool", "CurrentSchool") || "StudentVUE";
+      const profileId = svField(studentInfo, "permID") || svField(profile, "sisNumber", "SisNumber", "studentID", "StudentID", "studentId", "permID", "PermID");
+      const profileGender = svField(studentInfo, "gender");
+      const profileGrade = svField(studentInfo, "grade");
       let profilePhoto = svField(profile, "photoDataUri", "photo", "Photo", "photoUrl", "PhotoUrl", "pictureUrl", "PictureUrl", "image", "Image", "imageData", "ImageData", "base64Photo", "PhotoData", "studentPhoto", "StudentPhoto");
       if (profilePhoto && typeof profilePhoto === "string" && !profilePhoto.startsWith("data:") && !profilePhoto.startsWith("http")) {
         profilePhoto = `data:image/jpeg;base64,${profilePhoto}`;
       }
-      const initials = profileName.split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "S";
+      // Kept around so openSvProfileModal() can populate the detail modal
+      // without recomputing all of this from data.rawJson.
+      svProfileDetails = { fullName: profileFullName, school: profileSchool, id: profileId, gender: profileGender, grade: profileGrade };
+      const initials = profileShortName.split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "S";
       const profileCard = $("svProfileCard");
       if (profileCard) {
         profileCard.innerHTML = profilePhoto
           ? `<img class="sv-profile-photo" src="${profilePhoto}" alt="Student profile picture" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="sv-profile-placeholder" style="display:none;">${escapeHTML(initials)}</div>`
           : `<div class="sv-profile-placeholder">${escapeHTML(initials)}</div>`;
-        profileCard.innerHTML += `<div><div class="sv-profile-name">${escapeHTML(profileName)}</div><div class="sv-profile-school">${escapeHTML(profileSchool)}</div></div>`;
+        profileCard.innerHTML += `<div style="flex:1;min-width:0;"><div class="sv-profile-name">${escapeHTML(profileShortName)}</div><div class="sv-profile-school">${escapeHTML(profileSchool)}</div>${profileId ? `<div class="sv-profile-school">ID: ${escapeHTML(String(profileId))}</div>` : ""}</div><div class="arrow">›</div>`;
       }
 
       const courseHistory = data.courseHistory || {};
@@ -6259,7 +6394,7 @@
 
       const errorBanner = $("svErrorBanner");
       if (errorBanner) {
-        const friendlyNames = { webCalendar: "Calendar", webProfile: "Profile", webSchedule: "Schedule", webCourseHistory: "Course History" };
+        const friendlyNames = { webCalendar: "Calendar", webProfile: "Profile", webSchedule: "Schedule", webCourseHistory: "Course History", webStudentInfo: "Student Info" };
         const failed = (data.errors || []).map(e => e.split(":")[0]).map(m => friendlyNames[m] || m);
         if (failed.length) {
           errorBanner.style.display = "block";
@@ -6281,7 +6416,7 @@
       if (!data.courses || data.courses.length === 0) {
         container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any classes.</div></div>`;
       } else {
-        data.courses.forEach(c => {
+        svSortedCourses(data.courses).forEach(c => {
           const card = document.createElement("div");
           card.className = "class-card";
           card.style.cursor = "default";
@@ -6290,14 +6425,41 @@
           card.innerHTML = `
             <div class="class-name">${escapeHTML(c.title)}</div>
             <div class="class-code">${escapeHTML(c.teacher)}</div>
-            ${time ? `<div class="sv-class-time">${escapeHTML(time)}</div>` : ""}
-            ${c.room ? `<div class="class-room">${escapeHTML(c.room)}</div>` : ""}
-            <div class="class-grade">${escapeHTML(c.scoreString || "—")}</div>
-            ${percent ? `<div class="sv-class-percent">${escapeHTML(percent)}</div>` : ""}
+            <div class="sv-card-top-right">
+              <div class="sv-class-grade">${escapeHTML(c.scoreString || "—")}</div>
+              ${percent ? `<div class="sv-class-percent">${escapeHTML(percent)}</div>` : ""}
+            </div>
+            <div class="sv-card-bottom-left">
+              ${time ? `<div class="sv-class-time">${escapeHTML(time)}</div>` : ""}
+            </div>
+            <div class="sv-card-bottom-right">
+              ${c.room ? `<div class="sv-card-room">${escapeHTML(c.room)}</div>` : ""}
+            </div>
           `;
           container.appendChild(card);
         });
       }
+    }
+
+    // Orders classes the way they run through the day: by period number when
+    // the Worker gave us one, falling back to the class's scheduled start
+    // time (from the Schedule page) for anything without a usable period —
+    // more reliable than trusting whatever order Gradebook.aspx happened to
+    // list classes in, which doesn't always match period order.
+    function svSortedCourses(courses) {
+      const withKey = courses.map((c, idx) => {
+        const digits = c.period != null ? String(c.period).replace(/\D/g, "") : "";
+        let key = digits ? parseInt(digits, 10) : null;
+        if (key == null) {
+          const time = svGetClassTime(c);
+          const startStr = time ? time.split("–")[0].trim() : "";
+          const parsed = startStr ? new Date(`1970-01-01 ${startStr}`) : null;
+          key = parsed && !Number.isNaN(parsed.getTime()) ? parsed.getTime() : Infinity;
+        }
+        return { c, key, idx };
+      });
+      withKey.sort((a, b) => (a.key - b.key) || (a.idx - b.idx));
+      return withKey.map(x => x.c);
     }
 
     let svCalendarEventMap = {};
@@ -6373,7 +6535,19 @@
     }
 
 
+    function openSvProfileModal() {
+      const d = svProfileDetails || {};
+      const setText = (id, value) => { const el = $(id); if (el) el.textContent = value || "—"; };
+      setText("svModalName", d.fullName);
+      setText("svModalSchool", d.school);
+      setText("svModalId", d.id != null ? String(d.id) : "");
+      setText("svModalGender", d.gender);
+      setText("svModalGrade", d.grade);
+      openModal("svProfileModal");
+    }
+
     function openSvCourseHistory() {
+      closeModal("svProfileModal");
       const modal = $("svCourseHistoryModal");
       const content = $("svCourseHistoryContent");
       const historyResponse = svData?.courseHistory || {};
@@ -6396,6 +6570,30 @@
         `).join("");
       }
       modal.classList.add("show");
+    }
+
+    async function svDownloadTranscript() {
+      const creds = load("StudentVueCreds");
+      if (!creds) { alert("Connect to StudentVUE first."); return; }
+      const btn = $("svTranscriptButton");
+      const original = btn.textContent;
+      btn.textContent = "Preparing…";
+      btn.disabled = true;
+      try {
+        const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
+        const link = document.createElement("a");
+        link.href = result.dataUri;
+        link.download = result.filename || "Unofficial_Transcript.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (err) {
+        console.error("[StudentVUE]", err);
+        alert(err.message || "Couldn't download the transcript.");
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
     }
 
     function svToggleRaw() {
@@ -6538,15 +6736,27 @@
        manifest's icons on the fly when it's fetched. Either way, an icon already on a
        home screen won't update itself — it has to be removed and re-added. */
     const ICON_OPTIONS = [
-      { id: "default", name: "Classic", icon: "Icons/My Student (Classic).png" },
-      { id: "duotone-dark", name: "Classic Duotone Dark", icon: "Icons/My Student (Classic Duotone Dark).png" },
-      { id: "duotone-light", name: "Classic Duotone Light", icon: "Icons/My Student (Classic Duotone Light).png" },
-      { id: "Red", name: "Red", icon: "Icons/My Student (Red).png" },
-      { id: "blue", name: "Blue", icon: "Icons/My Student (Blue).png" },
-      { id: "green", name: "Green", icon: "Icons/My Student (Green).png" },
-      { id: "purple", name: "Purple", icon: "Icons/My Student (Purple).png" },
-      { id: "teal", name: "Teal", icon: "Icons/My Student (Teal).png" },
-      { id: "gold", name: "Gold", icon: "Icons/My Student (Gold).png" }
+      { id: "default", name: "Classic", icon: "Icons/My Student/My Student (Classic).png", group: "My Student" },
+      { id: "duotone-dark", name: "Classic Duotone Dark", icon: "Icons/My Student/My Student (Classic Duotone Dark).png", group: "My Student" },
+      { id: "duotone-light", name: "Classic Duotone Light", icon: "Icons/My Student/My Student (Classic Duotone Light).png", group: "My Student" },
+      { id: "Red", name: "Red", icon: "Icons/My Student/My Student (Red).png", group: "My Student" },
+      { id: "blue", name: "Blue", icon: "Icons/My Student/My Student (Blue).png", group: "My Student" },
+      { id: "green", name: "Green", icon: "Icons/My Student/My Student (Green).png", group: "My Student" },
+      { id: "purple", name: "Purple", icon: "Icons/My Student/My Student (Purple).png", group: "My Student" },
+      { id: "teal", name: "Teal", icon: "Icons/My Student/My Student (Teal).png", group: "My Student" },
+      { id: "gold", name: "Gold", icon: "Icons/My Student/My Student (Gold).png", group: "My Student" },
+      // Add more StudentVUE-branded icon files to the Icons folder using
+      // this same "StudentVUE (Name).png" naming pattern, then add an
+      // entry here — the picker below groups automatically by "group".
+      { id: "sv-classic", name: "Classic", icon: "Icons/StudentVUE/StudentVUE (Classic).png", group: "StudentVUE" },
+      { id: "sv-classic-inversed", name: "Classic Inversed", icon: "Icons/StudentVUE/StudentVUE (Classic Inversed).png", group: "StudentVUE" },
+      { id: "sv-outline", name: "Outline", icon: "Icons/StudentVUE/StudentVUE (Outline).png", group: "StudentVUE" },
+      { id: "sv-no-outline", name: "No Outline", icon: "Icons/StudentVUE/StudentVUE (No Outline).png", group: "StudentVUE" },
+      { id: "sv-pink", name: "Pink", icon: "Icons/StudentVUE/StudentVUE (Pink).png", group: "StudentVUE" },
+      { id: "sv-gold", name: "Gold", icon: "Icons/StudentVUE/StudentVUE (Gold).png", group: "StudentVUE" },
+      { id: "sv-blue", name: "Blue", icon: "Icons/StudentVUE/StudentVUE (Blue).png", group: "StudentVUE" },
+      { id: "sv-purple", name: "Purple", icon: "Icons/StudentVUE/StudentVUE (Purple).png", group: "StudentVUE" },
+      { id: "sv-green", name: "Green", icon: "Icons/StudentVUE/StudentVUE (Green).png", group: "StudentVUE" }
     ];
     const APP_ICON_CHOICE_KEY = "AppIconChoice";
 
@@ -6564,22 +6774,50 @@
       if (previewImg) { previewImg.src = opt.icon; previewImg.alt = opt.name; }
     }
 
+    const APP_ICON_GROUPS = [...new Set(ICON_OPTIONS.map(o => o.group))];
+    let appIconGroupView = APP_ICON_GROUPS[0];
+
     function openAppIconModal() {
+      // Default the switcher to whichever group the current icon belongs
+      // to, so opening the picker shows your active icon right away.
+      const current = ICON_OPTIONS.find(o => o.id === getAppIconChoiceId());
+      appIconGroupView = current ? current.group : APP_ICON_GROUPS[0];
+      renderAppIconGroupSwitcher();
       renderAppIconOptions();
       openModal("appIconModal");
+    }
+
+    function renderAppIconGroupSwitcher() {
+      const wrap = $("appIconGroupSwitcher");
+      if (!wrap) return;
+      wrap.innerHTML = APP_ICON_GROUPS.map(g => `
+        <button type="button" class="view-button ${g === appIconGroupView ? "active" : ""}"
+          onclick="changeAppIconGroup('${g.replace(/'/g, "\\'")}')">${escapeHTML(g)}</button>
+      `).join("");
+    }
+
+    function changeAppIconGroup(group) {
+      appIconGroupView = group;
+      renderAppIconGroupSwitcher();
+      renderAppIconOptions();
     }
 
     function renderAppIconOptions() {
       const wrap = $("appIconOptionsList");
       if (!wrap) return;
       const current = getAppIconChoiceId();
-      wrap.innerHTML = ICON_OPTIONS.map(opt => `
-        <button type="button" class="app-icon-option ${opt.id === current ? "selected" : ""}"
-          onclick="selectAppIcon('${opt.id}')">
-          <img src="${opt.icon}" alt="${escapeHTML(opt.name)}">
-          <span>${escapeHTML(opt.name)}</span>
-        </button>
-      `).join("");
+      const items = ICON_OPTIONS.filter(opt => opt.group === appIconGroupView);
+      wrap.innerHTML = `
+        <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
+          ${items.map(opt => `
+            <button type="button" class="app-icon-option ${opt.id === current ? "selected" : ""}"
+              onclick="selectAppIcon('${opt.id}')">
+              <img src="${opt.icon}" alt="${escapeHTML(opt.name)}">
+              <span>${escapeHTML(opt.name)}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
     }
 
     function selectAppIcon(id) {
@@ -6605,6 +6843,7 @@
 
     /* ===== START ===== */
     loadDarkMode();
+    loadDefaultToStudentVuePref();
     applyStoredAppIconLinks();
     renderAccountUI(auth.currentUser);
     renderRecentAccounts();
@@ -6616,6 +6855,7 @@
     renderTimerDisplay();
     setupAvatarCropDragHandlers();
     setupResetSlideHandlers();
+    applyDefaultStartupPage();
   </script>
 </body>
 
