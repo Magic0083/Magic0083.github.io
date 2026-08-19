@@ -6399,7 +6399,7 @@
         const failed = (data.errors || []).map(e => e.split(":")[0]).map(m => friendlyNames[m] || m);
         if (failed.length) {
           errorBanner.style.display = "block";
-          errorBanner.textContent = `Couldn't load: ${failed.join(", ")}. Grades still loaded fine — tap ↻ to try those again.`;
+          errorBanner.textContent = `Couldn't load: ${failed.join(", ")}. Tap ↻ to try those again.`;
         } else {
           errorBanner.style.display = "none";
         }
