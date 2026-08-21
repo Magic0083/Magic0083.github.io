@@ -362,6 +362,17 @@
       font-size: 13px;
       font-weight: 400;
       line-height: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .sv-assignment-week-header span {
+      margin-left: auto;
+      white-space: nowrap;
+      font-weight: 400;
+      opacity: .9;
     }
 
     /* The assignments sit in their own separate card below the week header. */
@@ -376,10 +387,10 @@
       display: grid;
       grid-template-columns: 48px minmax(0, 1fr) auto;
       align-items: center;
-      min-height: 82px;
+      min-height: 75px;
       background: var(--card);
       border-bottom: 1px solid var(--border);
-      padding: 9px 20px 9px 8px;
+      padding: 9px 18px 9px 8px;
       gap: 9px;
     }
 
@@ -6754,6 +6765,33 @@
       };
     }
 
+
+    function formatSvAssignmentWeek(week) {
+      const raw = String(week ?? "").trim();
+      const match = raw.match(/^Week\s*(\d+)\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s+through\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/i);
+      if (!match) return raw || "Week";
+
+      const weekNumber = parseInt(match[1], 10);
+      const start = new Date(
+        Number(match[4]), Number(match[2]) - 1, Number(match[3]), 12
+      );
+      const end = new Date(
+        Number(match[7]), Number(match[5]) - 1, Number(match[6]), 12
+      );
+
+      const startMonth = start.toLocaleDateString("en-US", { month: "long" });
+      const endMonth = end.toLocaleDateString("en-US", { month: "long" });
+      const startDay = start.getDate();
+      const endDay = end.getDate();
+
+      const range = start.getFullYear() === end.getFullYear() &&
+        start.getMonth() === end.getMonth()
+        ? `${startMonth} ${startDay}-${endDay}`
+        : `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
+
+      return `Week ${weekNumber} • ${range}`;
+    }
+
     function renderSvAssignments(weeks, classInfo = "") {
       const content = $("svAssignmentsPageContent");
       const hasItems = weeks.some(w => Array.isArray(w.items) && w.items.length);
@@ -6768,7 +6806,7 @@
         return `
           <section class="sv-assignment-week">
             <div class="sv-assignment-week-header">
-              ${escapeHTML(w.week || "Week")} <span style="font-weight:400;opacity:.9;">(${items.length} ${items.length === 1 ? "item" : "items"})</span>
+              ${escapeHTML(formatSvAssignmentWeek(w.week))} <span>(${items.length} ${items.length === 1 ? "item" : "items"})</span>
             </div>
             <div class="sv-assignment-items">
               ${items.map(i => {
