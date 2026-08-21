@@ -285,6 +285,216 @@
       margin: 20px 2px 10px;
     }
 
+
+    /* ===== StudentVUE assignment page ===== */
+    .sv-assignments-page-content {
+      padding: 0 0 24px;
+    }
+
+    .sv-assignment-class-info {
+      margin-bottom: 12px;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .sv-assignment-class-title {
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .sv-assignment-class-teacher {
+      color: var(--secondary);
+      font-size: 13px;
+      margin-bottom: 13px;
+    }
+
+    .sv-assignment-class-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .sv-assignment-class-stat {
+      background: var(--background);
+      border-radius: 10px;
+      padding: 9px 8px;
+      min-width: 0;
+    }
+
+    .sv-assignment-class-stat-label {
+      color: var(--secondary);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      margin-bottom: 3px;
+    }
+
+    .sv-assignment-class-stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sv-assignment-list {
+      background: transparent;
+    }
+
+    .sv-assignment-week {
+      margin-bottom: 22px;
+    }
+
+    .sv-assignment-week+.sv-assignment-week {
+      margin-top: 22px;
+    }
+
+    .sv-assignment-week-header {
+      margin-bottom: 10px;
+      background: var(--blue);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.25;
+    }
+
+    /* The assignments sit in their own separate card below the week header. */
+    .sv-assignment-items {
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+    }
+
+    .sv-assignment-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      align-items: center;
+      min-height: 82px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 12px 9px 8px;
+      gap: 9px;
+    }
+
+    .sv-assignment-row:last-child {
+      border-bottom: 0;
+    }
+
+    .sv-assignment-date {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .sv-assignment-month {
+      color: var(--secondary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .sv-assignment-day {
+      color: var(--secondary);
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -1px;
+    }
+
+    .sv-assignment-main {
+      min-width: 0;
+    }
+
+    .sv-assignment-title {
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .sv-assignment-meta {
+      color: var(--secondary);
+      font-size: 12px;
+      line-height: 1.25;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sv-assignment-missing {
+      display: inline-block;
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 750;
+      margin-top: 4px;
+    }
+
+    .sv-assignment-result {
+      min-width: 46px;
+      text-align: right;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .sv-assignment-score {
+      color: var(--secondary);
+      font-size: 29px;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .sv-assignment-percent {
+      color: var(--secondary);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .sv-assignment-empty {
+      padding: 28px 18px;
+    }
+
+    @media (max-width: 520px) {
+      .sv-assignment-class-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .sv-assignment-row {
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        padding-right: 9px;
+      }
+
+      .sv-assignment-day {
+        font-size: 25px;
+      }
+
+      .sv-assignment-title {
+        font-size: 15px;
+      }
+
+      .sv-assignment-score {
+        font-size: 26px;
+      }
+    }
+
     .sv-calendar-card {
       background: var(--card);
       border-radius: 21px;
@@ -2634,6 +2844,19 @@
       </div>
     </div>
 
+    <!-- STUDENTVUE ASSIGNMENTS PAGE -->
+    <div id="svAssignmentsPage" class="page">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="icon-button" onclick="openStudentVue()" aria-label="Back to StudentVUE">‹</button>
+          <h1>Assignments</h1>
+        </div>
+        <button class="icon-button" onclick="reloadSvAssignments()" aria-label="Reload assignments"
+          title="Reload assignments">↻</button>
+      </div>
+      <div id="svAssignmentsPageContent" class="sv-assignments-page-content"></div>
+    </div>
+
     <!-- STUDENTVUE COURSE HISTORY MODAL -->
     <div id="svCourseHistoryModal" class="modal-background">
       <div class="modal">
@@ -2641,6 +2864,17 @@
           <h2>Course History</h2><button class="close-button" onclick="closeModal('svCourseHistoryModal')">×</button>
         </div>
         <div id="svCourseHistoryContent"></div>
+      </div>
+    </div>
+
+    <!-- STUDENTVUE ASSIGNMENTS MODAL -->
+    <div id="svAssignmentsModal" class="modal-background">
+      <div class="modal sv-assignments-modal">
+        <div class="modal-header">
+          <h2 id="svAssignmentsModalTitle">Assignments</h2><button class="close-button"
+            onclick="closeModal('svAssignmentsModal')">×</button>
+        </div>
+        <div id="svAssignmentsModalContent"></div>
       </div>
     </div>
 
@@ -6201,7 +6435,8 @@
             scoreString: current?.mark || "—",
             scoreRaw: current?.score || "",
             percent: current?.score || "",
-            classID: c.classID || ""
+            classID: c.classID || "",
+            focusArgs: c.focusArgs || null
           };
         });
 
@@ -6420,7 +6655,7 @@
         svSortedCourses(data.courses).forEach(c => {
           const card = document.createElement("div");
           card.className = "class-card";
-          card.style.cursor = "default";
+          card.style.cursor = c.focusArgs ? "pointer" : "default";
           const time = svGetClassTime(c);
           const percent = c.percent ? String(c.percent) : "";
           card.innerHTML = `
@@ -6437,6 +6672,7 @@
               ${c.room ? `<div class="sv-card-room">${escapeHTML(c.room)}</div>` : ""}
             </div>
           `;
+          if (c.focusArgs) card.addEventListener("click", () => openSvAssignments(c));
           container.appendChild(card);
         });
       }
@@ -6461,6 +6697,105 @@
       });
       withKey.sort((a, b) => (a.key - b.key) || (a.idx - b.idx));
       return withKey.map(x => x.c);
+    }
+
+    let svAssignmentsCurrentCourse = null;
+
+    async function reloadSvAssignments() {
+      if (!svAssignmentsCurrentCourse) return;
+      await openSvAssignments(svAssignmentsCurrentCourse);
+    }
+
+    async function openSvAssignments(course) {
+      if (!course.focusArgs) return;
+      svAssignmentsCurrentCourse = course;
+      const creds = load("StudentVueCreds");
+      if (!creds) return;
+
+      const content = $("svAssignmentsPageContent");
+      openToolPage("svAssignmentsPage");
+      content.innerHTML = `<div class="calendar-empty"><div class="calendar-empty-icon">⏳</div>Loading assignments…</div>`;
+
+      const grade = course.scoreString || "—";
+      const percent = course.percent ? String(course.percent) : "—";
+      const period = course.period || "—";
+      const room = course.room || "—";
+      const teacher = course.teacher || "—";
+
+      const classInfo = `
+        <div class="sv-assignment-class-info">
+          <div class="sv-assignment-class-title">${escapeHTML(course.title || "Class")}</div>
+          <div class="sv-assignment-class-teacher">${escapeHTML(teacher)}</div>
+          <div class="sv-assignment-class-stats">
+            <div class="sv-assignment-class-stat"><div class="sv-assignment-class-stat-label">Grade</div><div class="sv-assignment-class-stat-value">${escapeHTML(grade)}</div></div>
+            <div class="sv-assignment-class-stat"><div class="sv-assignment-class-stat-label">Percent</div><div class="sv-assignment-class-stat-value">${escapeHTML(percent)}</div></div>
+            <div class="sv-assignment-class-stat"><div class="sv-assignment-class-stat-label">Period</div><div class="sv-assignment-class-stat-value">${escapeHTML(period)}</div></div>
+            <div class="sv-assignment-class-stat"><div class="sv-assignment-class-stat-label">Room</div><div class="sv-assignment-class-stat-value">${escapeHTML(room)}</div></div>
+          </div>
+        </div>`;
+      content.innerHTML = classInfo + `<div class="calendar-empty"><div class="calendar-empty-icon">⏳</div>Loading assignments…</div>`;
+
+      try {
+        const result = await svWorkerRequest(creds, "webAssignments", { focusArgs: course.focusArgs });
+        renderSvAssignments(result.weeks || [], classInfo);
+      } catch (err) {
+        console.error("[StudentVUE]", err);
+        content.innerHTML = classInfo + `<div class="calendar-empty"><div class="calendar-empty-icon">⚠️</div>${escapeHTML(err.message || "Couldn't load assignments.")}</div>`;
+      }
+    }
+
+    function svAssignmentDateParts(value) {
+      if (!value) return { month: "", day: "" };
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return { month: "", day: "" };
+      return {
+        month: d.toLocaleDateString("en-US", { month: "short" }).toUpperCase(),
+        day: d.toLocaleDateString("en-US", { day: "2-digit" })
+      };
+    }
+
+    function renderSvAssignments(weeks, classInfo = "") {
+      const content = $("svAssignmentsPageContent");
+      const hasItems = weeks.some(w => Array.isArray(w.items) && w.items.length);
+      if (!hasItems) {
+        content.innerHTML = classInfo + `<div class="calendar-empty sv-assignment-empty"><div class="calendar-empty-icon">📄</div>No assignments found for this class.</div>`;
+        return;
+      }
+
+      content.innerHTML = classInfo + `<div class="sv-assignment-list">${weeks.map(w => {
+        const items = Array.isArray(w.items) ? w.items : [];
+        if (!items.length) return "";
+        return `
+          <section class="sv-assignment-week">
+            <div class="sv-assignment-week-header">
+              ${escapeHTML(w.week || "Week")} <span style="font-weight:400;opacity:.9;">(${items.length} ${items.length === 1 ? "item" : "items"})</span>
+            </div>
+            <div class="sv-assignment-items">
+              ${items.map(i => {
+          const graded = i.itemType === "GradeBookItem";
+          const date = svAssignmentDateParts(i.dueDate);
+          const metaParts = [i.assignmentType || (graded ? "Assignment" : "Resource")];
+          if (i.pointsPossible) metaParts.push(`${i.pointsPossible} points`);
+          return `
+                  <div class="sv-assignment-row">
+                    <div class="sv-assignment-date">
+                      ${date.month ? `<div class="sv-assignment-month">${escapeHTML(date.month)}</div><div class="sv-assignment-day">${escapeHTML(date.day)}</div>` : `<div class="sv-assignment-day">—</div>`}
+                    </div>
+                    <div class="sv-assignment-main">
+                      <div class="sv-assignment-title">${escapeHTML(i.title || "Untitled")}</div>
+                      <div class="sv-assignment-meta">${escapeHTML(metaParts.join(" | "))}</div>
+                      ${i.isMissing ? `<div class="sv-assignment-missing">Missing</div>` : ""}
+                    </div>
+                    ${graded ? `
+                      <div class="sv-assignment-result">
+                        <div class="sv-assignment-score">${i.hasGrade && i.gradeMark ? escapeHTML(String(i.gradeMark)) : "—"}</div>
+                        ${i.percent ? `<div class="sv-assignment-percent">${escapeHTML(String(i.percent))}</div>` : ""}
+                      </div>` : `<div class="sv-assignment-result"></div>`}
+                  </div>`;
+        }).join("")}
+            </div>
+          </section>`;
+      }).join("")}</div>`;
     }
 
     let svCalendarEventMap = {};
