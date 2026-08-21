@@ -375,6 +375,173 @@
       opacity: .9;
     }
 
+    .sv-assignment-row.sv-sim-clickable {
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .sv-assignment-row.sv-sim-clickable:hover {
+      background: var(--blue-light);
+    }
+
+    .sv-assignment-simulator {
+      padding: 14px;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 0 0 14px 14px;
+      border-top: none;
+    }
+
+    .sv-sim-title {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+
+    .sv-sim-score-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      padding: 8px 9px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .15s ease;
+    }
+
+    .sv-sim-range {
+      width: 100%;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .sv-sim-class-percent {
+      cursor: pointer;
+      user-select: none;
+      border-radius: 6px;
+      padding: 2px 4px;
+      transition: background .15s ease;
+    }
+
+    .sv-sim-class-percent:hover {
+      background: var(--blue-light);
+    }
+
+    .sv-sim-info {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: var(--card);
+    }
+
+    .sv-sim-category {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sv-sim-category:last-child {
+      text-align: right;
+    }
+
+    .sv-sim-info-label {
+      color: var(--secondary);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .sv-sim-category strong {
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sv-sim-scale {
+      display: flex;
+      justify-content: space-between;
+      color: var(--secondary);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .sv-sim-results {
+      display: grid;
+      width: 100%;
+      box-sizing: border-box;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .sv-sim-result {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 9px;
+      min-width: 0;
+    }
+
+    .sv-sim-result-label {
+      color: var(--secondary);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .sv-sim-result-value {
+      margin-top: 2px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .sv-sim-percent-toggle {
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s ease;
+    }
+
+    .sv-sim-percent-toggle:hover {
+      background: var(--blue-light);
+    }
+
+    .sv-sim-percent-toggle:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 1px;
+    }
+
+    .sv-sim-reset {
+      margin-top: 10px;
+      border: 0;
+      background: var(--blue-light);
+      color: var(--blue);
+      border-radius: 9px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sv-sim-note {
+      margin-top: 8px;
+      color: var(--secondary);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+
+
     /* The assignments sit in their own separate card below the week header. */
     .sv-assignment-items {
       background: var(--card);
@@ -6711,6 +6878,7 @@
     }
 
     let svAssignmentsCurrentCourse = null;
+    let svAssignmentsGradeData = null;
 
     async function reloadSvAssignments() {
       if (!svAssignmentsCurrentCourse) return;
@@ -6748,6 +6916,7 @@
 
       try {
         const result = await svWorkerRequest(creds, "webAssignments", { focusArgs: course.focusArgs });
+        svAssignmentsGradeData = result;
         renderSvAssignments(result.weeks || [], classInfo);
       } catch (err) {
         console.error("[StudentVUE]", err);
@@ -6765,57 +6934,488 @@
       };
     }
 
+    const svAssignmentSimulations = new Map();
+    let svCurrentAssignmentWeeks = [];
 
-    function formatSvAssignmentWeek(week) {
-      const raw = String(week ?? "").trim();
-      const match = raw.match(/^Week\s*(\d+)\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s+through\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/i);
-      if (!match) return raw || "Week";
+    function svNum(value) {
+      const n = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
+      return Number.isFinite(n) ? n : null;
+    }
 
-      const weekNumber = parseInt(match[1], 10);
-      const start = new Date(
-        Number(match[4]), Number(match[2]) - 1, Number(match[3]), 12
+    function svFindMeasure(item, measures) {
+      const id = svField(item, "measureId", "MeasureID", "measureTypeId", "MeasureTypeID", "measureTypeGU", "MeasureTypeGU");
+      const name = svField(item, "measureName", "MeasureName", "measureTypeName", "MeasureTypeName", "assignmentType");
+
+      if (id != null) {
+        const byId = measures.find(m => String(m.id) === String(id));
+        if (byId) return byId;
+      }
+
+      if (name) {
+        const lower = String(name).toLowerCase();
+        const byName = measures.find(m => String(m.name || "").toLowerCase() === lower);
+        if (byName) return byName;
+        const partial = measures.find(m => {
+          const mn = String(m.name || "").toLowerCase();
+          return mn && (mn.includes(lower) || lower.includes(mn));
+        });
+        if (partial) return partial;
+      }
+
+      return null;
+    }
+
+    function svGetWeightedMeasures() {
+      const measures = Array.isArray(svAssignmentsGradeData?.measureTypes)
+        ? svAssignmentsGradeData.measureTypes
+        : [];
+      return measures.filter(m => Number(m.weight) > 0);
+    }
+
+    function svGetAssignmentKey(item, weekIndex, itemIndex) {
+      const title = item?.title || "Untitled";
+      const due = item?.dueDate || "";
+      return `${weekIndex}:${itemIndex}:${title}:${due}`;
+    }
+
+    function svGetOriginalAssignmentScore(item) {
+      const possible = svNum(
+        item?.pointsPossible ??
+        item?.PointsPossible ??
+        item?.points_possible ??
+        item?.Points_Possible
       );
-      const end = new Date(
-        Number(match[7]), Number(match[5]) - 1, Number(match[6]), 12
+
+      if (possible == null || possible <= 0) return null;
+
+      // If StudentVUE explicitly says there is no grade, keep the assignment N/A.
+      if (
+        item?.hasGrade === false ||
+        item?.showAssignmentGrade === false ||
+        item?.ShowAssignmentGrade === false
+      ) {
+        return null;
+      }
+
+      // gradeMark is the authoritative earned-score field.
+      // Do NOT clamp it to pointsPossible because extra credit is valid.
+      const mark = String(
+        item?.gradeMark ??
+        item?.GradeMark ??
+        item?.mark ??
+        item?.Mark ??
+        ""
+      ).trim();
+
+      // Also support values such as "8/6".
+      const fraction = mark.match(
+        /^(-?\d+(?:\.\d+)?)\s*\/\s*(-?\d+(?:\.\d+)?)$/
       );
 
-      const startMonth = start.toLocaleDateString("en-US", { month: "long" });
-      const endMonth = end.toLocaleDateString("en-US", { month: "long" });
-      const startDay = start.getDate();
-      const endDay = end.getDate();
+      if (fraction) {
+        const earned = Number(fraction[1]);
+        if (Number.isFinite(earned) && earned >= 0) {
+          return earned;
+        }
+      }
 
-      const range = start.getFullYear() === end.getFullYear() &&
-        start.getMonth() === end.getMonth()
-        ? `${startMonth} ${startDay}-${endDay}`
-        : `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
+      // StudentVUE's gradeMark is normally the earned-point value.
+      const numericMark = svNum(mark);
+      if (numericMark != null && numericMark >= 0) {
+        return numericMark;
+      }
 
-      return `Week ${weekNumber} • ${range}`;
+      // Fallback to explicit earned-point fields.
+      const explicit = svNum(
+        item?.earnedPoints ??
+        item?.pointsEarned ??
+        item?.PointsEarned ??
+        item?.earned ??
+        item?.Earned
+      );
+
+      if (explicit != null && explicit >= 0) {
+        return explicit;
+      }
+
+      // Last fallback: percentage, only for an assignment StudentVUE says is graded.
+      const pct = svNum(
+        item?.percent ??
+        item?.calcValue ??
+        item?.CalcValue ??
+        item?.percentage ??
+        item?.Percentage
+      );
+
+      if (pct != null && pct >= 0 && item?.hasGrade !== false) {
+        return possible * pct / 100;
+      }
+
+      return null;
+    }
+
+    function svGetAllAssignments() {
+      const out = [];
+      svCurrentAssignmentWeeks.forEach((week, wi) => {
+        (week.items || []).forEach((item, ii) => {
+          const possible = svNum(item.pointsPossible);
+          if (possible == null || possible <= 0) return;
+          const measure = svFindMeasure(item, svAssignmentsGradeData?.measureTypes || []);
+          out.push({
+            key: svGetAssignmentKey(item, wi, ii),
+            item,
+            possible,
+            earned: svGetOriginalAssignmentScore(item),
+            measure
+          });
+        });
+      });
+      return out;
+    }
+
+    function svGradeFromPercentage(pct) {
+      if (pct == null || !Number.isFinite(pct)) return "—";
+
+      // StudentVUE's class-data score ranges are the authoritative scale when available.
+      const scales = svAssignmentsGradeData?.scoreScales || [];
+      for (const s of scales) {
+        const low = svNum(s.lowScore);
+        const high = svNum(s.highScore);
+        if (low != null && high != null && pct >= low && pct <= high) {
+          return String(s.score ?? "—");
+        }
+      }
+
+      // Safe fallback for districts where score ranges weren't exposed.
+      if (pct >= 90) return "A";
+      if (pct >= 80) return "B";
+      if (pct >= 70) return "C";
+      if (pct >= 60) return "D";
+      return "F";
+    }
+
+    function svCalculateSimulatedGrade() {
+      const basePct = svNum(svAssignmentsGradeData?.percentage);
+
+      // Nothing has been touched yet — show the real percentage exactly,
+      // rather than a from-scratch recomputation that can drift from it
+      // (extra-credit assignments are especially prone to exposing small
+      // differences between our weighting approximation and whatever exact
+      // method the district's gradebook uses internally).
+      if (svAssignmentSimulations.size === 0) {
+        return { pct: basePct, mark: svGradeFromPercentage(basePct), supported: basePct != null };
+      }
+
+      const measures = svGetWeightedMeasures();
+      const assignments = svGetAllAssignments();
+
+      if (!assignments.length) {
+        return { pct: basePct, mark: svGradeFromPercentage(basePct), supported: false };
+      }
+
+      // If StudentVUE exposes weighted categories but assignments don't expose
+      // category IDs, don't silently invent category membership.
+      const hasAnyMeasure = assignments.some(a => a.measure);
+      if (!measures.length || !hasAnyMeasure || basePct == null) {
+        return { pct: basePct, mark: svGradeFromPercentage(basePct), supported: false };
+      }
+
+      // For each weighted category, compare its ORIGINAL (unmodified) totals
+      // against its SIMULATED (slider-adjusted) totals. The category's
+      // percentage shift — not its absolute percentage — is what gets
+      // blended into the real baseline. This keeps the simulator anchored
+      // to the true percentage and only ever asks "how much does *this
+      // specific edit* move the needle," which sidesteps needing to
+      // perfectly reproduce StudentVUE's own aggregate formula.
+      const categoryCurrent = new Map();
+      const categorySimulated = new Map();
+
+      for (const a of assignments) {
+        if (!a.measure || Number(a.measure.weight) <= 0) continue;
+        const key = String(a.measure.id ?? a.measure.name);
+
+        if (!categoryCurrent.has(key)) categoryCurrent.set(key, { measure: a.measure, earned: 0, possible: 0 });
+        if (!categorySimulated.has(key)) categorySimulated.set(key, { measure: a.measure, earned: 0, possible: 0 });
+
+        if (a.earned != null) {
+          const cur = categoryCurrent.get(key);
+          cur.earned += a.earned;
+          cur.possible += a.possible;
+        }
+
+        const simulation = svAssignmentSimulations.get(a.key);
+        const score = simulation != null ? simulation : a.earned;
+        if (score != null) {
+          const sim = categorySimulated.get(key);
+          sim.earned += score;
+          sim.possible += a.possible;
+        }
+      }
+
+      let weightedDelta = 0;
+      let weightTotal = 0;
+
+      for (const [key, simStat] of categorySimulated) {
+        if (simStat.possible <= 0) continue;
+        const weight = Number(simStat.measure.weight) || 0;
+        if (weight <= 0) continue;
+
+        const curStat = categoryCurrent.get(key);
+        const simPct = simStat.earned / simStat.possible * 100;
+        // A category with no original graded work has no baseline to diff
+        // against — treat its simulated percentage as the delta's target
+        // directly rather than dividing by zero.
+        const curPct = curStat && curStat.possible > 0 ? curStat.earned / curStat.possible * 100 : simPct;
+
+        weightedDelta += (simPct - curPct) * weight;
+        weightTotal += weight;
+      }
+
+      if (weightTotal <= 0) {
+        return { pct: basePct, mark: svGradeFromPercentage(basePct), supported: false };
+      }
+
+      const pct = basePct + weightedDelta / weightTotal;
+      return { pct, mark: svGradeFromPercentage(pct), supported: true };
+    }
+
+    function svUpdateAllSimulators() {
+      document.querySelectorAll(".sv-assignment-simulator").forEach(el => {
+        const result = svCalculateSimulatedGrade();
+        const pctEl = el.querySelector(".sv-sim-class-percent");
+        const markEl = el.querySelector(".sv-sim-class-mark");
+
+        if (pctEl) {
+          const decimalMode = pctEl.dataset.decimalMode === "true";
+          pctEl.textContent =
+            result.pct == null
+              ? "—"
+              : decimalMode
+                ? `${result.pct.toFixed(2)}%`
+                : `${Math.round(result.pct)}%`;
+        }
+
+        if (markEl) markEl.textContent = result.mark || "—";
+
+        const note = el.querySelector(".sv-sim-note");
+        if (note) {
+          note.textContent = result.supported
+            ? ""
+            : "StudentVUE did not provide enough category/assignment data to calculate a weighted projection, so the current class grade is shown.";
+        }
+      });
+    }
+
+    function svToggleAssignmentSimulator(key, button) {
+      const simulator = document.querySelector(`[data-sim-key="${CSS.escape(key)}"]`);
+
+      if (simulator) {
+        simulator.remove();
+        svAssignmentSimulations.delete(key);
+        if (button) button.setAttribute("aria-expanded", "false");
+        svUpdateAllSimulators();
+        return;
+      }
+
+      const row = document.querySelector(`[data-assignment-key="${CSS.escape(key)}"]`);
+      if (!row) return;
+
+      const assignment = svGetAllAssignments().find(a => a.key === key);
+      if (!assignment) return;
+
+      const hasCurrentScore = assignment.earned != null;
+
+      // If the assignment already has a score, the simulator starts at that
+      // exact score. If it does not, leave it as N/A until the user actually
+      // moves the slider.
+      // Start at the actual StudentVUE gradeMark.
+      // Extra credit is allowed, so the slider may extend past pointsPossible.
+      const initial = hasCurrentScore
+        ? Math.max(0, Math.round(assignment.earned))
+        : 0;
+
+      const sliderMax = hasCurrentScore
+        ? Math.max(assignment.possible, initial)
+        : assignment.possible;
+
+      // IMPORTANT:
+      // Do NOT put an unscored assignment into the simulation map yet.
+      // That keeps the current class grade/percentage as the default.
+      if (hasCurrentScore) {
+        svAssignmentSimulations.set(key, initial);
+      } else {
+        svAssignmentSimulations.delete(key);
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "sv-assignment-simulator";
+      wrapper.dataset.simKey = key;
+
+      const result = svCalculateSimulatedGrade();
+
+      const measureName = assignment.measure?.name || "Not available";
+      const measureWeight = Number(assignment.measure?.weight);
+
+      const weightText = Number.isFinite(measureWeight) && measureWeight > 0
+        ? `${measureWeight.toFixed(2).replace(/\.00$/, "")}%`
+        : "N/A";
+
+      const scoreText = hasCurrentScore
+        ? `${initial} / ${assignment.possible}`
+        : `N/A / ${assignment.possible}`;
+
+      wrapper.innerHTML = `
+        <div class="sv-sim-title">Grade Simulator</div>
+
+        <div class="sv-sim-info">
+          <div class="sv-sim-category">
+            <span class="sv-sim-info-label">Category</span>
+            <strong>${escapeHTML(measureName)}</strong>
+          </div>
+          <div class="sv-sim-category">
+            <span class="sv-sim-info-label">Category Weight</span>
+            <strong>${escapeHTML(weightText)}</strong>
+          </div>
+        </div>
+
+        <div class="sv-sim-score-line">
+          <span>If You Score:</span>
+          <strong class="sv-sim-assignment-score">${scoreText}</strong>
+        </div>
+
+        <input
+          class="sv-sim-range"
+          type="range"
+          min="0"
+          max="${sliderMax}"
+          step="1"
+          value="${initial}"
+        >
+
+        <div class="sv-sim-scale">
+          <span>0</span>
+          <span>${sliderMax}</span>
+        </div>
+
+        <div class="sv-sim-results">
+          <div class="sv-sim-result">
+            <div class="sv-sim-result-label">Class Grade Would Be</div>
+            <div class="sv-sim-result-value sv-sim-class-mark">${escapeHTML(result.mark || "—")}</div>
+          </div>
+          <div class="sv-sim-result sv-sim-percent-toggle" role="button" tabindex="0">
+            <div class="sv-sim-result-label">Percentage Would Be</div>
+            <div class="sv-sim-result-value sv-sim-class-percent">${result.pct == null ? "—" : Math.round(result.pct) + "%"}</div>
+          </div>
+        </div>
+
+        <button type="button" class="sv-sim-reset">Reset</button>
+        <div class="sv-sim-note"></div>
+      `;
+
+      row.insertAdjacentElement("afterend", wrapper);
+
+      const range = wrapper.querySelector(".sv-sim-range");
+      const scoreEl = wrapper.querySelector(".sv-sim-assignment-score");
+      const percentEl = wrapper.querySelector(".sv-sim-class-percent");
+      const percentToggle = wrapper.querySelector(".sv-sim-percent-toggle");
+
+      let showDecimalPercent = false;
+
+      const renderPercent = (pct) => {
+        if (pct == null) {
+          percentEl.textContent = "—";
+          return;
+        }
+
+        percentEl.dataset.decimalMode = showDecimalPercent ? "true" : "false";
+        percentEl.textContent = showDecimalPercent
+          ? pct.toFixed(2) + "%"
+          : Math.round(pct) + "%";
+      };
+
+      const togglePercent = () => {
+        showDecimalPercent = !showDecimalPercent;
+        percentEl.dataset.decimalMode = showDecimalPercent ? "true" : "false";
+
+        const current = svCalculateSimulatedGrade();
+        renderPercent(current.pct);
+      };
+
+      // Whole-number percentage is always the default for a newly opened simulator.
+      percentEl.dataset.decimalMode = "false";
+
+      percentToggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        togglePercent();
+      });
+
+      percentToggle.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          togglePercent();
+        }
+      });
+
+      range.addEventListener("input", () => {
+        const value = Number(range.value);
+
+        // The moment the slider is moved, this assignment becomes a
+        // simulation even if it originally had no score.
+        svAssignmentSimulations.set(key, value);
+
+        scoreEl.textContent = `${value} / ${assignment.possible}`;
+
+        svUpdateAllSimulators();
+      });
+
+      wrapper.querySelector(".sv-sim-reset").addEventListener("click", (e) => {
+        e.stopPropagation();
+        svAssignmentSimulations.delete(key);
+        wrapper.remove();
+
+        if (button) {
+          button.setAttribute("aria-expanded", "false");
+        }
+
+        svUpdateAllSimulators();
+      });
+
+      button?.setAttribute("aria-expanded", "true");
+      svUpdateAllSimulators();
     }
 
     function renderSvAssignments(weeks, classInfo = "") {
       const content = $("svAssignmentsPageContent");
       const hasItems = weeks.some(w => Array.isArray(w.items) && w.items.length);
+      svCurrentAssignmentWeeks = weeks || [];
+      svAssignmentSimulations.clear();
+
       if (!hasItems) {
         content.innerHTML = classInfo + `<div class="calendar-empty sv-assignment-empty"><div class="calendar-empty-icon">📄</div>No assignments found for this class.</div>`;
         return;
       }
 
-      content.innerHTML = classInfo + `<div class="sv-assignment-list">${weeks.map(w => {
+      content.innerHTML = classInfo + `<div class="sv-assignment-list">${weeks.map((w, wi) => {
         const items = Array.isArray(w.items) ? w.items : [];
         if (!items.length) return "";
         return `
           <section class="sv-assignment-week">
             <div class="sv-assignment-week-header">
-              ${escapeHTML(formatSvAssignmentWeek(w.week))} <span>(${items.length} ${items.length === 1 ? "item" : "items"})</span>
+              ${escapeHTML(w.week || "Week")} <span>(${items.length} ${items.length === 1 ? "item" : "items"})</span>
             </div>
             <div class="sv-assignment-items">
-              ${items.map(i => {
+              ${items.map((i, ii) => {
           const graded = i.itemType === "GradeBookItem";
           const date = svAssignmentDateParts(i.dueDate);
           const metaParts = [i.assignmentType || (graded ? "Assignment" : "Resource")];
           if (i.pointsPossible) metaParts.push(`${i.pointsPossible} points`);
+          const key = svGetAssignmentKey(i, wi, ii);
+          const clickable = graded && svNum(i.pointsPossible) > 0;
+
           return `
-                  <div class="sv-assignment-row">
+                  <div class="sv-assignment-row ${clickable ? "sv-sim-clickable" : ""}"
+                       ${clickable ? `data-assignment-key="${escapeHTML(key)}" role="button" tabindex="0" aria-expanded="false"` : ""}>
                     <div class="sv-assignment-date">
                       ${date.month ? `<div class="sv-assignment-month">${escapeHTML(date.month)}</div><div class="sv-assignment-day">${escapeHTML(date.day)}</div>` : `<div class="sv-assignment-day">—</div>`}
                     </div>
@@ -6834,6 +7434,18 @@
             </div>
           </section>`;
       }).join("")}</div>`;
+
+      content.querySelectorAll(".sv-sim-clickable").forEach(row => {
+        const key = row.dataset.assignmentKey;
+        const toggle = () => svToggleAssignmentSimulator(key, row);
+        row.addEventListener("click", toggle);
+        row.addEventListener("keydown", e => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggle();
+          }
+        });
+      });
     }
 
     let svCalendarEventMap = {};
