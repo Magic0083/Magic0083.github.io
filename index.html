@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f4f5f7">
   <link rel="icon" type="image/svg+xml" href="Favicon.svg">
@@ -37,6 +38,7 @@
       --nav: rgba(255, 255, 255, .92);
       --danger: #ff3b30;
       --shadow: 0 4px 16px rgba(0, 0, 0, .05);
+      --stripe-row: #fafbfc;
     }
 
     body.dark {
@@ -48,6 +50,7 @@
       --blue-light: #202d3e;
       --nav: rgba(27, 28, 32, .94);
       --shadow: 0 5px 18px rgba(0, 0, 0, .25);
+      --stripe-row: var(--background);
     }
 
     body {
@@ -171,7 +174,7 @@
       opacity: .6;
     }
 
-    .icon-button.spinning #svRefreshIcon {
+    .icon-button.spinning .spin-icon {
       display: inline-block;
       animation: iconSpin .8s linear infinite;
     }
@@ -183,6 +186,37 @@
 
       to {
         transform: rotate(360deg);
+      }
+    }
+
+    .sv-spinner {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 14px;
+    }
+
+    .sv-spinner i {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 8px;
+      margin: -3px 0 0 -3px;
+      border-radius: 50%;
+      background: var(--secondary);
+      animation: sv-spinner-fade 1s linear infinite;
+    }
+
+    @keyframes sv-spinner-fade {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .15;
       }
     }
 
@@ -558,17 +592,20 @@
       font-weight: 800;
     }
 
-    .sv-sim-percent-toggle {
+    .sv-sim-percent-toggle,
+    .sv-sim-class-toggle {
       cursor: pointer;
       user-select: none;
       transition: background .15s ease;
     }
 
-    .sv-sim-percent-toggle:hover {
+    .sv-sim-percent-toggle:hover,
+    .sv-sim-class-toggle:hover {
       background: var(--blue-light);
     }
 
-    .sv-sim-percent-toggle:focus-visible {
+    .sv-sim-percent-toggle:focus-visible,
+    .sv-sim-class-toggle:focus-visible {
       outline: 2px solid var(--blue);
       outline-offset: 1px;
     }
@@ -1560,6 +1597,20 @@
       font-weight: 600;
     }
 
+    .course-history-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      padding: 8px 9px;
+      border-radius: 8px;
+    }
+
+    .course-history-row:nth-child(odd) {
+      background: var(--stripe-row);
+    }
+
     .primary-button {
       width: 100%;
       border: none;
@@ -1976,7 +2027,7 @@
     }
 
     .agenda-event {
-      background: var(--card);
+      background-color: #26272d;
       border-radius: 17px;
       padding: 15px;
       display: flex;
@@ -3044,7 +3095,7 @@
         </div>
         <div class="top-bar-actions">
           <button id="svRefreshButton" class="icon-button" onclick="svRefresh()" style="display:none;"><span
-              id="svRefreshIcon">↻</span></button>
+              id="svRefreshIcon" class="spin-icon">↻</span></button>
         </div>
       </div>
 
@@ -3086,6 +3137,20 @@
         <div style="font-size:15px;color:var(--secondary);margin-bottom:16px;">Auto-login is off. Tap below to sign
           in to StudentVUE.</div>
         <button class="primary-button" onclick="svManualLogin()" style="max-width:220px;margin:0 auto;">Login</button>
+      </div>
+
+      <div id="svLoadingView" class="calendar-empty" style="display:none;padding:60px 15px;">
+        <div class="sv-spinner">
+          <i style="transform:rotate(0deg) translateY(-17px);animation-delay:-1s;"></i>
+          <i style="transform:rotate(45deg) translateY(-17px);animation-delay:-0.875s;"></i>
+          <i style="transform:rotate(90deg) translateY(-17px);animation-delay:-0.75s;"></i>
+          <i style="transform:rotate(135deg) translateY(-17px);animation-delay:-0.625s;"></i>
+          <i style="transform:rotate(180deg) translateY(-17px);animation-delay:-0.5s;"></i>
+          <i style="transform:rotate(225deg) translateY(-17px);animation-delay:-0.375s;"></i>
+          <i style="transform:rotate(270deg) translateY(-17px);animation-delay:-0.25s;"></i>
+          <i style="transform:rotate(315deg) translateY(-17px);animation-delay:-0.125s;"></i>
+        </div>
+        <div>Signing in and loading your StudentVUE data…</div>
       </div>
 
       <div id="svDataView" style="display:none;">
@@ -3159,8 +3224,8 @@
           <button class="icon-button" onclick="openStudentVue()" aria-label="Back to StudentVUE">‹</button>
           <h1>Assignments</h1>
         </div>
-        <button class="icon-button" onclick="reloadSvAssignments()" aria-label="Reload assignments"
-          title="Reload assignments">↻</button>
+        <button id="svAssignmentsRefreshButton" class="icon-button" onclick="reloadSvAssignments()"
+          aria-label="Reload assignments" title="Reload assignments"><span class="spin-icon">↻</span></button>
       </div>
       <div id="svAssignmentsPageContent" class="sv-assignments-page-content"></div>
     </div>
@@ -6711,6 +6776,25 @@
     let svData = load("StudentVueData");
     let svCalendarDate = new Date();
     let svProfileDetails = null;
+    // Tracks whether a manual login has already succeeded once this page
+    // load (auto-login off case) — reset on every actual page reload, but
+    // not when just navigating back and forth between StudentVUE and its
+    // sub-pages (assignments, etc.) within the same visit.
+    let svUnlockedThisSession = false;
+
+    // Same dotted circular spinner used in the static #svLoadingView markup
+    // — kept as one constant here since the assignments page builds its
+    // loading state dynamically in JS.
+    const SV_SPINNER_HTML = `<div class="sv-spinner">
+      <i style="transform:rotate(0deg) translateY(-17px);animation-delay:-1s;"></i>
+      <i style="transform:rotate(45deg) translateY(-17px);animation-delay:-0.875s;"></i>
+      <i style="transform:rotate(90deg) translateY(-17px);animation-delay:-0.75s;"></i>
+      <i style="transform:rotate(135deg) translateY(-17px);animation-delay:-0.625s;"></i>
+      <i style="transform:rotate(180deg) translateY(-17px);animation-delay:-0.5s;"></i>
+      <i style="transform:rotate(225deg) translateY(-17px);animation-delay:-0.375s;"></i>
+      <i style="transform:rotate(270deg) translateY(-17px);animation-delay:-0.25s;"></i>
+      <i style="transform:rotate(315deg) translateY(-17px);animation-delay:-0.125s;"></i>
+    </div>`;
 
     function openStudentVue() {
       openToolPage("studentvue");
@@ -6720,17 +6804,27 @@
         $("svPortalUrl").value = creds.portalUrl;
         $("svUsername").value = creds.username;
         $("svPassword").value = creds.password;
-        $("svRefreshButton").style.display = "flex";
-        // Always refresh StudentVUE data when opening this page. Cached data can be
-        // incomplete from an older version of the StudentVUE integration.
-        const hasCachedData = svData && svData.courses;
-        if (hasCachedData) renderStudentVue(svData);
         if (svAutoLoginEnabled()) {
+          $("svRefreshButton").style.display = "flex";
+          if (svData && svData.courses) {
+            renderStudentVue(svData);
+          } else {
+            // Nothing cached to show yet — a blank screen during the fetch
+            // looked broken, so show a visible loading state instead.
+            svShowLoading();
+          }
           svFetchGrades(creds, { showLoginOnFail: true });
-        } else if (!hasCachedData) {
-          // No cached data to fall back on and auto-login is off — show a
-          // gate that requires an explicit tap rather than silently doing
-          // nothing or fetching anyway.
+        } else if (svUnlockedThisSession && svData && svData.courses) {
+          // Already logged in manually earlier this visit (e.g. came back
+          // from Assignments via the back button) — no need to gate again.
+          $("svRefreshButton").style.display = "flex";
+          renderStudentVue(svData);
+        } else {
+          // Auto-login off means every visit requires an explicit tap —
+          // cached data doesn't get a free pass, or the gate would only
+          // ever show up on a totally empty cache (e.g. right after a
+          // reload with data already saved from before, it would've
+          // skipped straight past the gate).
           svShowLoginGate();
         }
       } else {
@@ -6738,8 +6832,16 @@
       }
     }
 
+    function svShowLoading() {
+      $("svLoginView").style.display = "none";
+      $("svLoginGateView").style.display = "none";
+      $("svDataView").style.display = "none";
+      $("svLoadingView").style.display = "block";
+    }
+
     function svShowLoginGate() {
       $("svLoginView").style.display = "none";
+      $("svLoadingView").style.display = "none";
       $("svDataView").style.display = "none";
       $("svLoginGateView").style.display = "block";
       $("svRefreshButton").style.display = "none";
@@ -6750,11 +6852,13 @@
       if (!creds) { svShowLoginView(); return; }
       $("svLoginGateView").style.display = "none";
       $("svRefreshButton").style.display = "flex";
+      svShowLoading();
       svFetchGrades(creds, { showLoginOnFail: true });
     }
 
     function svShowLoginView() {
       $("svLoginGateView").style.display = "none";
+      $("svLoadingView").style.display = "none";
       $("svLoginView").style.display = "block";
       $("svDataView").style.display = "none";
       $("svRefreshButton").style.display = "none";
@@ -7015,8 +7119,10 @@
     }
 
     function renderStudentVue(data) {
+      svUnlockedThisSession = true;
       $("svLoginView").style.display = "none";
       $("svLoginGateView").style.display = "none";
+      $("svLoadingView").style.display = "none";
       $("svDataView").style.display = "block";
       $("svRefreshButton").style.display = "flex";
       const lastUpdated = $("svLastUpdated");
@@ -7095,7 +7201,7 @@
 
       const errorBanner = $("svErrorBanner");
       if (errorBanner) {
-        const friendlyNames = { webCalendar: "Calendar", webProfile: "Profile", webSchedule: "Schedule", webCourseHistory: "Course History", webStudentInfo: "Student Info" };
+        const friendlyNames = { webCalendar: "Calendar", webProfile: "Profile", webSchedule: "Schedule", webCourseHistory: "Course History", webStudentInfo: "Student Info", webGradebook: "Classes" };
         const failed = (data.errors || []).map(e => e.split(":")[0]).map(m => friendlyNames[m] || m);
         if (failed.length) {
           errorBanner.style.display = "block";
@@ -7179,8 +7285,10 @@
       if (!creds) return;
 
       const content = $("svAssignmentsPageContent");
+      const refreshBtn = $("svAssignmentsRefreshButton");
+      if (refreshBtn) refreshBtn.classList.add("spinning");
       openToolPage("svAssignmentsPage");
-      content.innerHTML = `<div class="calendar-empty"><div class="calendar-empty-icon">⏳</div>Loading assignments…</div>`;
+      content.innerHTML = `<div class="calendar-empty">${SV_SPINNER_HTML}Loading assignments…</div>`;
 
       const grade = course.scoreString || "—";
       const percent = course.percent ? String(course.percent) : "—";
@@ -7199,7 +7307,7 @@
             <div class="sv-assignment-class-stat"><div class="sv-assignment-class-stat-label">Room</div><div class="sv-assignment-class-stat-value">${escapeHTML(room)}</div></div>
           </div>
         </div>`;
-      content.innerHTML = classInfo + `<div class="calendar-empty"><div class="calendar-empty-icon">⏳</div>Loading assignments…</div>`;
+      content.innerHTML = classInfo + `<div class="calendar-empty">${SV_SPINNER_HTML}Loading assignments…</div>`;
 
       try {
         const result = await svWorkerRequestRetrying(creds, "webAssignments", { focusArgs: course.focusArgs });
@@ -7208,6 +7316,8 @@
       } catch (err) {
         console.error("[StudentVUE]", err);
         content.innerHTML = classInfo + `<div class="calendar-empty"><div class="calendar-empty-icon">⚠️</div>${escapeHTML(err.message || "Couldn't load assignments.")}</div>`;
+      } finally {
+        if (refreshBtn) refreshBtn.classList.remove("spinning");
       }
     }
 
@@ -7550,7 +7660,7 @@
 
       const scoreText = hasCurrentScore
         ? `${initial} / ${assignment.possible}`
-        : `N/A / ${assignment.possible}`;
+        : `— / ${assignment.possible}`;
 
       wrapper.innerHTML = `
         <div class="sv-sim-score-line">
@@ -7573,7 +7683,7 @@
         </div>
 
         <div class="sv-sim-results">
-          <div class="sv-sim-result">
+          <div class="sv-sim-result sv-sim-class-toggle" role="button" tabindex="0">
             <div class="sv-sim-result-label">Class Grade Would Be</div>
             <div class="sv-sim-result-value sv-sim-class-mark">${escapeHTML(result.mark || "—")}</div>
           </div>
@@ -7583,7 +7693,7 @@
           </div>
         </div>
 
-        <div class="sv-sim-info">
+        <div class="sv-sim-info" style="display:none;">
           <div class="sv-sim-category">
             <span class="sv-sim-info-label">Category</span>
             <strong>${escapeHTML(measureName)}</strong>
@@ -7650,6 +7760,26 @@
           event.preventDefault();
           event.stopPropagation();
           togglePercent();
+        }
+      });
+
+      const classGradeToggle = wrapper.querySelector(".sv-sim-class-toggle");
+      const infoBlock = wrapper.querySelector(".sv-sim-info");
+
+      const toggleInfoBlock = () => {
+        infoBlock.style.display = infoBlock.style.display === "none" ? "grid" : "none";
+      };
+
+      classGradeToggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggleInfoBlock();
+      });
+
+      classGradeToggle.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleInfoBlock();
         }
       });
 
@@ -7860,10 +7990,10 @@
           <div class="section-title" style="margin-top:8px;">${escapeHTML(g.grade || "Grade")}</div>
           ${(g.terms || []).map(t => `
             <div class="profile-card" style="margin-bottom:10px;">
-              <div style="font-weight:800;">${escapeHTML(t.schoolName || "School")}</div>
-              <div style="color:var(--secondary);font-size:12px;margin-top:3px;">${escapeHTML([t.year, t.termName].filter(Boolean).join(" · "))}</div>
-              <div style="margin-top:10px;display:flex;flex-direction:column;gap:7px;">
-                ${(t.courses || []).map(c => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;"><span>${escapeHTML(c.title || "Course")}</span><strong>${escapeHTML(c.mark || "—")}</strong></div>`).join("")}
+              <div style="font-weight:700;">${escapeHTML(t.schoolName || "School")}</div>
+              <div style="color:var(--secondary);font-size:12px;margin-top:4px;">${escapeHTML([t.year, t.termName].filter(Boolean).join(" · "))}</div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:2px;">
+                ${(t.courses || []).map(c => `<div class="course-history-row"><span>${escapeHTML(c.title || "Course")}</span><strong>${escapeHTML(c.mark || "—")}</strong></div>`).join("")}
               </div>
             </div>`).join("")}
         `).join("");
@@ -7920,6 +8050,7 @@
       localStorage.removeItem("StudentVueCreds");
       localStorage.removeItem("StudentVueData");
       svData = null;
+      svUnlockedThisSession = false;
       $("svWorkerUrl").value = ""; $("svPortalUrl").value = ""; $("svUsername").value = ""; $("svPassword").value = "";
       svShowLoginView();
     }
