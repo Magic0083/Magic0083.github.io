@@ -385,6 +385,7 @@
     }
 
     .sv-assignment-simulator {
+      margin: 0 0 10px 0;
       padding: 14px;
       width: 100%;
       box-sizing: border-box;
@@ -557,7 +558,7 @@
       min-height: 75px;
       background: var(--card);
       border-bottom: 1px solid var(--border);
-      padding: 9px 18px 9px 8px;
+      padding: 9px 16px 9px 8px;
       gap: 9px;
     }
 
@@ -612,12 +613,11 @@
       text-overflow: ellipsis;
     }
 
-    .sv-assignment-missing {
+    .sv-assignment-comment {
       display: inline-block;
-      color: var(--danger);
-      font-size: 11px;
-      font-weight: 750;
-      margin-top: 4px;
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 650;
     }
 
     .sv-assignment-result {
@@ -627,7 +627,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center;
     }
 
     .sv-assignment-score {
@@ -640,8 +640,8 @@
 
     .sv-assignment-percent {
       color: var(--secondary);
-      font-size: 12px;
-      margin-top: 5px;
+      font-size: 13px;
+      margin-top: 1px;
     }
 
     .sv-assignment-empty {
@@ -657,7 +657,6 @@
     @media (max-width: 420px) {
       .sv-assignment-row {
         grid-template-columns: 42px minmax(0, 1fr) auto;
-        padding-right: 20px;
       }
 
       .sv-assignment-day {
@@ -7066,7 +7065,8 @@
             item,
             possible,
             earned: svGetOriginalAssignmentScore(item),
-            measure
+            measure,
+            comment: item.comment || "",
           });
         });
       });
@@ -7097,11 +7097,11 @@
     function svCalculateSimulatedGrade() {
       const basePct = svNum(svAssignmentsGradeData?.percentage);
 
-      // Nothing has been touched yet — show the real percentage exactly,
-      // rather than a from-scratch recomputation that can drift from it
-      // (extra-credit assignments are especially prone to exposing small
-      // differences between our weighting approximation and whatever exact
-      // method the district's gradebook uses internally).
+      // Nothing touched yet — show the real percentage exactly, rather than
+      // a from-scratch recomputation that can drift from it (a small-point
+      // extra-credit assignment sitting well above 100% is exactly the kind
+      // of outlier that exposes any gap between our weighting approximation
+      // and whatever exact method the district's gradebook uses internally).
       if (svAssignmentSimulations.size === 0) {
         return { pct: basePct, mark: svGradeFromPercentage(basePct), supported: basePct != null };
       }
@@ -7122,11 +7122,11 @@
 
       // For each weighted category, compare its ORIGINAL (unmodified) totals
       // against its SIMULATED (slider-adjusted) totals. The category's
-      // percentage shift — not its absolute percentage — is what gets
-      // blended into the real baseline. This keeps the simulator anchored
-      // to the true percentage and only ever asks "how much does *this
-      // specific edit* move the needle," which sidesteps needing to
-      // perfectly reproduce StudentVUE's own aggregate formula.
+      // percentage SHIFT — not its absolute percentage — is what gets
+      // blended into the real baseline. This keeps the simulator anchored to
+      // the true percentage and only ever asks "how much does this specific
+      // edit move the needle," which sidesteps needing to perfectly
+      // reproduce StudentVUE's own aggregate formula.
       const categoryCurrent = new Map();
       const categorySimulated = new Map();
 
@@ -7192,7 +7192,7 @@
               ? "—"
               : decimalMode
                 ? `${result.pct.toFixed(2)}%`
-                : `${Math.round(result.pct)}%`;
+                : `${Math.floor(result.pct)}%`;
         }
 
         if (markEl) markEl.textContent = result.mark || "—";
@@ -7304,7 +7304,7 @@
           </div>
           <div class="sv-sim-result sv-sim-percent-toggle" role="button" tabindex="0">
             <div class="sv-sim-result-label">Percentage Would Be</div>
-            <div class="sv-sim-result-value sv-sim-class-percent">${result.pct == null ? "—" : Math.round(result.pct) + "%"}</div>
+            <div class="sv-sim-result-value sv-sim-class-percent">${result.pct == null ? "—" : Math.floor(result.pct) + "%"}</div>
           </div>
         </div>
 
@@ -7330,7 +7330,7 @@
         percentEl.dataset.decimalMode = showDecimalPercent ? "true" : "false";
         percentEl.textContent = showDecimalPercent
           ? pct.toFixed(2) + "%"
-          : Math.round(pct) + "%";
+          : Math.floor(pct) + "%";
       };
 
       const togglePercent = () => {
@@ -7422,11 +7422,11 @@
                     <div class="sv-assignment-main">
                       <div class="sv-assignment-title">${escapeHTML(i.title || "Untitled")}</div>
                       <div class="sv-assignment-meta">${escapeHTML(metaParts.join(" | "))}</div>
-                      ${i.isMissing ? `<div class="sv-assignment-missing">Missing</div>` : ""}
-                    </div>
-                    ${graded ? `
+                      </div>
+                      ${graded ? `
                       <div class="sv-assignment-result">
                         <div class="sv-assignment-score">${i.hasGrade && i.gradeMark ? escapeHTML(String(i.gradeMark)) : "—"}</div>
+                        ${i.comment && String(i.comment).trim() !== "" ? `<div class="sv-assignment-comment">${escapeHTML(String(i.comment))}</div>` : ""}
                         ${i.percent ? `<div class="sv-assignment-percent">${escapeHTML(String(i.percent))}</div>` : ""}
                       </div>` : `<div class="sv-assignment-result"></div>`}
                   </div>`;
