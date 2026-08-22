@@ -385,20 +385,13 @@
     }
 
     .sv-assignment-simulator {
-      padding: 14px;
+      padding: 16px;
       width: 100%;
       box-sizing: border-box;
       background: var(--background);
       border: 1px solid var(--border);
-      border-radius: 0 0 14px 14px;
+      border-radius: 0 0 16px 16px;
       border-top: none;
-    }
-
-    .sv-sim-title {
-      font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 10px;
-      color: var(--secondary);
     }
 
     .sv-sim-score-line {
@@ -406,17 +399,76 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 7px;
-      padding: 8px 9px;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 700;
-      transition: background .15s ease;
+      margin-bottom: 10px;
     }
 
+    .sv-sim-score-line span:first-child {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--secondary);
+      letter-spacing: .04em;
+    }
+
+    .sv-sim-score-line strong {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    /* Custom range slider — bigger, touch-friendly thumb with a live
+       color fill up to the current value (kept in sync via the
+       --sv-range-fill custom property, set on every input event). */
     .sv-sim-range {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
-      accent-color: var(--blue);
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(to right,
+          var(--blue) var(--sv-range-fill, 50%),
+          var(--border) var(--sv-range-fill, 50%));
+      outline: none;
+      cursor: pointer;
+      touch-action: pan-y;
+      margin-bottom: 12px;
+    }
+
+    .sv-sim-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+    .sv-sim-range::-webkit-slider-thumb:active {
+      transform: scale(1.18);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+    }
+
+    .sv-sim-range::-moz-range-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--border);
+    }
+
+    .sv-sim-range::-moz-range-progress {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .sv-sim-range::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
       cursor: pointer;
     }
 
@@ -436,9 +488,9 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px;
-      margin-bottom: 12px;
-      padding: 9px 10px;
-      border-radius: 10px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
       background: var(--card);
     }
 
@@ -487,8 +539,8 @@
 
     .sv-sim-result {
       background: var(--card);
-      border-radius: 10px;
-      padding: 9px;
+      border-radius: 12px;
+      padding: 11px 9px;
       min-width: 0;
     }
 
@@ -501,8 +553,8 @@
     }
 
     .sv-sim-result-value {
-      margin-top: 2px;
-      font-size: 15px;
+      margin-top: 3px;
+      font-size: 17px;
       font-weight: 800;
     }
 
@@ -522,15 +574,22 @@
     }
 
     .sv-sim-reset {
-      margin-top: 10px;
+      margin-top: 14px;
+      width: 100%;
+      box-sizing: border-box;
       border: 0;
       background: var(--blue-light);
       color: var(--blue);
-      border-radius: 9px;
-      padding: 7px 11px;
-      font-size: 12px;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      transition: background .12s ease, transform .1s ease;
+    }
+
+    .sv-sim-reset:active {
+      transform: scale(.97);
     }
 
     .sv-sim-note {
@@ -554,7 +613,7 @@
       display: grid;
       grid-template-columns: 48px minmax(0, 1fr) auto;
       align-items: center;
-      min-height: 75px;
+      min-height: 68px;
       background: var(--card);
       border-bottom: 1px solid var(--border);
       padding: 9px 16px 9px 8px;
@@ -575,7 +634,7 @@
     }
 
     .sv-assignment-month {
-      color: var(--secondary);
+      color: #7d808e;
       font-size: 12px;
       font-weight: 700;
       letter-spacing: .5px;
@@ -584,7 +643,7 @@
     }
 
     .sv-assignment-day {
-      color: var(--secondary);
+      color: #7d808e;
       font-size: 28px;
       font-weight: 500;
       letter-spacing: -1px;
@@ -631,7 +690,7 @@
 
     .sv-assignment-score {
       color: var(--secondary);
-      font-size: 29px;
+      font-size: 26px;
       font-weight: 500;
       line-height: 1;
       letter-spacing: -1px;
@@ -737,6 +796,8 @@
       padding: 5px 3px;
       background: var(--background);
       min-width: 0;
+      user-select: none;
+      cursor: pointer;
     }
 
     .sv-calendar-day.other {
@@ -777,7 +838,7 @@
     }
 
     .sv-class-percent {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--blue);
     }
@@ -1455,6 +1516,24 @@
       box-shadow: var(--shadow);
     }
 
+    /* StudentVUE keeps its own card colors regardless of theme — scoped to
+       every StudentVUE container (the main tool page plus its modals,
+       which live outside #studentvue in the DOM) so the rest of the app's
+       .profile-card/.info-card can follow --card without affecting these. */
+    #studentvue .profile-card,
+    #svProfileModal .profile-card,
+    #svCourseHistoryModal .profile-card,
+    #svDayModal .profile-card {
+      background: #26272d;
+    }
+
+    #studentvue .info-card,
+    #svProfileModal .info-card,
+    #svCourseHistoryModal .info-card,
+    #svDayModal .info-card {
+      background: #101012;
+    }
+
     .info-row {
       display: flex;
       align-items: center;
@@ -1602,6 +1681,49 @@
 
     .switch.active .switch-circle {
       transform: translateX(19px);
+    }
+
+    .sv-remember-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 18px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14.5px;
+      font-weight: 550;
+      color: var(--text);
+    }
+
+    .sv-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      border-radius: 7px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      position: relative;
+      transition: background .15s, border-color .15s;
+    }
+
+    .sv-checkbox:checked {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .sv-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 11px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
     }
 
     .calendar-controls {
@@ -2931,9 +3053,9 @@
           This connects to the current StudentVUE web portal through your Cloudflare Worker. The Worker handles the
           StudentVUE web login and returns the information to this app. Your login
           goes to the small proxy address below and then straight to your district's own StudentVUE server;
-          it isn't sent anywhere else. Your username and password are saved on this device (and to your
-          private cloud sync if you're signed in) the same way entries in Passwords are, so only store this
-          here if you're comfortable with that.
+          it isn't sent anywhere else. With Remember Me on, your username and password are saved on this device
+          (and to your private cloud sync if you're signed in) the same way entries in Passwords are, so only
+          leave it on if you're comfortable with that — turn it off to sign in fresh each time instead.
         </div>
         <div class="form-group">
           <label class="form-label">PROXY WORKER URL</label>
@@ -2951,9 +3073,19 @@
           <label class="form-label">PASSWORD</label>
           <input id="svPassword" type="password" class="form-input" autocomplete="current-password">
         </div>
+        <label class="sv-remember-row" for="svRememberMe">
+          <input type="checkbox" id="svRememberMe" class="sv-checkbox" checked>
+          <span>Remember Me</span>
+        </label>
         <button id="svConnectButton" class="primary-button" onclick="svConnect()">Connect</button>
         <div id="svLoginError"
           style="color:var(--danger);font-size:13px;margin-top:10px;display:none;text-align:center;"></div>
+      </div>
+
+      <div id="svLoginGateView" style="display:none;text-align:center;padding:60px 10px;">
+        <div style="font-size:15px;color:var(--secondary);margin-bottom:16px;">Auto-login is off. Tap below to sign
+          in to StudentVUE.</div>
+        <button class="primary-button" onclick="svManualLogin()" style="max-width:220px;margin:0 auto;">Login</button>
       </div>
 
       <div id="svDataView" style="display:none;">
@@ -3060,26 +3192,42 @@
         <div class="modal-header">
           <h2>Student Info</h2><button class="close-button" onclick="closeModal('svProfileModal')">×</button>
         </div>
-        <div class="info-card">
-          <div class="info-row">
-            <div class="info-label">Name</div>
-            <div id="svModalName" class="info-value">—</div>
+        <div id="svModalCard" class="info-card" onclick="toggleSvProfileCard()" style="cursor:pointer;">
+          <div id="svModalBasicRows">
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div id="svModalName" class="info-value">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">School</div>
+              <div id="svModalSchool" class="info-value">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">ID</div>
+              <div id="svModalId" class="info-value">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Gender</div>
+              <div id="svModalGender" class="info-value">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Grade</div>
+              <div id="svModalGrade" class="info-value">—</div>
+            </div>
           </div>
-          <div class="info-row">
-            <div class="info-label">School</div>
-            <div id="svModalSchool" class="info-value">—</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">ID</div>
-            <div id="svModalId" class="info-value">—</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Gender</div>
-            <div id="svModalGender" class="info-value">—</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Grade</div>
-            <div id="svModalGrade" class="info-value">—</div>
+          <div id="svModalExtraRows" style="display:none;">
+            <div class="info-row">
+              <div class="info-label">User ID</div>
+              <div id="svModalUserId" class="info-value">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Home Address</div>
+              <div id="svModalHomeAddress" class="info-value" style="text-align:left;">—</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Phone</div>
+              <div id="svModalPhone" class="info-value" style="white-space:pre-line;text-align:left;">—</div>
+            </div>
           </div>
         </div>
         <button class="secondary-button sv-history-button" onclick="openSvCourseHistory()">View Course
@@ -3211,6 +3359,19 @@
             <div class="setting-description">Skip Home and go straight to StudentVUE when you open the app</div>
           </div>
           <div id="defaultToStudentVueSwitch" class="switch" onclick="toggleDefaultToStudentVue()">
+            <div class="switch-circle"></div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="padding:0;overflow:hidden;"><img
+              src="Icons/StudentVUE/StudentVUE (Classic).png" alt=""
+              style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></div>
+          <div class="setting-info">
+            <div class="setting-title">Auto Login to StudentVUE</div>
+            <div class="setting-description">Sign in automatically when you open StudentVUE, instead of tapping
+              Login</div>
+          </div>
+          <div id="svAutoLoginSwitch" class="switch" onclick="toggleSvAutoLogin()">
             <div class="switch-circle"></div>
           </div>
         </div>
@@ -5315,6 +5476,25 @@
       }
     }
 
+    // Defaults to ON (matches the app's original always-auto-fetch
+    // behavior) — only an explicit "false" turns it off, so people who
+    // never visit this setting see no change.
+    function svAutoLoginEnabled() {
+      return localStorage.getItem("StudentVueAutoLogin") !== "false";
+    }
+
+    function toggleSvAutoLogin() {
+      const enabled = !svAutoLoginEnabled();
+      localStorage.setItem("StudentVueAutoLogin", enabled ? "true" : "false");
+      $("svAutoLoginSwitch").classList.toggle("active", enabled);
+    }
+
+    function loadSvAutoLoginPref() {
+      if (svAutoLoginEnabled()) {
+        $("svAutoLoginSwitch").classList.add("active");
+      }
+    }
+
     // Called once at startup (after everything else has rendered) to skip
     // Home and jump straight into StudentVUE, if the person turned that on
     // in Settings. Mirrors what happens when someone taps Tools then
@@ -6543,14 +6723,38 @@
         $("svRefreshButton").style.display = "flex";
         // Always refresh StudentVUE data when opening this page. Cached data can be
         // incomplete from an older version of the StudentVUE integration.
-        if (svData && svData.courses) renderStudentVue(svData);
-        svFetchGrades(creds, { showLoginOnFail: true });
+        const hasCachedData = svData && svData.courses;
+        if (hasCachedData) renderStudentVue(svData);
+        if (svAutoLoginEnabled()) {
+          svFetchGrades(creds, { showLoginOnFail: true });
+        } else if (!hasCachedData) {
+          // No cached data to fall back on and auto-login is off — show a
+          // gate that requires an explicit tap rather than silently doing
+          // nothing or fetching anyway.
+          svShowLoginGate();
+        }
       } else {
         svShowLoginView();
       }
     }
 
+    function svShowLoginGate() {
+      $("svLoginView").style.display = "none";
+      $("svDataView").style.display = "none";
+      $("svLoginGateView").style.display = "block";
+      $("svRefreshButton").style.display = "none";
+    }
+
+    function svManualLogin() {
+      const creds = load("StudentVueCreds");
+      if (!creds) { svShowLoginView(); return; }
+      $("svLoginGateView").style.display = "none";
+      $("svRefreshButton").style.display = "flex";
+      svFetchGrades(creds, { showLoginOnFail: true });
+    }
+
     function svShowLoginView() {
+      $("svLoginGateView").style.display = "none";
       $("svLoginView").style.display = "block";
       $("svDataView").style.display = "none";
       $("svRefreshButton").style.display = "none";
@@ -6573,12 +6777,16 @@
       if (!creds.workerUrl || !creds.portalUrl || !creds.username || !creds.password) {
         svSetError("Please fill in every field."); return;
       }
+      const rememberMe = $("svRememberMe").checked;
       svSetError(null);
       $("svConnectButton").textContent = "Connecting…";
       $("svConnectButton").disabled = true;
       svFetchGrades(creds, {
         showLoginOnFail: false,
-        onSuccess: () => { save("StudentVueCreds", creds); },
+        // Unchecked: credentials stay in memory for this page load only —
+        // nothing written to localStorage, so nothing goes to cloud sync
+        // either. Next time the app opens, StudentVUE asks again.
+        onSuccess: () => { if (rememberMe) save("StudentVueCreds", creds); },
         onDone: () => { $("svConnectButton").textContent = "Connect"; $("svConnectButton").disabled = false; }
       });
     }
@@ -6597,7 +6805,44 @@
         // instead of the app firing five separate logins in parallel (which
         // could race each other on the district's server and intermittently
         // fail — see the "webAll" note in the Worker's own comments).
-        const result = await svWorkerRequest(creds, "webAll");
+        let result = await svWorkerRequestRetrying(creds, "webAll");
+
+        // Grades came back, but one or more of the other pieces (calendar,
+        // profile, schedule, course history) didn't — that's usually a
+        // one-off hiccup on a specific endpoint, not a real, lasting
+        // problem, so take one more full pass and fill in whatever came
+        // back this time rather than leaving those sections blank for the
+        // rest of the session.
+        if (Array.isArray(result.errors) && result.errors.length > 0) {
+          try {
+            const retryResult = await svWorkerRequestRetrying(creds, "webAll", {}, 2);
+            const merged = { ...result };
+            const fieldByLabel = {
+              webGradebook: "classes",
+              webCalendar: "calendar",
+              webProfile: "profile",
+              webSchedule: "schedule",
+              webCourseHistory: "courseHistory",
+              webStudentInfo: "studentInfo"
+            };
+            for (const key of ["classes", "calendar", "profile", "studentInfo", "schedule", "courseHistory"]) {
+              if ((merged[key] == null || (Array.isArray(merged[key]) && merged[key].length === 0)) && retryResult[key] != null) {
+                merged[key] = retryResult[key];
+              }
+            }
+            merged.errors = (retryResult.errors || []).filter(e => {
+              const label = e.split(":")[0]?.trim();
+              const field = fieldByLabel[label];
+              // Only still count it as an error if that field is genuinely
+              // still missing after both attempts.
+              return field && (merged[field] == null || (Array.isArray(merged[field]) && merged[field].length === 0));
+            });
+            result = merged;
+          } catch {
+            // The retry itself failing entirely just means we keep the
+            // first attempt's (partial) result — better than nothing.
+          }
+        }
 
         const classes = (result.classes || []).map(c => {
           const periods = Array.isArray(c.gradingPeriods) ? c.gradingPeriods : [];
@@ -6651,6 +6896,31 @@
       try { body = await response.json(); } catch { throw new Error(`Worker returned an invalid response for ${method}.`); }
       if (!response.ok || body.error) throw new Error(body.error || `StudentVUE request failed (${method}).`);
       return body;
+    }
+
+    // Wraps svWorkerRequest with a couple of retries + a short backoff.
+    // A lot of what's flowed through here is inherently a bit flaky — this
+    // is screen-scraping a live district server, not a stable published
+    // API — so a single transient hiccup (a slow response, a session race,
+    // a one-off 500) shouldn't surface as a hard failure to the person
+    // using the app when trying again a moment later would've just worked.
+    // Errors that clearly won't change on retry (bad credentials, a
+    // malformed request) still fail immediately instead of wasting time.
+    async function svWorkerRequestRetrying(creds, method, extra = {}, attempts = 3) {
+      let lastErr;
+      for (let i = 0; i < attempts; i++) {
+        try {
+          return await svWorkerRequest(creds, method, extra);
+        } catch (err) {
+          lastErr = err;
+          const msg = err.message || "";
+          if (/username and password|missing one of|invalid json|missing ".*"|couldn't understand that portal url/i.test(msg)) {
+            throw err;
+          }
+          if (i < attempts - 1) await new Promise(r => setTimeout(r, 500 * (i + 1)));
+        }
+      }
+      throw lastErr;
     }
 
     function svNormalizeDate(value) {
@@ -6746,6 +7016,7 @@
 
     function renderStudentVue(data) {
       $("svLoginView").style.display = "none";
+      $("svLoginGateView").style.display = "none";
       $("svDataView").style.display = "block";
       $("svRefreshButton").style.display = "flex";
       const lastUpdated = $("svLastUpdated");
@@ -6776,13 +7047,31 @@
       const profileId = svField(studentInfo, "permID") || svField(profile, "sisNumber", "SisNumber", "studentID", "StudentID", "studentId", "permID", "PermID");
       const profileGender = svField(studentInfo, "gender");
       const profileGrade = svField(studentInfo, "grade");
+      const profileUserId = svField(studentInfo, "userID", "UserID", "userId");
+      const profileHomeAddress = svField(studentInfo, "homeAddress", "HomeAddress");
+      const profilePhoneNumbers = Array.isArray(studentInfo.phoneNumbers) ? studentInfo.phoneNumbers : [];
+      // p.number can come through as "xxx-xxx-xxxx (not listed)" — strip
+      // everything but the digits and reformat as (XXX) XXX-XXXX, so the
+      // type label, "(not listed)" note, and "(primary)" marker all drop
+      // out; a number that isn't a clean 10 digits falls back to showing
+      // whatever was there rather than guessing at its shape.
+      const formatPhoneNumber = (raw) => {
+        if (!raw) return null;
+        const digits = String(raw).replace(/\D/g, "");
+        const tenDigits = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+        if (tenDigits.length === 10) return `(${tenDigits.slice(0, 3)}) ${tenDigits.slice(3, 6)}-${tenDigits.slice(6)}`;
+        return String(raw).trim();
+      };
+      const profilePhoneText = profilePhoneNumbers.length
+        ? profilePhoneNumbers.map(p => formatPhoneNumber(p.number)).filter(Boolean).join("\n")
+        : null;
       let profilePhoto = svField(profile, "photoDataUri", "photo", "Photo", "photoUrl", "PhotoUrl", "pictureUrl", "PictureUrl", "image", "Image", "imageData", "ImageData", "base64Photo", "PhotoData", "studentPhoto", "StudentPhoto");
       if (profilePhoto && typeof profilePhoto === "string" && !profilePhoto.startsWith("data:") && !profilePhoto.startsWith("http")) {
         profilePhoto = `data:image/jpeg;base64,${profilePhoto}`;
       }
       // Kept around so openSvProfileModal() can populate the detail modal
       // without recomputing all of this from data.rawJson.
-      svProfileDetails = { fullName: profileFullName, school: profileSchool, id: profileId, gender: profileGender, grade: profileGrade };
+      svProfileDetails = { fullName: profileFullName, school: profileSchool, id: profileId, gender: profileGender, grade: profileGrade, userId: profileUserId, homeAddress: profileHomeAddress, phone: profilePhoneText };
       const initials = profileShortName.split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "S";
       const profileCard = $("svProfileCard");
       if (profileCard) {
@@ -6913,7 +7202,7 @@
       content.innerHTML = classInfo + `<div class="calendar-empty"><div class="calendar-empty-icon">⏳</div>Loading assignments…</div>`;
 
       try {
-        const result = await svWorkerRequest(creds, "webAssignments", { focusArgs: course.focusArgs });
+        const result = await svWorkerRequestRetrying(creds, "webAssignments", { focusArgs: course.focusArgs });
         svAssignmentsGradeData = result;
         renderSvAssignments(result.weeks || [], classInfo);
       } catch (err) {
@@ -7264,21 +7553,8 @@
         : `N/A / ${assignment.possible}`;
 
       wrapper.innerHTML = `
-        <div class="sv-sim-title">Grade Simulator</div>
-
-        <div class="sv-sim-info">
-          <div class="sv-sim-category">
-            <span class="sv-sim-info-label">Category</span>
-            <strong>${escapeHTML(measureName)}</strong>
-          </div>
-          <div class="sv-sim-category">
-            <span class="sv-sim-info-label">Category Weight</span>
-            <strong>${escapeHTML(weightText)}</strong>
-          </div>
-        </div>
-
         <div class="sv-sim-score-line">
-          <span>If You Score:</span>
+          <span>If you score</span>
           <strong class="sv-sim-assignment-score">${scoreText}</strong>
         </div>
 
@@ -7307,6 +7583,17 @@
           </div>
         </div>
 
+        <div class="sv-sim-info">
+          <div class="sv-sim-category">
+            <span class="sv-sim-info-label">Category</span>
+            <strong>${escapeHTML(measureName)}</strong>
+          </div>
+          <div class="sv-sim-category">
+            <span class="sv-sim-info-label">Category Weight</span>
+            <strong>${escapeHTML(weightText)}</strong>
+          </div>
+        </div>
+
         <button type="button" class="sv-sim-reset">Reset</button>
         <div class="sv-sim-note"></div>
       `;
@@ -7317,6 +7604,16 @@
       const scoreEl = wrapper.querySelector(".sv-sim-assignment-score");
       const percentEl = wrapper.querySelector(".sv-sim-class-percent");
       const percentToggle = wrapper.querySelector(".sv-sim-percent-toggle");
+
+      const updateRangeFill = () => {
+        const min = Number(range.min) || 0;
+        const max = Number(range.max) || 100;
+        const val = Number(range.value);
+        const pct = max > min ? Math.min(100, Math.max(0, ((val - min) / (max - min)) * 100)) : 0;
+        range.style.setProperty("--sv-range-fill", pct + "%");
+      };
+      updateRangeFill();
+
 
       let showDecimalPercent = false;
 
@@ -7364,6 +7661,7 @@
         svAssignmentSimulations.set(key, value);
 
         scoreEl.textContent = `${value} / ${assignment.possible}`;
+        updateRangeFill();
 
         svUpdateAllSimulators();
       });
@@ -7528,7 +7826,23 @@
       setText("svModalId", d.id != null ? String(d.id) : "");
       setText("svModalGender", d.gender);
       setText("svModalGrade", d.grade);
+      setText("svModalUserId", d.userId);
+      setText("svModalHomeAddress", d.homeAddress ? d.homeAddress.replace(/\n+/g, ", ") : d.homeAddress);
+      setText("svModalPhone", d.phone);
+      const basicRows = $("svModalBasicRows");
+      const extraRows = $("svModalExtraRows");
+      if (basicRows) basicRows.style.display = "";
+      if (extraRows) extraRows.style.display = "none";
       openModal("svProfileModal");
+    }
+
+    function toggleSvProfileCard() {
+      const basicRows = $("svModalBasicRows");
+      const extraRows = $("svModalExtraRows");
+      if (!basicRows || !extraRows) return;
+      const showingExtra = extraRows.style.display !== "none";
+      basicRows.style.display = showingExtra ? "" : "none";
+      extraRows.style.display = showingExtra ? "none" : "";
     }
 
     function openSvCourseHistory() {
@@ -7565,7 +7879,7 @@
       btn.textContent = "Preparing…";
       btn.disabled = true;
       try {
-        const result = await svWorkerRequest(creds, "webReport", { reportKey: "transcriptLegacy" });
+        const result = await svWorkerRequestRetrying(creds, "webReport", { reportKey: "transcriptLegacy" });
 
         const isHomeScreen = window.navigator.standalone === true ||
           window.matchMedia("(display-mode: standalone)").matches;
@@ -7841,6 +8155,7 @@
     /* ===== START ===== */
     loadDarkMode();
     loadDefaultToStudentVuePref();
+    loadSvAutoLoginPref();
     applyStoredAppIconLinks();
     renderAccountUI(auth.currentUser);
     renderRecentAccounts();
