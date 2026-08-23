@@ -870,7 +870,7 @@
     .sv-calendar-event {
       font-size: 8px;
       line-height: 1.2;
-      padding: 3px 4px;
+      padding: 4px 4px;
       border-radius: 5px;
       background: var(--blue-light);
       overflow: hidden;
@@ -3431,7 +3431,7 @@
         <button class="primary-button" onclick="svManualLogin()" style="max-width:220px;margin:0 auto;">Login</button>
       </div>
 
-      <div id="svLoadingView" class="calendar-empty" style="display:none;padding:60px 15px;">
+      <div id="svLoadingView" class="calendar-empty" style="display:none;padding:80px 15px;">
         <div class="sv-spinner">
           <i style="transform:rotate(0deg) translateY(-17px);animation-delay:-1s;"></i>
           <i style="transform:rotate(45deg) translateY(-17px);animation-delay:-0.875s;"></i>
@@ -3442,7 +3442,7 @@
           <i style="transform:rotate(270deg) translateY(-17px);animation-delay:-0.25s;"></i>
           <i style="transform:rotate(315deg) translateY(-17px);animation-delay:-0.125s;"></i>
         </div>
-        <div>Signing in and loading your StudentVUE data…</div>
+        <div>Loading your StudentVUE data…</div>
       </div>
 
       <div id="svDataView" style="display:none;">
@@ -8198,7 +8198,7 @@
         else d = new Date(year, month, dayIndex);
         const key = formatDateKey(d);
         const dayEvents = eventMap[key] || [];
-        const maxShown = window.matchMedia("(min-width: 1024px)").matches ? 4 : 3;
+        const maxShown = window.matchMedia("(min-width: 1024px)").matches ? 3 : 2;
         html += `<div class="sv-calendar-day ${other ? "other" : ""} ${key === todayKey ? "today" : ""}" onclick="openSvDayModal('${key}')" role="button" tabindex="0">`;
         html += `<div class="sv-calendar-number">${d.getDate()}</div><div class="sv-calendar-events">`;
         dayEvents.slice(0, maxShown).forEach(e => {
