@@ -600,11 +600,6 @@
       transition: background .15s ease;
     }
 
-    .sv-sim-percent-toggle:hover,
-    .sv-sim-class-toggle:hover {
-      background: var(--blue-light);
-    }
-
     .sv-sim-percent-toggle:focus-visible,
     .sv-sim-class-toggle:focus-visible {
       outline: 2px solid var(--blue);
@@ -636,8 +631,6 @@
       font-size: 10px;
       line-height: 1.35;
     }
-
-
 
     /* The assignments sit in their own separate card below the week header. */
     .sv-assignment-items {
@@ -2909,12 +2902,22 @@
         background: color-mix(in srgb, var(--danger) 20%, transparent);
       }
 
+      .sv-profile-card:hover {
+        transform: translateY(-2px);
+        background-color: var(--light-gray);
+      }
+
       .sv-calendar-day:not(.other):hover {
         box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
         background: var(--blue-light);
       }
 
       .sv-calendar-day.today:hover {
+        background: var(--blue-light);
+      }
+
+      .sv-sim-percent-toggle:hover,
+      .sv-sim-class-toggle:hover {
         background: var(--blue-light);
       }
 
@@ -2968,11 +2971,6 @@
       .list-button:hover .arrow,
       .setting-row:hover .arrow {
         transform: translateX(3px);
-      }
-
-      .sv-profile-card:hover {
-        transform: translateY(-2px);
-        background-color: var(--light-gray);
       }
     }
   </style>
