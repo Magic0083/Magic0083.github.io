@@ -39,6 +39,7 @@
       --danger: #ff3b30;
       --shadow: 0 4px 16px rgba(0, 0, 0, .05);
       --stripe-row: #fafbfc;
+      --light-gray: #292b34
     }
 
     body.dark {
@@ -415,7 +416,7 @@
     }
 
     .sv-assignment-row.sv-sim-clickable:hover {
-      background: var(--blue-light);
+      background: var(--light-gray);
     }
 
     .sv-assignment-simulator {
@@ -828,13 +829,16 @@
     }
 
     .sv-calendar-day {
-      min-height: 72px;
+      height: 78px;
       border-radius: 12px;
       padding: 5px 3px;
       background: var(--background);
       min-width: 0;
       user-select: none;
       cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .sv-calendar-day.other {
@@ -851,12 +855,16 @@
       font-weight: 800;
       margin-bottom: 3px;
       text-align: center;
+      flex-shrink: 0;
     }
 
     .sv-calendar-events {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
     }
 
     .sv-calendar-event {
@@ -1567,7 +1575,8 @@
     #studentvue .info-card,
     #svProfileModal .info-card,
     #svCourseHistoryModal .info-card,
-    #svDayModal .info-card {
+    #svDayModal .info-card,
+    #passwordDetailModal .info-card {
       background: #101012;
     }
 
@@ -1673,6 +1682,8 @@
       text-align: left;
       margin-bottom: 8px;
       box-shadow: var(--shadow);
+      user-select: none;
+      cursor: pointer;
     }
 
     .setting-icon {
@@ -1781,12 +1792,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
+      margin: 22px 0 14px 0;
     }
 
     .calendar-month-title {
       font-size: 20px;
-      font-weight: 750;
+      font-weight: 700;
     }
 
     .calendar-arrows {
@@ -1813,6 +1824,7 @@
       border-radius: 14px;
       margin-bottom: 14px;
       box-shadow: var(--shadow);
+      gap: 4px;
     }
 
     .view-button {
@@ -2027,13 +2039,17 @@
     }
 
     .agenda-event {
-      background-color: #26272d;
+      background-color: var(--card);
       border-radius: 17px;
       padding: 15px;
       display: flex;
       align-items: center;
       box-shadow: var(--shadow);
       cursor: pointer;
+    }
+
+    .modal > * > .agenda-event {
+      background-color: #26272d;
     }
 
     .agenda-event-color {
@@ -2160,6 +2176,14 @@
       background: var(--blue);
       color: white;
       border-color: var(--blue);
+    }
+
+    .class-day-button.selected:hover {
+      background: #0e4c8d;
+    }
+
+    .class-day-button:not(.selected):hover {
+      background: var(--light-gray);
     }
 
     .form-group {
@@ -2426,7 +2450,7 @@
       text-align: center;
       color: var(--secondary);
       font-size: 11px;
-      padding: 30px 0 5px;
+      padding: 15px 0 5px;
     }
 
     .bottom-nav {
@@ -2680,6 +2704,277 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ===== DESKTOP DASHBOARD LAYOUT =====
+       Phone layout above is untouched. Below this breakpoint everything
+       still renders exactly as before; this block only takes effect on
+       wide viewports and turns the bottom tab bar into a left sidebar
+       while letting each page spread out and use the extra width. */
+    @media (min-width: 1024px) {
+      body {
+        display: flex;
+      }
+
+      /* Bottom nav becomes a fixed left sidebar */
+      .bottom-nav {
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: none;
+        width: 282px;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+        border-right: 1px solid var(--border);
+        box-shadow: none;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 26px 14px 20px;
+        gap: 3px;
+      }
+
+      .bottom-nav::before {
+        content: "My Student Hub";
+        display: block;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -.5px;
+        padding: 2px 10px 12px;
+      }
+
+      .nav-button {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 13px;
+        height: auto;
+        padding: 11px 12px;
+        border-radius: 12px;
+        transition: background .15s;
+      }
+
+      .nav-button:hover {
+        background: var(--card);
+      }
+
+      .nav-button.active {
+        background: var(--blue-light);
+      }
+
+      .nav-icon {
+        font-size: 19px;
+        line-height: 1;
+      }
+
+      .nav-label {
+        font-size: 14.5px;
+        font-weight: 600;
+      }
+
+      /* Content area takes over the rest of the window */
+      .app {
+        max-width: none;
+        width: calc(100% - 282px);
+        min-height: 100vh;
+        margin: 0 0 0 282px;
+        padding: 40px 52px 60px;
+      }
+
+      .page.active {
+        max-width: 1360px;
+        margin: 0 auto;
+        animation: pageIn .25s ease;
+      }
+
+      /* Card stacks become multi-column dashboard grids instead of a
+         single tall column, so the page uses the full width. */
+      .class-list:not(.static),
+      .list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        align-items: start;
+        gap: 14px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(auto, 1fr));
+      }
+
+      .tool-grid {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      }
+
+      .kanban-board {
+        gap: 18px;
+      }
+
+      /* Single-focus form/detail pages get a comfortably narrow panel so
+         everything inside (cards, inputs, buttons) shares one consistent
+         width, instead of capping just the buttons on their own. */
+      #accountPage.page.active,
+      #profileInfo.page.active,
+      #gpa.page.active,
+      #timer.page.active {
+        margin: 0;
+      }
+
+      #richNoteEditor.page.active {
+        max-width: 900px;
+        margin: 0;
+      }
+
+      /* Modals open centered, not as a bottom sheet */
+      .modal-background {
+        align-items: center;
+      }
+
+      .modal {
+        max-width: 560px;
+        border-radius: 22px;
+        animation: modalCenterIn .2s ease;
+      }
+
+      @keyframes modalCenterIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px) scale(.98);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* StudentVUE calendar: a little taller on desktop, same
+         uniform-size + internal-scroll behavior as phone. */
+      .sv-calendar-day {
+        height: 110px;
+      }
+
+      /* Hover feedback for interactive elements — pointer/desktop only,
+         phone keeps its existing tap (:active) feedback untouched. */
+      .class-card,
+      .list-button,
+      .password-card,
+      .setting-row,
+      .profile-card:not(.static),
+      .button,
+      .add-class-button,
+      .primary-button,
+      .secondary-button,
+      .danger-button,
+      .sv-calendar-day:not(.other) {
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      }
+
+      .class-card:hover,
+      .list-button:hover,
+      .password-card:hover,
+      .setting-row:hover,
+      .profile-card:not(.static):hover,
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--card) 92%, var(--text) 8%);
+      }
+
+      .button:hover .icon,
+      .button:hover .list-icon,
+      .list-button:hover .icon,
+      .list-button:hover .list-icon {
+        background: #3b404c;
+      }
+
+      .add-class-button:hover,
+      .primary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--blue) 85%, rgb(73, 131, 212) 35%);
+      }
+
+      .secondary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--blue-light) 75%, var(--blue) 25%);
+      }
+
+      .danger-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--danger) 20%, transparent);
+      }
+
+      .sv-calendar-day:not(.other):hover {
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: var(--blue-light);
+      }
+
+      .sv-calendar-day.today:hover {
+        background: var(--blue-light);
+      }
+
+      .icon-button,
+      .close-button,
+      .view-button,
+      .mode-toggle-btn,
+      .rich-toolbar-btn,
+      .app-icon-option,
+      .text-link {
+        transition: filter .15s ease, background .15s ease, color .15s ease;
+      }
+
+      .icon-button:hover,
+      .rich-toolbar-btn:hover,
+      .app-icon-option:hover {
+        background: var(--light-gray);
+      }
+
+      .close-button:hover {
+        background: color-mix(in srgb, var(--blue-light) 70%, var(--blue) 30%);
+      }
+
+      .view-button:hover,
+      .mode-toggle-btn:hover {
+        background: var(--light-gray);
+      }
+
+      .view-button.active:hover,
+      .mode-toggle-btn.active:hover {
+        background: color-mix(in srgb, var(--blue) 85%, black 15%);
+      }
+
+      .text-link:hover {
+        opacity: .75;
+      }
+
+      .calendar-day:hover {
+        background: var(--light-gray);
+      }
+
+      /* Sidebar nav rows */
+      .nav-button:hover {
+        background: var(--light-gray);
+      }
+
+      .arrow {
+        transition: transform .15s ease;
+      }
+
+      .list-button:hover .arrow,
+      .setting-row:hover .arrow {
+        transform: translateX(3px);
+      }
+
+      .sv-profile-card:hover {
+        transform: translateY(-2px);
+        background-color: var(--light-gray);
+      }
+    }
   </style>
 </head>
 
@@ -2717,7 +3012,7 @@
       <div class="top-bar">
         <h1>Classes</h1>
       </div>
-      <div id="classList" class="class-list"></div>
+      <div id="classList" class="class-list static"></div>
       <button class="add-class-button" onclick="openClassModal()">+ Add Class</button>
       <div class="footer">Tap a class to edit it.</div>
     </div>
@@ -2756,7 +3051,7 @@
       </div>
 
       <div id="projectListView">
-        <div id="projectList" class="class-list"></div>
+        <div id="projectList" class="class-list static"></div>
         <button class="add-class-button" onclick="openProjectModal()">+ Add Project</button>
         <div class="footer">Tap a project to open its board.</div>
       </div>
@@ -2783,7 +3078,7 @@
       </div>
 
       <div id="setListView">
-        <div id="setList" class="class-list"></div>
+        <div id="setList" class="class-list static"></div>
         <button class="add-class-button" onclick="openSetModal()">+ Add Study Set</button>
         <div class="footer">Tap a set to view its cards.</div>
       </div>
@@ -2801,7 +3096,7 @@
             <div class="button-description">Test yourself</div>
           </button>
         </div>
-        <div id="cardList" class="class-list"></div>
+        <div id="cardList" class="class-list static"></div>
         <button class="add-class-button" onclick="openCardModal()">+ Add Card</button>
         <div class="footer">Tap a card to edit its front and back.</div>
       </div>
@@ -2821,13 +3116,13 @@
         <div id="gpaCreditTotal" style="font-size:13px;opacity:.8;margin-top:4px;">0 credit hours</div>
       </div>
       <div class="info-card" style="margin-bottom:20px;">
-        <div class="info-row">
+        <div class="info-row" style="border-bottom:none;">
           <div class="info-label" style="width:auto;flex:1;">Include Current GPA</div>
           <div id="gpaUseCurrentSwitch" class="switch" onclick="toggleGpaUseCurrent()">
             <div class="switch-circle"></div>
           </div>
         </div>
-        <div id="gpaPriorCreditsRow" class="info-row" style="display:none;">
+        <div id="gpaPriorCreditsRow" class="info-row" style="display:none; border-top:1px solid var(--border)">
           <div class="info-label" style="width:auto;flex:1;">Prior Credit Hours</div>
           <div class="info-value" style="flex:0 0 auto;"><input id="gpaPriorCredits" class="form-input" type="number"
               min="0" step="0.5" inputmode="decimal" placeholder="0" style="width:90px;padding:8px;text-align:right;"
@@ -2837,7 +3132,7 @@
       <div id="gpaUseCurrentHint" class="quiz-help" style="display:none;margin-top:-12px;margin-bottom:20px;">Your
         current GPA (set in Settings) will be blended in using the credit hours entered above.</div>
       <div class="section-title">Courses</div>
-      <div id="gpaCourseList" class="list"></div>
+      <div id="gpaCourseList" class="class-list static"></div>
       <button class="add-class-button" onclick="openGpaModal()">+ Add Course</button>
       <div class="footer">Tap a course to edit or remove it.</div>
     </div>
@@ -2892,7 +3187,7 @@
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openNoteModal()">+</button></div>
       </div>
-      <div id="notesList" class="list"></div>
+      <div id="notesList" class="class-list static"></div>
       <button class="add-class-button" onclick="openNoteModal()">+ Add Note</button>
       <div class="footer">Tap a note to edit it.</div>
     </div>
@@ -2906,7 +3201,7 @@
         </div>
         <div class="top-bar-actions"><button class="icon-button" onclick="openRichNoteEditor()">+</button></div>
       </div>
-      <div id="richNotesList" class="list"></div>
+      <div id="richNotesList" class="class-list static"></div>
       <button class="add-class-button" onclick="openRichNoteEditor()">+ Add Note</button>
       <div class="footer">Tap a note to open it. Supports markdown, images, and LaTeX ($x^2$).</div>
     </div>
@@ -2969,7 +3264,7 @@
       </div>
 
       <div id="checklistListView">
-        <div id="checklistList" class="class-list"></div>
+        <div id="checklistList" class="class-list static"></div>
         <button class="add-class-button" onclick="openChecklistModal()">+ Add Checklist</button>
         <div class="footer">Tap a checklist to view its items.</div>
       </div>
@@ -3081,7 +3376,7 @@
         you're signed in to an account, they also sync to your private cloud storage. Avoid storing anything highly
         sensitive here.
       </div>
-      <div id="passwordList" class="list"></div>
+      <div id="passwordList" class="class-list static"></div>
       <button class="add-class-button" onclick="openPasswordModal()">+ Add Password / Info</button>
       <div class="footer">Tap an entry to edit it.</div>
     </div>
@@ -3101,12 +3396,9 @@
 
       <div id="svLoginView">
         <div class="security-note">
-          This connects to the current StudentVUE web portal through your Cloudflare Worker. The Worker handles the
-          StudentVUE web login and returns the information to this app. Your login
-          goes to the small proxy address below and then straight to your district's own StudentVUE server;
-          it isn't sent anywhere else. With Remember Me on, your username and password are saved on this device
-          (and to your private cloud sync if you're signed in) the same way entries in Passwords are, so only
-          leave it on if you're comfortable with that — turn it off to sign in fresh each time instead.
+          This connects to StudentVUE through a Cloudflare Worker, which handles login and returns your information to the app.
+          With Remember Me on, your login is saved on this device (and private cloud sync if signed in). Turn it off to sign in
+          fresh each time.
         </div>
         <div class="form-group">
           <label class="form-label">PROXY WORKER URL</label>
@@ -3134,7 +3426,7 @@
       </div>
 
       <div id="svLoginGateView" style="display:none;text-align:center;padding:60px 10px;">
-        <div style="font-size:15px;color:var(--secondary);margin-bottom:16px;">Auto-login is off. Tap below to sign
+        <div style="font-size:15px;color:var(--secondary);margin-bottom:24px;">Auto-login is off. Tap below to sign
           in to StudentVUE.</div>
         <button class="primary-button" onclick="svManualLogin()" style="max-width:220px;margin:0 auto;">Login</button>
       </div>
@@ -3507,7 +3799,7 @@
           <h1>Profile</h1>
         </div>
       </div>
-      <div class="profile-card" style="margin-bottom:12px;">
+      <div class="profile-card static" style="margin-bottom:12px;">
         <div class="avatar-upload-wrap">
           <div class="profile-avatar" id="profileInfoAvatar">A</div>
           <button class="avatar-edit-badge" onclick="$('avatarFileInput').click()" aria-label="Change photo">📷</button>
@@ -5053,7 +5345,7 @@
       const container = $("classList");
       container.innerHTML = "";
       if (classes.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">📚</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add your first class below.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:40px;">📚</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add your first class below.</div></div>`;
         return;
       }
       classes.forEach(c => {
@@ -5611,7 +5903,7 @@
       const container = $("projectList");
       container.innerHTML = "";
       if (projects.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">✅</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Projects Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a project to start tracking tasks.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:40px;">✅</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Projects Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a project to start tracking tasks.</div></div>`;
         return;
       }
       projects.forEach(p => {
@@ -5857,7 +6149,7 @@
       const container = $("setList");
       container.innerHTML = "";
       if (studySets.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🧠</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Study Sets Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a set to start making flashcards.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:40px;">🧠</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Study Sets Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a set to start making flashcards.</div></div>`;
         return;
       }
       studySets.forEach(s => {
@@ -5892,7 +6184,7 @@
       const container = $("cardList");
       if (!s) { container.innerHTML = ""; return; }
       if (s.cards.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🗂️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Cards Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a card to get started.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">🗂️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Cards Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a card to get started.</div></div>`;
         return;
       }
       container.innerHTML = s.cards.map(c => `
@@ -6227,7 +6519,7 @@
       const container = $("gpaCourseList");
       container.innerHTML = "";
       if (gpaCourses.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🎯</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Courses Added</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a course to calculate your GPA.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">🎯</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Courses Added</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a course to calculate your GPA.</div></div>`;
       } else {
         gpaCourses.forEach(c => {
           const btn = document.createElement("button");
@@ -6368,7 +6660,7 @@
       const container = $("notesList");
       container.innerHTML = "";
       if (notes.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🗒️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a note to jot something down.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">🗒️</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a note to jot something down.</div></div>`;
         return;
       }
       [...notes].sort((a, b) => (b.updated || 0) - (a.updated || 0)).forEach(n => {
@@ -6481,7 +6773,7 @@
       const container = $("checklistList");
       container.innerHTML = "";
       if (checklists.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">☑️</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Checklists Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a checklist for packing, shopping, or anything else.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:40px;">☑️</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Checklists Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a checklist for packing, shopping, or anything else.</div></div>`;
         return;
       }
       checklists.forEach(c => {
@@ -6517,7 +6809,7 @@
       const container = $("checklistItemsList");
       if (!c) { container.innerHTML = ""; return; }
       if (c.items.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">✅</div><div style="font-size:15px;color:var(--secondary);margin-top:6px;">Add your first item above.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">✅</div><div style="font-size:15px;color:var(--secondary);margin-top:6px;">Add your first item above.</div></div>`;
         return;
       }
       container.innerHTML = c.items.map(i => `
@@ -6622,7 +6914,7 @@
       const container = $("richNotesList");
       container.innerHTML = "";
       if (richNotes.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">📝</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a note with formatting, images, and math.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">📝</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Notes Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Create a note with formatting, images, and math.</div></div>`;
         return;
       }
       [...richNotes].sort((a, b) => (b.updated || 0) - (a.updated || 0)).forEach(n => {
@@ -7221,7 +7513,7 @@
       if (rawToggleBtn) rawToggleBtn.textContent = "Show Raw Response";
 
       if (!data.courses || data.courses.length === 0) {
-        container.innerHTML = `<div class="profile-card"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any classes.</div></div>`;
+        container.innerHTML = `<div class="profile-card static"><div style="font-size:40px;">🎓</div><div style="font-size:18px;font-weight:700;margin-top:10px;">No Classes Found</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">StudentVUE didn't return any classes.</div></div>`;
       } else {
         svSortedCourses(data.courses).forEach(c => {
           const card = document.createElement("div");
@@ -7906,17 +8198,26 @@
         else d = new Date(year, month, dayIndex);
         const key = formatDateKey(d);
         const dayEvents = eventMap[key] || [];
+        const maxShown = window.matchMedia("(min-width: 1024px)").matches ? 4 : 3;
         html += `<div class="sv-calendar-day ${other ? "other" : ""} ${key === todayKey ? "today" : ""}" onclick="openSvDayModal('${key}')" role="button" tabindex="0">`;
         html += `<div class="sv-calendar-number">${d.getDate()}</div><div class="sv-calendar-events">`;
-        dayEvents.slice(0, 4).forEach(e => {
+        dayEvents.slice(0, maxShown).forEach(e => {
           const assignment = Number(e.type) === 2;
           html += `<div class="sv-calendar-event ${assignment ? "assignment" : ""}" title="${escapeHTML(e.description || e.title || "")}">${escapeHTML(e.title || "Event")}</div>`;
         });
-        if (dayEvents.length > 4) html += `<div class="sv-calendar-event">+${dayEvents.length - 4} more</div>`;
+        if (dayEvents.length > maxShown) html += `<div class="sv-calendar-event">+${dayEvents.length - maxShown} more</div>`;
         html += `</div></div>`;
       }
       grid.innerHTML = html;
     }
+
+    let svCalendarResizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(svCalendarResizeTimer);
+      svCalendarResizeTimer = setTimeout(() => {
+        if ($("svCalendarGrid")?.innerHTML) renderSvCalendar();
+      }, 200);
+    });
 
     function openSvDayModal(dateKey) {
       const events = svCalendarEventMap[dateKey] || [];
@@ -7933,7 +8234,7 @@
       } else {
         content.innerHTML = events.map(e => {
           const assignment = Number(e.type) === 2;
-          return `<div class="profile-card" style="margin-bottom:10px;text-align:left;">
+          return `<div class="profile-card static" style="margin-bottom:10px;text-align:left;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:20px;">${assignment ? "📝" : "📌"}</div>
               <div>
@@ -7989,7 +8290,7 @@
         content.innerHTML = history.map(g => `
           <div class="section-title" style="margin-top:8px;">${escapeHTML(g.grade || "Grade")}</div>
           ${(g.terms || []).map(t => `
-            <div class="profile-card" style="margin-bottom:10px;">
+            <div class="profile-card static" style="margin-bottom:10px;">
               <div style="font-weight:700;">${escapeHTML(t.schoolName || "School")}</div>
               <div style="color:var(--secondary);font-size:12px;margin-top:4px;">${escapeHTML([t.year, t.termName].filter(Boolean).join(" · "))}</div>
               <div style="margin-top:10px;display:flex;flex-direction:column;gap:2px;">
@@ -8057,7 +8358,7 @@
 
     function renderPasswordEntries() {
       const container = $("passwordList"); container.innerHTML = "";
-      if (!passwordEntries.length) { container.innerHTML = `<div class="profile-card"><div style="font-size:36px;">🔐</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Passwords Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a login or other information below.</div></div>`; return; }
+      if (!passwordEntries.length) { container.innerHTML = `<div class="profile-card static"><div style="font-size:36px;">🔐</div><div style="font-size:16px;font-weight:700;margin-top:8px;">No Passwords Yet</div><div style="color:var(--secondary);font-size:13px;margin-top:5px;">Add a login or other information below.</div></div>`; return; }
       passwordEntries.forEach(entry => {
         const btn = document.createElement("button"); btn.className = "password-card"; btn.onclick = () => openPasswordDetail(entry.id);
         btn.innerHTML = `<div class="password-card-top"><div class="list-icon" style="margin-right:0;">🔐</div><div class="list-info"><div class="list-title">${escapeHTML(entry.name || "Untitled")}</div><div class="password-type">${escapeHTML(entry.website || entry.email || entry.username || entry.phone || "Login information")}</div></div><div class="arrow">›</div></div>`;
