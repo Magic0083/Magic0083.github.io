@@ -32,14 +32,19 @@
       --card: #ffffff;
       --text: #17181a;
       --secondary: #777777;
-      --border: #e5e5e7;
+      --border: #d7dadf;
       --blue: #1769c2;
       --blue-light: #edf3fb;
       --nav: rgba(255, 255, 255, .92);
       --danger: #ff3b30;
-      --shadow: 0 4px 16px rgba(0, 0, 0, .05);
-      --stripe-row: #fafbfc;
-      --light-gray: #292b34
+      --shadow: 0 4px 16px rgba(0, 0, 0, .09);
+      --stripe-row: #c3cad3;
+      --light-gray: #eceff2;
+      --agenda-modal-bg: var(--background);
+      --icon-hover-bg: color-mix(in srgb, var(--blue-light) 88%, var(--blue) 12%);
+      --hover-card-bg: #ecf3fa;
+      --sv-card-bg: #e6e8eb;
+      --sv-card-alt-bg: #ffffff;
     }
 
     body.dark {
@@ -52,6 +57,12 @@
       --nav: rgba(27, 28, 32, .94);
       --shadow: 0 5px 18px rgba(0, 0, 0, .25);
       --stripe-row: var(--background);
+      --light-gray: #292b34;
+      --agenda-modal-bg: #26272d;
+      --icon-hover-bg: #3b404c;
+      --hover-card-bg: color-mix(in srgb, var(--card) 92%, var(--text) 8%);
+      --sv-card-bg: #26272d;
+      --sv-card-alt-bg: #101012;
     }
 
     body {
@@ -1546,23 +1557,30 @@
       box-shadow: var(--shadow);
     }
 
-    /* StudentVUE keeps its own card colors regardless of theme — scoped to
-       every StudentVUE container (the main tool page plus its modals,
-       which live outside #studentvue in the DOM) so the rest of the app's
-       .profile-card/.info-card can follow --card without affecting these. */
-    #studentvue .profile-card,
-    #svProfileModal .profile-card,
-    #svCourseHistoryModal .profile-card,
-    #svDayModal .profile-card {
+    /* StudentVUE's own tool page keeps its fixed dark card colors regardless
+       of theme, matching the real StudentVUE app's look. Its detail modals
+       (Student Info, Course History, Day) and the password detail modal are
+       ordinary app surfaces, so they follow the theme via --sv-card-bg /
+       --sv-card-alt-bg instead of being locked to StudentVUE's dark palette. */
+    #studentvue .profile-card {
       background: #26272d;
     }
 
-    #studentvue .info-card,
+    #svProfileModal .profile-card,
+    #svCourseHistoryModal .profile-card,
+    #svDayModal .profile-card {
+      background: var(--sv-card-bg);
+    }
+
+    #studentvue .info-card {
+      background: #101012;
+    }
+
     #svProfileModal .info-card,
     #svCourseHistoryModal .info-card,
     #svDayModal .info-card,
     #passwordDetailModal .info-card {
-      background: #101012;
+      background: var(--sv-card-alt-bg);
     }
 
     .info-row {
@@ -2033,8 +2051,8 @@
       cursor: pointer;
     }
 
-    .modal > * > .agenda-event {
-      background-color: #26272d;
+    .modal>*>.agenda-event {
+      background-color: var(--agenda-modal-bg);
     }
 
     .agenda-event-color {
@@ -2485,6 +2503,46 @@
       color: var(--blue);
     }
 
+    /* Sidebar title row (sits above the nav buttons) — desktop only, shown
+       by the min-width:1024px block below. */
+    .sidebar-header {
+      display: none;
+    }
+
+    /* Sidebar collapse toggle — only ever shown on desktop, positioned by
+       the min-width:1024px block below. */
+    .sidebar-toggle {
+      display: none;
+      width: 42px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 10px;
+      background: none;
+      color: var(--secondary);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .sidebar-collapsed .sidebar-toggle {
+      width: 100%;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--light-gray);
+      color: var(--text);
+    }
+
+    .sidebar-toggle-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      background-color: currentColor;
+      -webkit-mask: url('Icons/SVG/Sidebar.svg') no-repeat center / contain;
+      mask: url('Icons/SVG/Sidebar.svg') no-repeat center / contain;
+    }
+
     /* Flashcards */
     .flip-card {
       background: transparent;
@@ -2721,13 +2779,18 @@
         gap: 3px;
       }
 
-      .bottom-nav::before {
-        content: "My Student Hub";
-        display: block;
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 2px 0 2px 10px;
+      }
+
+      .sidebar-title {
         font-size: 20px;
         font-weight: 700;
         letter-spacing: -.5px;
-        padding: 2px 10px 12px;
       }
 
       .nav-button {
@@ -2865,13 +2928,14 @@
       .button:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
-        background: color-mix(in srgb, var(--card) 92%, var(--text) 8%);
+        background: var(--hover-card-bg);
       }
 
       .button:hover .icon,
       .list-button:hover .list-icon,
+      .password-card-top:hover .list-icon,
       .setting-row:hover .setting-icon {
-        background: #3b404c;
+        background: var(--icon-hover-bg);
       }
 
       .add-class-button:hover,
@@ -2895,7 +2959,7 @@
 
       .sv-profile-card:hover {
         transform: translateY(-2px);
-        background-color: var(--light-gray);
+        background-color: var(--hover-card-bg);
       }
 
       .sv-calendar-day:not(.other):hover {
@@ -2966,6 +3030,45 @@
       .list-button:hover .arrow,
       .setting-row:hover .arrow {
         transform: translateX(3px);
+      }
+
+      /* Sidebar collapse toggle — desktop only. Hidden by default (and on
+         phone, via the base .sidebar-toggle rule below); this block just
+         shows it, sitting inline with the title inside .sidebar-header. */
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      /* Collapsed state: icons only, no labels, narrower sidebar. Scoped to
+         body.sidebar-collapsed so it only ever applies on desktop, and only
+         once the user has actually toggled it. */
+      body.sidebar-collapsed .bottom-nav {
+        width: 84px;
+        padding: 26px 10px 20px;
+      }
+
+      body.sidebar-collapsed .sidebar-header {
+        justify-content: center;
+        padding: 2px 0 2px;
+      }
+
+      body.sidebar-collapsed .sidebar-title {
+        display: none;
+      }
+
+      body.sidebar-collapsed .nav-button {
+        justify-content: center;
+        gap: 0;
+        padding: 11px 0;
+      }
+
+      body.sidebar-collapsed .nav-label {
+        display: none;
+      }
+
+      body.sidebar-collapsed .app {
+        width: calc(100% - 84px);
+        margin-left: 84px;
       }
     }
   </style>
@@ -3389,17 +3492,19 @@
 
       <div id="svLoginView">
         <div class="security-note">
-          This connects to StudentVUE through a Cloudflare Worker, which handles login and returns your information to the app.
-          With Remember Me on, your login is saved on this device (and private cloud sync if signed in). Turn it off to sign in
+          This connects to StudentVUE through a Cloudflare Worker, which handles login and returns your information to
+          the app.
+          With Remember Me on, your login is saved on this device (and private cloud sync if signed in). Turn it off to
+          sign in
           fresh each time.
         </div>
         <div class="form-group">
           <label class="form-label">PROXY WORKER URL</label>
-          <input id="svWorkerUrl" class="form-input" placeholder="https://studentvue-proxy.yoursubdomain.workers.dev">
+          <input id="svWorkerUrl" class="form-input" placeholder="https://studentvue-proxy.yoursubdomain.workers.dev" value="https://studentvue-proxy.agonz4u2.workers.dev">
         </div>
         <div class="form-group">
           <label class="form-label">STUDENTVUE PORTAL URL</label>
-          <input id="svPortalUrl" class="form-input" placeholder="https://synergyweb.pusd11.net">
+          <input id="svPortalUrl" class="form-input" placeholder="https://synergyweb.pusd11.net" value="https://synergyweb.pusd11.net">
         </div>
         <div class="form-group">
           <label class="form-label">USERNAME</label>
@@ -3835,23 +3940,30 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <button class="nav-button active" onclick="showPage('home', this)">
+    <div class="sidebar-header">
+      <span class="sidebar-title">My Student Hub</span>
+      <button id="sidebarToggleButton" class="sidebar-toggle" onclick="toggleSidebarCollapsed()"
+        aria-label="Collapse sidebar" title="Collapse sidebar">
+        <span class="sidebar-toggle-icon"></span>
+      </button>
+    </div>
+    <button class="nav-button active" onclick="showPage('home', this)" title="Home">
       <div class="nav-icon">🏠</div>
       <div class="nav-label">Home</div>
     </button>
-    <button class="nav-button" onclick="showPage('classes', this)">
+    <button class="nav-button" onclick="showPage('classes', this)" title="Classes">
       <div class="nav-icon">📚</div>
       <div class="nav-label">Classes</div>
     </button>
-    <button class="nav-button" onclick="showPage('calendar', this)">
+    <button class="nav-button" onclick="showPage('calendar', this)" title="Calendar">
       <div class="nav-icon">📅</div>
       <div class="nav-label">Calendar</div>
     </button>
-    <button id="navToolsButton" class="nav-button" onclick="showPage('tools', this)">
+    <button id="navToolsButton" class="nav-button" onclick="showPage('tools', this)" title="Tools">
       <div class="nav-icon">🧰</div>
       <div class="nav-label">Tools</div>
     </button>
-    <button class="nav-button" onclick="showPage('settings', this)">
+    <button class="nav-button" onclick="showPage('settings', this)" title="Settings">
       <div class="nav-icon">⚙️</div>
       <div class="nav-label">Settings</div>
     </button>
@@ -5808,6 +5920,29 @@
         document.body.classList.add("dark");
         $("darkSwitch").classList.add("active");
         document.querySelector('meta[name="theme-color"]').setAttribute("content", "#101114");
+      }
+    }
+
+    /* ===== SIDEBAR COLLAPSE (desktop) ===== */
+    function toggleSidebarCollapsed() {
+      document.body.classList.toggle("sidebar-collapsed");
+      const collapsed = document.body.classList.contains("sidebar-collapsed");
+      localStorage.setItem("SidebarCollapsed", collapsed ? "true" : "false");
+      const btn = $("sidebarToggleButton");
+      if (btn) {
+        btn.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+        btn.setAttribute("title", collapsed ? "Expand sidebar" : "Collapse sidebar");
+      }
+    }
+
+    function loadSidebarCollapsed() {
+      if (localStorage.getItem("SidebarCollapsed") === "true") {
+        document.body.classList.add("sidebar-collapsed");
+        const btn = $("sidebarToggleButton");
+        if (btn) {
+          btn.setAttribute("aria-label", "Expand sidebar");
+          btn.setAttribute("title", "Expand sidebar");
+        }
       }
     }
 
@@ -8577,6 +8712,7 @@
 
     /* ===== START ===== */
     loadDarkMode();
+    loadSidebarCollapsed();
     loadDefaultToStudentVuePref();
     loadSvAutoLoginPref();
     applyStoredAppIconLinks();
