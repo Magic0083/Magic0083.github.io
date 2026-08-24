@@ -1,0 +1,3051 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Arial, sans-serif;
+}
+
+:root {
+    --background: #f4f5f7;
+    --card: #ffffff;
+    --text: #17181a;
+    --secondary: #777777;
+    --border: #d7dadf;
+    --blue: #1769c2;
+    --blue-light: #edf3fb;
+    --nav: rgba(255, 255, 255, .92);
+    --danger: #ff3b30;
+    --shadow: 0 4px 16px rgba(0, 0, 0, .09);
+    --stripe-row: #c3cad3;
+    --light-gray: #eceff2;
+    --agenda-modal-bg: var(--background);
+    --icon-hover-bg: color-mix(in srgb, var(--blue-light) 88%, var(--blue) 12%);
+    --hover-card-bg: #ecf3fa;
+    --sv-card-bg: #e6e8eb;
+    --sv-card-alt-bg: #ffffff;
+}
+
+body.dark {
+    --background: #101114;
+    --card: #1b1c20;
+    --text: #f5f5f7;
+    --secondary: #999ba1;
+    --border: #303136;
+    --blue-light: #202d3e;
+    --nav: rgba(27, 28, 32, .94);
+    --shadow: 0 5px 18px rgba(0, 0, 0, .25);
+    --stripe-row: var(--background);
+    --light-gray: #292b34;
+    --agenda-modal-bg: #26272d;
+    --icon-hover-bg: #3b404c;
+    --hover-card-bg: color-mix(in srgb, var(--card) 92%, var(--text) 8%);
+    --sv-card-bg: #26272d;
+    --sv-card-alt-bg: #101012;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background .25s, color .25s;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+.app {
+    width: 100%;
+    max-width: 500px;
+    min-height: 100vh;
+    margin: auto;
+    background: var(--background);
+    padding: 20px 20px 110px;
+}
+
+.page {
+    display: none;
+    animation: pageIn .25s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    padding: 18px 5px 22px;
+}
+
+.small-title {
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    margin-bottom: 5px;
+}
+
+.title {
+    font-size: 34px;
+    font-weight: 750;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    color: var(--secondary);
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.top-bar h1 {
+    font-size: 30px;
+    letter-spacing: -.8px;
+}
+
+.top-bar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-bar-left h1 {
+    font-size: 24px;
+}
+
+.icon-button {
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.icon-button.active {
+    background: var(--blue);
+    color: #fff;
+}
+
+.icon-button.spinning {
+    pointer-events: none;
+    opacity: .6;
+}
+
+.icon-button.spinning .spin-icon {
+    display: inline-block;
+    animation: iconSpin .8s linear infinite;
+}
+
+@keyframes iconSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.sv-spinner {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 14px;
+}
+
+.sv-spinner i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 8px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--secondary);
+    animation: sv-spinner-fade 1s linear infinite;
+}
+
+@keyframes sv-spinner-fade {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .15;
+    }
+}
+
+.student-card {
+    background: linear-gradient(135deg, #174a8b, #2767b8);
+    color: white;
+    border-radius: 25px;
+    padding: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 12px 28px rgba(23, 74, 139, .20);
+}
+
+.student-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sv-profile-card {
+    background: var(--card);
+    border-radius: 21px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 16px;
+}
+
+.sv-profile-photo {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: var(--blue-light);
+    flex-shrink: 0;
+}
+
+.sv-profile-placeholder {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.sv-profile-name {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.sv-profile-school {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.sv-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.sv-summary-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+}
+
+.sv-summary-label {
+    color: var(--secondary);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.sv-summary-value {
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.sv-summary-sub {
+    color: var(--secondary);
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.sv-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 20px 2px 10px;
+}
+
+
+/* ===== StudentVUE assignment page ===== */
+.sv-assignments-page-content {
+    padding: 0 0 24px;
+}
+
+.sv-assignment-class-info {
+    margin-bottom: 32px;
+    padding: 16px;
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.sv-assignment-class-title {
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.sv-assignment-class-teacher {
+    color: var(--secondary);
+    font-size: 13px;
+    margin-bottom: 13px;
+}
+
+.sv-assignment-class-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.sv-assignment-class-stat {
+    background: var(--background);
+    border-radius: 10px;
+    padding: 9px 8px;
+    min-width: 0;
+}
+
+.sv-assignment-class-stat-label {
+    color: var(--secondary);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+    margin-bottom: 3px;
+}
+
+.sv-assignment-class-stat-value {
+    font-size: 15px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sv-assignment-list {
+    background: transparent;
+}
+
+.sv-assignment-week {
+    margin-bottom: 22px;
+}
+
+.sv-assignment-week+.sv-assignment-week {
+    margin-top: 22px;
+}
+
+.sv-assignment-week-header {
+    margin-bottom: 10px;
+    background: var(--blue);
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sv-assignment-week-header span {
+    margin-left: auto;
+    white-space: nowrap;
+    font-weight: 400;
+    opacity: .9;
+}
+
+.sv-assignment-row.sv-sim-clickable {
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.sv-assignment-simulator {
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 0 0 16px 16px;
+    border-top: none;
+}
+
+.sv-sim-score-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.sv-sim-score-line span:first-child {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--secondary);
+    letter-spacing: .04em;
+}
+
+.sv-sim-score-line strong {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* Custom range slider — bigger, touch-friendly thumb with a live
+   color fill up to the current value (kept in sync via the
+   --sv-range-fill custom property, set on every input event). */
+.sv-sim-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--blue) var(--sv-range-fill, 50%),
+            var(--border) var(--sv-range-fill, 50%));
+    outline: none;
+    cursor: pointer;
+    touch-action: pan-y;
+    margin-bottom: 12px;
+}
+
+.sv-sim-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.sv-sim-range::-webkit-slider-thumb:active {
+    transform: scale(1.18);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+}
+
+.sv-sim-range::-moz-range-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--border);
+}
+
+.sv-sim-range::-moz-range-progress {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--blue);
+}
+
+.sv-sim-range::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
+    cursor: pointer;
+}
+
+.sv-sim-class-percent {
+    cursor: pointer;
+    user-select: none;
+    border-radius: 6px;
+    padding: 2px 4px;
+    transition: background .15s ease;
+}
+
+.sv-sim-info {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--card);
+}
+
+.sv-sim-category {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sv-sim-category:last-child {
+    text-align: right;
+}
+
+.sv-sim-info-label {
+    color: var(--secondary);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.sv-sim-category strong {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sv-sim-scale {
+    display: flex;
+    justify-content: space-between;
+    color: var(--secondary);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.sv-sim-results {
+    display: grid;
+    width: 100%;
+    box-sizing: border-box;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.sv-sim-result {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 11px 9px;
+    min-width: 0;
+}
+
+.sv-sim-result-label {
+    color: var(--secondary);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.sv-sim-result-value {
+    margin-top: 3px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.sv-sim-percent-toggle,
+.sv-sim-class-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s ease;
+}
+
+.sv-sim-percent-toggle:focus-visible,
+.sv-sim-class-toggle:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px;
+}
+
+.sv-sim-reset {
+    margin-top: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 0;
+    background: var(--blue-light);
+    color: var(--blue);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .12s ease, transform .1s ease;
+}
+
+.sv-sim-reset:active {
+    transform: scale(.97);
+}
+
+.sv-sim-note {
+    margin-top: 8px;
+    color: var(--secondary);
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+/* The assignments sit in their own separate card below the week header. */
+.sv-assignment-items {
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.sv-assignment-row {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 68px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 9px 16px 9px 8px;
+    gap: 9px;
+}
+
+.sv-assignment-row:last-child {
+    border-bottom: 0;
+}
+
+.sv-assignment-date {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sv-assignment-month {
+    color: #7d808e;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.sv-assignment-day {
+    color: #7d808e;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -1px;
+}
+
+.sv-assignment-main {
+    min-width: 0;
+}
+
+.sv-assignment-title {
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.sv-assignment-meta {
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1.25;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sv-assignment-comment {
+    display: inline-block;
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.sv-assignment-result {
+    min-width: 46px;
+    text-align: right;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sv-assignment-score {
+    color: var(--secondary);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.sv-assignment-percent {
+    color: var(--secondary);
+    font-size: 13px;
+    margin-top: 1px;
+}
+
+.sv-assignment-empty {
+    padding: 28px 18px;
+}
+
+@media (max-width: 520px) {
+    .sv-assignment-class-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+    .sv-assignment-row {
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+    }
+
+    .sv-assignment-day {
+        font-size: 25px;
+    }
+
+    .sv-assignment-title {
+        font-size: 15px;
+    }
+
+    .sv-assignment-score {
+        font-size: 26px;
+    }
+}
+
+.sv-calendar-card {
+    background: var(--card);
+    border-radius: 21px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.sv-calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.sv-calendar-title {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.sv-calendar-nav {
+    display: flex;
+    gap: 5px;
+}
+
+.sv-calendar-nav button {
+    border: none;
+    background: var(--blue-light);
+    color: var(--blue);
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 16px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.sv-calendar-nav button.sv-calendar-today-btn {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 14px;
+}
+
+.sv-calendar-weekdays,
+.sv-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.sv-calendar-weekday {
+    text-align: center;
+    color: var(--secondary);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 0;
+}
+
+.sv-calendar-day {
+    height: 78px;
+    border-radius: 12px;
+    padding: 5px 3px;
+    background: var(--background);
+    min-width: 0;
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sv-calendar-day.other {
+    opacity: .3;
+}
+
+.sv-calendar-day.today {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+}
+
+.sv-calendar-number {
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 3px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sv-calendar-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.sv-calendar-event {
+    font-size: 8px;
+    line-height: 1.2;
+    padding: 4px 4px;
+    border-radius: 5px;
+    background: var(--blue-light);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sv-calendar-event.assignment {
+    background: color-mix(in srgb, var(--blue) 18%, transparent);
+}
+
+.sv-class-percent {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--blue);
+}
+
+.sv-class-time {
+    color: var(--secondary);
+    font-size: 12px;
+    text-align: left;
+}
+
+.sv-card-bottom-left {
+    position: absolute;
+    left: 18px;
+    bottom: 17px;
+    max-width: calc(100% - 130px);
+}
+
+.sv-card-top-right {
+    position: absolute;
+    right: 17px;
+    top: 17px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.sv-class-grade {
+    min-width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.sv-card-bottom-right {
+    position: absolute;
+    right: 17px;
+    bottom: 17px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    max-width: 130px;
+}
+
+.sv-card-room {
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.sv-history-button {
+    margin-top: 10px;
+}
+
+.school-logo {
+    width: auto;
+    height: 48px;
+    border-radius: 15px;
+    padding: 0 10px;
+    background: rgba(255, 255, 255, .18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 17px;
+}
+
+.student-status {
+    background: rgba(255, 255, 255, .18);
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.student-name {
+    margin-top: 24px;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.student-school {
+    margin-top: 4px;
+    opacity: .8;
+    font-size: 14px;
+}
+
+.section-title {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 25px 3px 12px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.button {
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 20px;
+    padding: 19px 16px;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .15s;
+    position: relative;
+}
+
+.button:active {
+    transform: scale(.96);
+}
+
+.icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    margin-bottom: 13px;
+}
+
+.button-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.button-description {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.list-button {
+    width: 100%;
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: var(--shadow);
+}
+
+.list-icon {
+    width: 43px;
+    height: 43px;
+    background: var(--blue-light);
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    margin-right: 13px;
+    flex-shrink: 0;
+}
+
+.list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-title {
+    font-weight: 650;
+    font-size: 15px;
+}
+
+.list-subtitle {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.arrow {
+    color: var(--secondary);
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.class-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.class-card {
+    background: var(--card);
+    border-radius: 21px;
+    padding: 18px;
+    min-height: 125px;
+    position: relative;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform .15s;
+}
+
+.class-card:active {
+    transform: scale(.98);
+}
+
+.class-name {
+    font-size: 19px;
+    font-weight: 750;
+    padding-right: 100px;
+}
+
+.class-code {
+    color: var(--secondary);
+    font-size: 14px;
+    margin-top: 4px;
+    font-weight: 550;
+}
+
+.class-details {
+    position: absolute;
+    left: 18px;
+    bottom: 17px;
+    color: var(--secondary);
+    font-size: 12px;
+    max-width: calc(100% - 130px);
+    text-align: left;
+}
+
+.class-grade {
+    position: absolute;
+    right: 17px;
+    top: 17px;
+    min-width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.class-room {
+    position: absolute;
+    right: 17px;
+    bottom: 17px;
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 600;
+    max-width: 90px;
+    text-align: right;
+}
+
+.add-class-button {
+    width: 100%;
+    border: none;
+    background: var(--blue);
+    color: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(23, 105, 194, .22);
+}
+
+.add-tile {
+    border: 2px dashed var(--border);
+    background: transparent;
+    box-shadow: none;
+    color: var(--secondary);
+}
+
+.link-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.progress-bar-track {
+    background: var(--border);
+    height: 6px;
+    border-radius: 6px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width .2s;
+}
+
+.kanban-board {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.kanban-column {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: var(--shadow);
+}
+
+.kanban-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 750;
+    margin-bottom: 10px;
+    padding: 0 2px;
+}
+
+.kanban-count {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: 20px;
+}
+
+.kanban-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.kanban-empty {
+    color: var(--secondary);
+    font-size: 12px;
+    text-align: center;
+    padding: 12px 0;
+}
+
+.task-card {
+    background: var(--background);
+    border-radius: 14px;
+    padding: 11px 13px;
+    cursor: pointer;
+}
+
+.task-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.task-title {
+    font-size: 13px;
+    font-weight: 650;
+    flex: 1;
+}
+
+.task-due {
+    font-size: 11px;
+    color: var(--secondary);
+    margin-top: 5px;
+    padding-left: 16px;
+}
+
+.task-due.overdue {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.calendar-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 2px 12px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-nav-arrow {
+    border: none;
+    background: var(--blue-light);
+    color: var(--text);
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 17px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.calendar-card-title {
+    font-size: 17px;
+    font-weight: 750;
+    text-align: center;
+    flex: 1;
+    cursor: pointer;
+}
+
+.profile-card {
+    background: var(--card);
+    color: var(--text);
+    border: none;
+    border-radius: 23px;
+    padding: 23px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+.profile-avatar {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    margin: auto;
+    background: linear-gradient(135deg, #174a8b, #4c8ed9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 27px;
+    font-weight: 800;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-upload-wrap {
+    position: relative;
+    width: 78px;
+    margin: 0 auto;
+}
+
+.avatar-edit-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    border: 3px solid var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.slide-confirm-track {
+    position: relative;
+    height: 54px;
+    border-radius: 27px;
+    background: var(--background);
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+}
+
+.slide-confirm-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+    transition: color .15s;
+}
+
+.slide-confirm-track.armed .slide-confirm-label {
+    color: var(--danger);
+}
+
+.slide-confirm-handle {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: grab;
+    transition: left .2s;
+    touch-action: none;
+}
+
+.slide-confirm-handle.dragging {
+    transition: none;
+    cursor: grabbing;
+}
+
+.recent-account-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 10px 8px 14px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    max-width: 100%;
+}
+
+.recent-account-chip span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.recent-account-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1;
+}
+
+.app-icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 14px;
+    width: 84px;
+}
+
+.app-icon-option img {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    background-color: #0b0b0e;
+    border: 2px solid transparent;
+}
+
+.app-icon-option.selected img {
+    border-color: var(--blue);
+}
+
+.app-icon-option span {
+    font-size: 12px;
+    color: var(--text);
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+.avatar-crop-viewport {
+    width: 240px;
+    height: 240px;
+    max-width: 62vw;
+    max-height: 62vw;
+    aspect-ratio: 1 / 1;
+    margin: 4px auto 0;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    background: var(--background);
+    box-shadow: inset 0 0 0 1px var(--border);
+    touch-action: none;
+    cursor: grab;
+}
+
+.avatar-crop-viewport.dragging {
+    cursor: grabbing;
+}
+
+.avatar-crop-viewport img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    transform-origin: center center;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.text-link {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 0 0;
+}
+
+.profile-name {
+    font-size: 21px;
+    font-weight: 700;
+    margin-top: 12px;
+}
+
+.profile-school {
+    color: var(--secondary);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.info-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 5px 16px;
+    box-shadow: var(--shadow);
+}
+
+/* StudentVUE's own tool page keeps its fixed dark card colors regardless
+   of theme, matching the real StudentVUE app's look. Its detail modals
+   (Student Info, Course History, Day) and the password detail modal are
+   ordinary app surfaces, so they follow the theme via --sv-card-bg /
+   --sv-card-alt-bg instead of being locked to StudentVUE's dark palette. */
+#studentvue .profile-card {
+    background: #26272d;
+}
+
+#svProfileModal .profile-card,
+#svCourseHistoryModal .profile-card,
+#svDayModal .profile-card {
+    background: var(--sv-card-bg);
+}
+
+#studentvue .info-card {
+    background: #101012;
+}
+
+#svProfileModal .info-card,
+#svCourseHistoryModal .info-card,
+#svDayModal .info-card,
+#passwordDetailModal .info-card {
+    background: var(--sv-card-alt-bg);
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    width: 105px;
+    color: var(--secondary);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.info-value {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.course-history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    padding: 8px 9px;
+    border-radius: 8px;
+}
+
+.course-history-row:nth-child(odd) {
+    background: var(--stripe-row);
+}
+
+.primary-button {
+    width: 100%;
+    border: none;
+    background: var(--blue);
+    color: white;
+    border-radius: 17px;
+    padding: 15px;
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.secondary-button {
+    width: 100%;
+    border: none;
+    background: var(--blue-light);
+    color: var(--blue);
+    border-radius: 17px;
+    padding: 15px;
+    margin-top: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.danger-button {
+    width: 100%;
+    border: none;
+    background: rgba(255, 59, 48, .10);
+    color: var(--danger);
+    border-radius: 17px;
+    padding: 15px;
+    margin-top: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+}
+
+.settings-label {
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 4px 8px;
+}
+
+.setting-row {
+    width: 100%;
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    padding: 16px;
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+    user-select: none;
+    cursor: pointer;
+}
+
+.setting-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 13px;
+}
+
+.setting-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.setting-title {
+    font-size: 15px;
+    font-weight: 650;
+    overflow-wrap: break-word;
+}
+
+.setting-description {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+    overflow-wrap: break-word;
+}
+
+.switch {
+    width: 48px;
+    height: 29px;
+    background: #d1d1d6;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.switch.active {
+    background: #34c759;
+}
+
+.switch-circle {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform .2s;
+}
+
+.switch.active .switch-circle {
+    transform: translateX(19px);
+}
+
+.sv-remember-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 18px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14.5px;
+    font-weight: 550;
+    color: var(--text);
+}
+
+.sv-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    position: relative;
+    transition: background .15s, border-color .15s;
+}
+
+.sv-checkbox:checked {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.sv-checkbox:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 22px 0 14px 0;
+}
+
+.calendar-month-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.calendar-arrows {
+    display: flex;
+    gap: 6px;
+}
+
+.calendar-arrow {
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.calendar-view-switcher {
+    display: flex;
+    background: var(--card);
+    padding: 4px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    gap: 4px;
+}
+
+.view-button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--secondary);
+    padding: 9px 4px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.view-button.active {
+    background: var(--blue);
+    color: white;
+}
+
+.calendar-card {
+    background: var(--card);
+    border-radius: 21px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    color: var(--secondary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 0;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    min-height: 70px;
+    min-width: 0;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 3px 6px;
+    cursor: pointer;
+    position: relative;
+    transition: background .15s;
+}
+
+.calendar-day:active {
+    transform: scale(.97);
+}
+
+.calendar-day.other-month {
+    opacity: .28;
+}
+
+.calendar-day.today {
+    color: var(--blue);
+    font-weight: 800;
+}
+
+.calendar-day-number {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.calendar-day.today .calendar-day-number {
+    background: var(--blue);
+    color: white;
+}
+
+.calendar-day.custom-colored {
+    background: color-mix(in srgb, var(--day-color) 18%, transparent);
+}
+
+.calendar-day-events {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 5px;
+}
+
+.day-event-chip {
+    width: 100%;
+    min-width: 0;
+    font-size: 9px;
+    font-weight: 650;
+    line-height: 1.3;
+    padding: 2px 4px;
+    border-radius: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    background: color-mix(in srgb, var(--chip-color) 22%, transparent);
+    color: var(--text);
+    border-left: 3px solid var(--chip-color);
+    box-sizing: border-box;
+}
+
+.day-event-more {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--secondary);
+    text-align: left;
+    width: 100%;
+    padding: 1px 4px;
+}
+
+.day-color-bar {
+    position: absolute;
+    bottom: 3px;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    border-radius: 5px;
+    background: var(--day-color);
+}
+
+.week-view {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.week-day-card {
+    background: var(--card);
+    border-radius: 17px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}
+
+.week-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.week-day-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.week-day-date {
+    color: var(--secondary);
+    font-size: 12px;
+}
+
+.week-event {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.week-event-color {
+    width: 5px;
+    height: 35px;
+    border-radius: 5px;
+}
+
+.week-event-info {
+    flex: 1;
+}
+
+.week-event-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.week-event-time {
+    color: var(--secondary);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.agenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.agenda-date {
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 700;
+    margin: 8px 3px 3px;
+}
+
+.agenda-event {
+    background-color: var(--card);
+    border-radius: 17px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}
+
+.modal>*>.agenda-event {
+    background-color: var(--agenda-modal-bg);
+}
+
+.agenda-event-color {
+    width: 5px;
+    align-self: stretch;
+    min-height: 40px;
+    border-radius: 5px;
+    margin-right: 12px;
+}
+
+.agenda-event-info {
+    flex: 1;
+}
+
+.agenda-event-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.agenda-event-subtitle {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.calendar-empty {
+    text-align: center;
+    padding: 30px 15px;
+    color: var(--secondary);
+}
+
+.calendar-empty-icon {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+body:has(.modal-background.show) {
+    overflow: hidden;
+}
+
+.modal-background {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0, 0, 0, .45);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 10px;
+    overscroll-behavior: contain;
+}
+
+.modal-background.show {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 25px 25px 18px 18px;
+    padding: 22px;
+    animation: modalUp .25s ease;
+}
+
+@keyframes modalUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+}
+
+.close-button {
+    border: none;
+    background: var(--blue-light);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.class-day-buttons {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.class-day-button {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.class-day-button.selected {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+.class-day-button.selected:hover {
+    background: #0e4c8d;
+}
+
+.class-day-button:not(.selected):hover {
+    background: var(--light-gray);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 0 6px 3px;
+}
+
+.form-input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 13px;
+    font-size: 15px;
+    outline: none;
+}
+
+.form-input[type="time"],
+.form-input[type="date"] {
+    padding: 13px 8px;
+}
+
+.form-input:focus {
+    border-color: var(--blue);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    min-width: 0;
+}
+
+.form-grid>.form-group {
+    min-width: 0;
+}
+
+textarea.form-input {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+}
+
+.color-option.selected {
+    border-color: var(--text);
+    transform: scale(1.08);
+}
+
+/* Image attach */
+.image-preview-wrap {
+    position: relative;
+    margin-top: 10px;
+}
+
+.image-preview-wrap img {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+}
+
+.image-preview-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .55);
+    color: white;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.thumb-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* Checklists */
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border-radius: 14px;
+    padding: 13px 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 8px;
+}
+
+.checklist-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+}
+
+.checklist-checkbox.checked {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.checklist-item-text {
+    flex: 1;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.checklist-item-text.checked {
+    text-decoration: line-through;
+    color: var(--secondary);
+}
+
+.checklist-item-delete {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+/* Rich notes editor */
+.rich-toolbar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 0 10px;
+}
+
+.rich-toolbar-btn {
+    flex-shrink: 0;
+    background: var(--card);
+    border: none;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.rich-note-textarea {
+    width: 100%;
+    min-height: 50vh;
+    border: none;
+    border-radius: 16px;
+    background: var(--card);
+    color: var(--text);
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.55;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.rich-note-preview {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 50vh;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.rich-note-preview h1,
+.rich-note-preview h2,
+.rich-note-preview h3 {
+    margin: 14px 0 8px;
+}
+
+.rich-note-preview p {
+    margin: 8px 0;
+}
+
+.rich-note-preview ul,
+.rich-note-preview ol {
+    padding-left: 22px;
+    margin: 8px 0;
+}
+
+.rich-note-preview img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 8px 0;
+}
+
+.rich-note-preview code {
+    background: var(--background);
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.rich-note-preview pre code {
+    display: block;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+.mode-toggle {
+    display: flex;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 3px;
+    gap: 3px;
+}
+
+.mode-toggle-btn {
+    border: none;
+    background: none;
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.mode-toggle-btn.active {
+    background: var(--blue);
+    color: white;
+}
+
+.footer {
+    text-align: center;
+    color: var(--secondary);
+    font-size: 11px;
+    padding: 15px 0 5px;
+}
+
+.bottom-nav {
+    position: fixed;
+    z-index: 100;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(calc(100% - 24px), 470px);
+    height: 67px;
+    background: var(--nav);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, .13);
+}
+
+.nav-button {
+    border: none;
+    background: none;
+    height: 100%;
+    flex: 1;
+    color: var(--secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+}
+
+.nav-icon {
+    font-size: 21px;
+    line-height: 22px;
+}
+
+.nav-label {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.nav-button.active {
+    color: var(--blue);
+}
+
+/* Sidebar title row (sits above the nav buttons) — desktop only, shown
+   by the min-width:1024px block below. */
+.sidebar-header {
+    display: none;
+}
+
+/* Sidebar collapse toggle — only ever shown on desktop, positioned by
+   the min-width:1024px block below. */
+.sidebar-toggle {
+    display: none;
+    width: 42px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background: none;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.sidebar-collapsed .sidebar-toggle {
+    width: 100%;
+}
+
+.sidebar-toggle:hover {
+    background: var(--light-gray);
+    color: var(--text);
+}
+
+.sidebar-toggle-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    background-color: currentColor;
+    -webkit-mask: url('Icons/SVG/Sidebar.svg') no-repeat center / contain;
+    mask: url('Icons/SVG/Sidebar.svg') no-repeat center / contain;
+}
+
+/* Flashcards */
+.flip-card {
+    background: transparent;
+    min-height: 220px;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    text-align: center;
+    transition: transform .5s;
+    transform-style: preserve-3d;
+}
+
+.flip-card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    background: var(--blue-light);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    font-size: 18px;
+    font-weight: 650;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+    background: var(--card);
+    border: 1px solid var(--border);
+}
+
+/* Quiz */
+.quiz-question {
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    padding: 10px 5px 22px;
+}
+
+.quiz-option {
+    width: 100%;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 15px;
+    padding: 14px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.quiz-option.correct {
+    border-color: #34c759;
+    background: rgba(52, 199, 89, .12);
+}
+
+.quiz-option.incorrect {
+    border-color: var(--danger);
+    background: rgba(255, 59, 48, .12);
+}
+
+.quiz-score {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.quiz-score-number {
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--blue);
+}
+
+.quiz-help {
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 5px;
+}
+
+.quiz-check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 15px;
+    padding: 13px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.quiz-check-row.selected {
+    border-color: var(--blue);
+    background: var(--blue-light);
+}
+
+.quiz-check-row input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--blue);
+    flex-shrink: 0;
+}
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.password-card {
+    background: var(--card);
+    color: var(--text);
+    border: none;
+    border-radius: 18px;
+    padding: 15px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font: inherit;
+}
+
+.password-card:focus {
+    outline: none;
+}
+
+.password-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.password-type {
+    color: var(--secondary);
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.password-secret {
+    margin-top: 10px;
+    padding: 9px 11px;
+    background: var(--background);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.security-note {
+    background: var(--blue-light);
+    color: var(--secondary);
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+}
+
+@media (max-width: 380px) {
+    .app {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .title {
+        font-size: 30px;
+    }
+
+    .grid {
+        gap: 9px;
+    }
+
+    .button {
+        padding: 16px 13px;
+    }
+
+    .calendar-day {
+        min-height: 48px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== DESKTOP DASHBOARD LAYOUT =====
+   Phone layout above is untouched. Below this breakpoint everything
+   still renders exactly as before; this block only takes effect on
+   wide viewports and turns the bottom tab bar into a left sidebar
+   while letting each page spread out and use the extra width. */
+@media (min-width: 1024px) {
+    body {
+        display: flex;
+    }
+
+    /* Bottom nav becomes a fixed left sidebar */
+    .bottom-nav {
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: none;
+        width: 282px;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+        border-right: 1px solid var(--border);
+        box-shadow: none;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 26px 14px 20px;
+        gap: 3px;
+    }
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 2px 0 2px 10px;
+    }
+
+    .sidebar-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -.5px;
+    }
+
+    .nav-button {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 13px;
+        height: auto;
+        padding: 11px 12px;
+        border-radius: 12px;
+        transition: background .15s;
+    }
+
+    .nav-button:hover {
+        background: var(--card);
+    }
+
+    .nav-button.active {
+        background: var(--blue-light);
+    }
+
+    .nav-icon {
+        font-size: 19px;
+        line-height: 1;
+    }
+
+    .nav-label {
+        font-size: 14.5px;
+        font-weight: 600;
+    }
+
+    /* Content area takes over the rest of the window */
+    .app {
+        max-width: none;
+        width: calc(100% - 282px);
+        min-height: 100vh;
+        margin: 0 0 0 282px;
+        padding: 40px 52px 60px;
+    }
+
+    .page.active {
+        max-width: 1360px;
+        margin: 0 auto;
+        animation: pageIn .25s ease;
+    }
+
+    /* Card stacks become multi-column dashboard grids instead of a
+     single tall column, so the page uses the full width. */
+    .class-list:not(.static),
+    .list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        align-items: start;
+        gap: 14px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(auto, 1fr));
+    }
+
+    .tool-grid {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    }
+
+    .kanban-board {
+        gap: 18px;
+    }
+
+    /* Single-focus form/detail pages get a comfortably narrow panel so
+     everything inside (cards, inputs, buttons) shares one consistent
+     width, instead of capping just the buttons on their own. */
+    #accountPage.page.active,
+    #profileInfo.page.active,
+    #gpa.page.active,
+    #timer.page.active {
+        margin: 0;
+    }
+
+    #richNoteEditor.page.active {
+        max-width: 900px;
+        margin: 0;
+    }
+
+    /* Modals open centered, not as a bottom sheet */
+    .modal-background {
+        align-items: center;
+    }
+
+    .modal {
+        max-width: 560px;
+        border-radius: 22px;
+        animation: modalCenterIn .2s ease;
+    }
+
+    @keyframes modalCenterIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* StudentVUE calendar: a little taller on desktop, same
+     uniform-size + internal-scroll behavior as phone. */
+    .sv-calendar-day {
+        height: 110px;
+    }
+
+    /* Hover feedback for interactive elements — pointer/desktop only,
+     phone keeps its existing tap (:active) feedback untouched. */
+    .class-card,
+    .list-button,
+    .password-card,
+    .setting-row,
+    .profile-card:not(.static),
+    .button,
+    .add-class-button,
+    .primary-button,
+    .secondary-button,
+    .danger-button,
+    .sv-calendar-day:not(.other) {
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .class-card:hover,
+    .list-button:hover,
+    .password-card:hover,
+    .setting-row:hover,
+    .profile-card:not(.static):hover,
+    .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: var(--hover-card-bg);
+    }
+
+    .button:hover .icon,
+    .list-button:hover .list-icon,
+    .password-card-top:hover .list-icon,
+    .setting-row:hover .setting-icon {
+        background: var(--icon-hover-bg);
+    }
+
+    .add-class-button:hover,
+    .primary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--blue) 85%, rgb(73, 131, 212) 35%);
+    }
+
+    .secondary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--blue-light) 75%, var(--blue) 25%);
+    }
+
+    .danger-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: color-mix(in srgb, var(--danger) 20%, transparent);
+    }
+
+    .sv-profile-card:hover {
+        transform: translateY(-2px);
+        background-color: var(--hover-card-bg);
+    }
+
+    .sv-calendar-day:not(.other):hover {
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .13);
+        background: var(--blue-light);
+    }
+
+    .sv-calendar-day.today:hover {
+        background: var(--blue-light);
+    }
+
+    .sv-sim-percent-toggle:hover,
+    .sv-sim-class-toggle:hover {
+        background: var(--blue-light);
+    }
+
+    .sv-assignment-row.sv-sim-clickable:hover {
+        background: var(--light-gray);
+    }
+
+    .icon-button,
+    .close-button,
+    .view-button,
+    .mode-toggle-btn,
+    .rich-toolbar-btn,
+    .app-icon-option,
+    .text-link {
+        transition: filter .15s ease, background .15s ease, color .15s ease;
+    }
+
+    .icon-button:hover,
+    .rich-toolbar-btn:hover,
+    .app-icon-option:hover {
+        background: var(--light-gray);
+    }
+
+    .close-button:hover {
+        background: color-mix(in srgb, var(--blue-light) 70%, var(--blue) 30%);
+    }
+
+    .view-button:hover,
+    .mode-toggle-btn:hover {
+        background: var(--light-gray);
+    }
+
+    .view-button.active:hover,
+    .mode-toggle-btn.active:hover {
+        background: color-mix(in srgb, var(--blue) 85%, black 15%);
+    }
+
+    .text-link:hover {
+        opacity: .75;
+    }
+
+    .calendar-day:hover {
+        background: var(--light-gray);
+    }
+
+    /* Sidebar nav rows */
+    .nav-button:hover {
+        background: var(--light-gray);
+    }
+
+    .arrow {
+        transition: transform .15s ease;
+    }
+
+    .list-button:hover .arrow,
+    .setting-row:hover .arrow {
+        transform: translateX(3px);
+    }
+
+    /* Sidebar collapse toggle — desktop only. Hidden by default (and on
+     phone, via the base .sidebar-toggle rule below); this block just
+     shows it, sitting inline with the title inside .sidebar-header. */
+    .sidebar-toggle {
+        display: flex;
+    }
+
+    /* Collapsed state: icons only, no labels, narrower sidebar. Scoped to
+     body.sidebar-collapsed so it only ever applies on desktop, and only
+     once the user has actually toggled it. */
+    body.sidebar-collapsed .bottom-nav {
+        width: 84px;
+        padding: 26px 10px 20px;
+    }
+
+    body.sidebar-collapsed .sidebar-header {
+        justify-content: center;
+        padding: 2px 0 2px;
+    }
+
+    body.sidebar-collapsed .sidebar-title {
+        display: none;
+    }
+
+    body.sidebar-collapsed .nav-button {
+        justify-content: center;
+        gap: 0;
+        padding: 11px 0;
+    }
+
+    body.sidebar-collapsed .nav-label {
+        display: none;
+    }
+
+    body.sidebar-collapsed .app {
+        width: calc(100% - 84px);
+        margin-left: 84px;
+    }
+}
