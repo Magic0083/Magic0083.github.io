@@ -176,6 +176,17 @@ function renderRecentAccounts() {
 
 function openAccountPage() { accountClearError(); renderRecentAccounts(); openToolPage("accountPage"); }
 
+/* ===== FIRST-RUN START SCREEN ===== */
+const START_SCREEN_SEEN_KEY = "StartScreenSeen";
+function shouldShowStartScreen() { return localStorage.getItem(START_SCREEN_SEEN_KEY) !== "true"; }
+function dismissStartScreen() {
+    localStorage.setItem(START_SCREEN_SEEN_KEY, "true");
+    const el = $("startScreen");
+    if (el) el.classList.add("hidden");
+}
+function startScreenContinueAsGuest() { dismissStartScreen(); }
+function startScreenGoToAuth() { dismissStartScreen(); openAccountPage(); }
+
 function accountSignUp() {
     accountClearError();
     const email = $("accountEmail").value.trim();
@@ -183,7 +194,7 @@ function accountSignUp() {
     if (!email || !password) { accountShowError("Enter an email and password."); return; }
     if (password.length < 6) { accountShowError("Password must be at least 6 characters."); return; }
     auth.createUserWithEmailAndPassword(email, password)
-        .then(() => rememberAccountEmail(email, password))
+        .then(() => { rememberAccountEmail(email, password); dismissStartScreen(); })
         .catch(err => accountShowError(err.message));
 }
 
@@ -193,7 +204,7 @@ function accountLogIn() {
     const password = $("accountPassword").value;
     if (!email || !password) { accountShowError("Enter an email and password."); return; }
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => rememberAccountEmail(email, password))
+        .then(() => { rememberAccountEmail(email, password); dismissStartScreen(); })
         .catch(err => accountShowError(err.message));
 }
 
@@ -239,6 +250,7 @@ function confirmDeleteAccount() {
 
 auth.onAuthStateChanged(user => {
     renderAccountUI(user);
+    if (user) dismissStartScreen();
     if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
     if (!user) { initialSyncDone = false; return; }
     initialSyncDone = false;
@@ -1567,6 +1579,8 @@ function toggleDarkMode() {
     document.body.classList.toggle("dark");
     const isDark = document.body.classList.contains("dark");
     $("darkSwitch").classList.toggle("active", isDark);
+    const toggleBtn = $("darkModeToggleBtn");
+    if (toggleBtn) toggleBtn.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("DarkMode", isDark ? "true" : "false");
     document.querySelector('meta[name="theme-color"]').setAttribute("content", isDark ? "#101114" : "#f4f5f7");
 }
@@ -1575,6 +1589,8 @@ function loadDarkMode() {
     if (localStorage.getItem("DarkMode") === "true") {
         document.body.classList.add("dark");
         $("darkSwitch").classList.add("active");
+        const toggleBtn = $("darkModeToggleBtn");
+        if (toggleBtn) toggleBtn.textContent = "☀️";
         document.querySelector('meta[name="theme-color"]').setAttribute("content", "#101114");
     }
 }
@@ -4420,3 +4436,4 @@ renderTimerDisplay();
 setupAvatarCropDragHandlers();
 setupResetSlideHandlers();
 restoreLastPageOrDefault();
+if (!shouldShowStartScreen()) dismissStartScreen();
