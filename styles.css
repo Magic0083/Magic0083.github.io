@@ -1662,6 +1662,78 @@ textarea {
     cursor: pointer;
 }
 
+/* Light/dark toggle — positioned within the start screen only, since
+   that's the sole place it should appear (see index.html). */
+.dark-mode-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+/* ===== FIRST-RUN START SCREEN =====
+   Shown once, over everything else, until the person logs in, signs
+   up, or explicitly continues as a guest — see the StartScreenSeen
+   flag in script.js. Visible by default in markup/CSS so there's no
+   flash of the app underneath before script.js (loaded at the very
+   end of body) gets a chance to hide it. */
+.start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.start-screen.hidden {
+    display: none;
+}
+
+.start-screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 340px;
+}
+
+.start-screen-logo {
+    width: 84px;
+    height: 84px;
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+}
+
+.start-screen-title {
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin-top: 16px;
+}
+
+.start-screen-buttons {
+    width: 100%;
+    margin-top: 28px;
+}
+
+.start-screen-guest {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 16px 4px 0;
+    cursor: pointer;
+}
+
+.start-screen-guest:hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
 .settings-section {
     margin-bottom: 25px;
 }
