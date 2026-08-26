@@ -339,6 +339,10 @@ let currentChecklistID = null, editingChecklistID = null, selectedChecklistColor
 let timerInterval = null, timerSeconds = 25 * 60, timerIsBreak = false, timerRunning = false, timerCycle = 1;
 
 /* ===== NAVIGATION ===== */
+function recordCurrentPage(pageID) {
+    try { sessionStorage.setItem("lastPageID", pageID); } catch (e) { }
+}
+
 function showPage(pageID, button) {
     $$(".page").forEach(p => p.classList.remove("active"));
     $(pageID).classList.add("active");
@@ -348,18 +352,21 @@ function showPage(pageID, button) {
     if (pageID === "classes") renderClasses();
     if (pageID === "calendar") renderCalendar();
     if (pageID === "home") renderHomeLinks();
+    recordCurrentPage(pageID);
 }
 
 function openToolPage(pageID) {
     $$(".page").forEach(p => p.classList.remove("active"));
     $(pageID).classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    recordCurrentPage(pageID);
 }
 
 function showSettingsFromTools() {
     $$(".page").forEach(p => p.classList.remove("active"));
     $("settings").classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    recordCurrentPage("settings");
 }
 
 function showProfileFromTools() { showSettingsFromTools(); }
@@ -368,6 +375,7 @@ function showToolsFromTool() {
     $$(".page").forEach(p => p.classList.remove("active"));
     $("tools").classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    recordCurrentPage("tools");
 }
 
 function openPage(url) { window.open(url, '_blank'); }
@@ -843,6 +851,7 @@ function renderClasses() {
     classes.forEach(c => {
         const card = document.createElement("div");
         card.className = "class-card";
+        card.dataset.classId = c.id;
         card.onclick = () => openClassModal(c.id);
         let details = c.days;
         if (c.start || c.end) details += " · " + formatTime(c.start) + " – " + formatTime(c.end);
@@ -854,7 +863,265 @@ function renderClasses() {
         ${c.room ? `<div class="class-room">${escapeHTML(c.room)}</div>` : ""}
       `;
         container.appendChild(card);
+        attachClassDragHandlers(card);
     });
+}
+
+/* ===== CLASS CARD DRAG-TO-REORDER ===== */
+function attachClassDragHandlers(card) {
+    const LONG_PRESS_MS = 320;
+    const MOVE_CANCEL_PX = 12;
+    const MOUSE_MOVE_PX = 3;
+
+    let startX = 0, startY = 0;
+    let offsetY = 0;
+    let dragging = false;
+    let suppressClick = false;
+    let placeholder = null;
+    let containerEl = null;
+    let pressTimer = null;
+
+    function clearPress() {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+    }
+
+    function beginDrag(clientY) {
+        dragging = true;
+        containerEl = card.parentElement;
+        const rect = card.getBoundingClientRect();
+        offsetY = clientY - rect.top;
+        // offsetY = rect.height / 2;
+
+        placeholder = document.createElement("div");
+        placeholder.className = "class-card-placeholder";
+        placeholder.style.height = rect.height + "px";
+        containerEl.insertBefore(placeholder, card);
+
+        card.style.width = rect.width + "px";
+        card.style.height = rect.height + "px";
+        card.style.left = rect.left + "px";
+        card.style.top = rect.top + "px";
+        card.style.background = "#3b3c47";
+        card.style.border = "4px solid #5b5c6c";
+        document.body.appendChild(card);
+        card.style.position = "fixed";
+        card.style.zIndex = "9999";
+        card.style.pointerEvents = "none";
+        card.style.cursor = "grabbing";
+        containerEl.classList.add("dragging-in-progress");
+
+        card.getBoundingClientRect();
+        requestAnimationFrame(() => {
+            card.classList.add("dragging-card");
+        });
+
+        if (navigator.vibrate) navigator.vibrate(8);
+    }
+
+    function restingRect(el) {
+        const rect = el.getBoundingClientRect();
+        const t = getComputedStyle(el).transform;
+        if (!t || t === "none") return rect;
+        const match = t.match(/matrix\(([^)]+)\)/);
+        if (!match) return rect;
+        const parts = match[1].split(",").map(Number);
+        const ty = parts.length === 6 ? parts[5] : 0; // matrix(a,b,c,d,tx,ty)
+        if (!ty) return rect;
+        return { top: rect.top - ty, bottom: rect.bottom - ty, height: rect.height, left: rect.left, width: rect.width };
+    }
+
+    function animateSiblingReorder(reorderFn) {
+        const siblings = Array.from(containerEl.children).filter(el => el !== placeholder);
+        const firstRects = new Map();
+        siblings.forEach(el => firstRects.set(el, restingRect(el)));
+
+        reorderFn();
+
+        siblings.forEach(el => {
+            const first = firstRects.get(el);
+            const last = restingRect(el);
+            const deltaY = first.top - last.top;
+            if (!deltaY) return;
+            el.style.transition = "none";
+            el.style.transform = `translateY(${deltaY}px)`;
+            el.getBoundingClientRect(); // force reflow so the jump above registers before animating away
+            requestAnimationFrame(() => {
+                el.style.transition = "transform 0.35s ease";
+                el.style.transform = "";
+            });
+            el.addEventListener("transitionend", () => { el.style.transition = ""; }, { once: true });
+        });
+    }
+
+    function updateDrag(clientY) {
+        card.style.top = (clientY - offsetY) + "px";
+        const siblings = Array.from(containerEl.children).filter(el => el !== placeholder);
+        for (const sib of siblings) {
+            const r = restingRect(sib);
+            const placeholderIsBefore = !!(placeholder.compareDocumentPosition(sib) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+            if (placeholderIsBefore) {
+                const triggerY = r.top + r.height * 0.15;
+                if (clientY >= triggerY) {
+                    animateSiblingReorder(() => containerEl.insertBefore(placeholder, sib.nextSibling));
+                    break;
+                }
+            } else {
+                const triggerY = r.top + r.height * 0.85;
+                if (clientY <= triggerY) {
+                    animateSiblingReorder(() => containerEl.insertBefore(placeholder, sib));
+                    break;
+                }
+            }
+        }
+    }
+
+    function finishDrag() {
+        dragging = false;
+        card.classList.remove("dragging-card");
+        card.style.position = "";
+        card.style.top = "";
+        card.style.left = "";
+        card.style.width = "";
+        card.style.height = "";
+        card.style.background = "";
+        card.style.border = "";
+        card.style.zIndex = "";
+        card.style.pointerEvents = "";
+        card.style.cursor = "";
+        containerEl.classList.remove("dragging-in-progress");
+        containerEl.insertBefore(card, placeholder);
+        placeholder.remove();
+        placeholder = null;
+
+        const newOrderIds = Array.from(containerEl.children).map(el => String(el.dataset.classId));
+        classes.sort((a, b) => newOrderIds.indexOf(String(a.id)) - newOrderIds.indexOf(String(b.id)));
+        save("Classes", classes);
+    }
+
+    card.addEventListener("contextmenu", e => e.preventDefault());
+    card.addEventListener("dragstart", e => e.preventDefault());
+
+    /* ---------- MOUSE (desktop) — instant: picks the card up the moment the
+       mouse moves at all while the button is held down, no wait. A plain
+       click (button pressed and released with no movement) still opens the
+       class modal as normal. ---------- */
+    card.addEventListener("pointerdown", e => {
+        if (e.pointerType !== "mouse" || e.button !== 0) return;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const onMove = ev => {
+            if (dragging && (ev.buttons & 1) === 0) {
+                onUp();
+                return;
+            }
+            if (!dragging) {
+                if (Math.abs(ev.clientX - startX) > MOUSE_MOVE_PX || Math.abs(ev.clientY - startY) > MOUSE_MOVE_PX) {
+                    beginDrag(ev.clientY);
+                    updateDrag(ev.clientY);
+                }
+                return;
+            }
+            ev.preventDefault();
+            updateDrag(ev.clientY);
+        };
+
+        const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            window.removeEventListener("pointercancel", onUp);
+            window.removeEventListener("blur", onUp);
+            if (dragging) {
+                finishDrag();
+                suppressClick = true;
+                setTimeout(() => { suppressClick = false; }, 50);
+            }
+        };
+
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+        window.addEventListener("blur", onUp);
+    });
+
+
+    /* ---------- TOUCH (phone/tablet) — plain Touch Events (more reliable
+       across mobile browsers than Pointer Events for touch). Keeps a brief
+       hold before picking up the card: a vertical swipe on a card is
+       otherwise indistinguishable from "scroll the page", so some hold time
+       is needed to tell the two apart. A quick tap still opens the modal. --- */
+    let touchId = null;
+    let scrolling = false;
+    let scrollStartTop = 0;
+
+    card.addEventListener("touchstart", e => {
+        if (e.touches.length !== 1) return;
+        const t = e.touches[0];
+        touchId = t.identifier;
+        startX = t.clientX;
+        startY = t.clientY;
+        scrolling = false;
+        clearPress();
+        pressTimer = setTimeout(() => beginDrag(startY), LONG_PRESS_MS);
+    }, { passive: true });
+
+    card.addEventListener("touchmove", e => {
+        let t = null;
+        for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === touchId) { t = e.touches[i]; break; }
+        }
+        if (!t) return;
+
+        if (!dragging) {
+            if (scrolling) {
+                e.preventDefault();
+                const scroller = document.scrollingElement || document.documentElement;
+                scroller.scrollTop = scrollStartTop + (startY - t.clientY);
+                return;
+            }
+            const dx = t.clientX - startX;
+            const dy = t.clientY - startY;
+            if (Math.abs(dx) > MOVE_CANCEL_PX || Math.abs(dy) > MOVE_CANCEL_PX) {
+                clearPress();
+                scrolling = true;
+                const scroller = document.scrollingElement || document.documentElement;
+                scrollStartTop = scroller.scrollTop;
+                e.preventDefault();
+                scroller.scrollTop = scrollStartTop + (startY - t.clientY);
+            }
+            return;
+        }
+
+        e.preventDefault();
+        updateDrag(t.clientY);
+    }, { passive: false });
+
+    function endTouch(e) {
+        let ended = false;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === touchId) { ended = true; break; }
+        }
+        if (!ended) return;
+        clearPress();
+        if (dragging) {
+            finishDrag();
+            suppressClick = true;
+            setTimeout(() => { suppressClick = false; }, 50);
+        } else if (scrolling) {
+            suppressClick = true;
+            setTimeout(() => { suppressClick = false; }, 50);
+        }
+        scrolling = false;
+        touchId = null;
+    }
+    card.addEventListener("touchend", endTouch);
+    card.addEventListener("touchcancel", endTouch);
+
+    card.addEventListener("click", e => {
+        if (suppressClick) { e.preventDefault(); e.stopImmediatePropagation(); }
+    }, true);
 }
 
 function openClassModal(id = null) {
@@ -4099,6 +4366,43 @@ function storeIconChoiceForServiceWorker(icon) {
     } catch (e) { /* IndexedDB unavailable — icon still applies via the link tags above */ }
 }
 
+function navButtonFor(pageID) {
+    return document.querySelector(`.nav-button[onclick*="showPage('${pageID}'"]`);
+}
+
+// Pages that just need to be shown again — no extra state (like which note or
+// which class's assignments) to reconstruct.
+const PAGE_RESTORE_MAP = {
+    home: () => showPage("home", navButtonFor("home")),
+    classes: () => showPage("classes", navButtonFor("classes")),
+    calendar: () => showPage("calendar", navButtonFor("calendar")),
+    tools: () => showPage("tools", navButtonFor("tools")),
+    settings: () => showPage("settings", navButtonFor("settings")),
+    todos: openTodos,
+    studysets: openStudySets,
+    gpa: openGPA,
+    timer: openTimer,
+    notes: openNotes,
+    richnotes: openRichNotes,
+    richNoteEditor: openRichNotes, // can't restore which specific note was open
+    checklists: openChecklists,
+    passwords: openPasswordVault,
+    studentvue: openStudentVue,
+    svAssignmentsPage: openStudentVue, // can't restore which class's assignments were open
+    accountPage: openAccountPage,
+    profileInfo: openProfilePage,
+};
+
+function restoreLastPageOrDefault() {
+    let lastPageID = null;
+    try { lastPageID = sessionStorage.getItem("lastPageID"); } catch (e) { }
+    if (lastPageID && PAGE_RESTORE_MAP[lastPageID]) {
+        PAGE_RESTORE_MAP[lastPageID]();
+    } else {
+        applyDefaultStartupPage();
+    }
+}
+
 /* ===== START ===== */
 loadDarkMode();
 loadSidebarCollapsed();
@@ -4115,4 +4419,4 @@ renderHomeLinks();
 renderTimerDisplay();
 setupAvatarCropDragHandlers();
 setupResetSlideHandlers();
-applyDefaultStartupPage();
+restoreLastPageOrDefault();
