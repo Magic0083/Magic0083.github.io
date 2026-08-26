@@ -23,6 +23,22 @@
 </head>
 
 <body>
+    <!-- FIRST-RUN START SCREEN -->
+    <div id="startScreen" class="start-screen">
+        <!-- Light/dark toggle — only shown here, on the start/login screen -->
+        <button id="darkModeToggleBtn" class="icon-button dark-mode-toggle" onclick="toggleDarkMode()"
+            title="Toggle light/dark mode">🌙</button>
+        <div class="start-screen-content">
+            <img src="Favicon.svg" alt="" class="start-screen-logo">
+            <div class="start-screen-title">My Student</div>
+            <div class="start-screen-buttons">
+                <button class="primary-button" onclick="startScreenGoToAuth()">Log In</button>
+                <button class="secondary-button" onclick="startScreenGoToAuth()">Sign Up</button>
+            </div>
+            <button class="start-screen-guest" onclick="startScreenContinueAsGuest()">Continue as Guest</button>
+        </div>
+    </div>
+
     <div class="app">
 
         <!-- HOME -->
